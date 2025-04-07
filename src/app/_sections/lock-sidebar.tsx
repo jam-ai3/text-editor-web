@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { EditorContext } from "@/contexts/editor-provider";
-import { LockOption } from "@/types";
+import { LockOption } from "@/lib/types";
 import { ArrowUpDown, Edit, RefreshCcw } from "lucide-react";
 import { ReactNode, useContext } from "react";
 

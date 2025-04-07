@@ -23,5 +23,7 @@ export default function Editor() {
     }
   }
 
-  return <section className="h-full flex-1">{renderEditor()}</section>;
+  return (
+    <section className="h-full flex-1 overflow-auto">{renderEditor()}</section>
+  );
 }

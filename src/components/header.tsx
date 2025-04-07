@@ -7,7 +7,7 @@ const LOGO_SIZE = 32;
 export default function Header() {
   return (
     <header className="p-4 border-b-2">
-      <nav className="grid grid-cols-3 items-center">
+      <nav className="grid grid-cols-3 items-center w-full">
         <Image
           src="/logo-no-bg.png"
           alt="logo"

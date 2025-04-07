@@ -31,3 +31,5 @@ export const TOOLS = {
 };
 
 export const PLUGINS = [Blockquote, Paragraph];
+
+export const MENU_BUTTON_SIZE = 16;

@@ -112,16 +112,8 @@ body {
   --foreground: oklch(0.145 0 0);
 }
 
-a {
-  color: var(--color-pink);
-}
-
 p {
   margin: 0;
-}
-
-p + p {
-  margin-top: 16px;
 }
 
 kbd,
@@ -137,104 +129,8 @@ code {
   font-size: 14px;
 }
 
-.app {
-  width: 720px;
-  margin: 0 auto 48px;
-}
-
-.editor {
-  position: relative;
-
-  width: 100%;
-  margin-bottom: 48px;
-}
-
-.menu {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  z-index: 1;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  width: calc(100% - 4px);
-  height: 40px;
-  margin: 0;
-  padding: 0 8px;
-
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom: 1px solid var(--color-gray-5);
-  background-color: var(--color-white);
-  color: var(--color-gray-2);
-}
-
-.bubble-menu-dark,
-.bubble-menu-light {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 8px;
-
-  border-radius: 4px;
-}
-
-.bubble-menu-dark {
-  background-color: var(--color-gray-1);
-  color: var(--color-white);
-}
-
-.bubble-menu-light {
-  border: 2px solid var(--color-gray-4);
-  background-color: var(--color-white);
-  color: var(--color-gray-2);
-}
-
-.link-menu {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  /* height: 40px; */
-  padding: 8px;
-
-  border: 2px solid var(--color-gray-5);
-  border-radius: 4px;
-  background-color: var(--color-white);
-}
-
-.button,
-.button-save,
-.button-remove,
 .menu-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 32px;
-
-  margin: 0;
-  padding: 0 8px;
-
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: currentColor;
-
-  font-family: inherit;
-  font-size: inherit;
-  line-height: 1;
-  font-weight: inherit;
-
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.menu-button {
-  width: 32px;
+  width: 24px;
   padding: 0;
 }
 
@@ -251,87 +147,10 @@ code {
   color: var(--color-gray-4);
 }
 
-.button-save {
-  background-color: var(--color-green);
-  color: var(--color-white);
-}
-
-.button-remove {
-  background-color: var(--color-red);
-  color: var(--color-white);
-}
-
-.button-remove:disabled {
-  background-color: var(--color-pale-pink);
-}
-
 /* Basic editor styles */
 .ProseMirror {
-  margin-top: 4px;
-  padding: 48px 8px 8px;
-
+  padding: 8px;
   border: 2px solid var(--color-gray-4);
-  border-radius: 4px;
-}
-
-.editor-mini .ProseMirror {
-  padding-top: 8px;
-}
-
-.ProseMirror-focused {
-  border-color: var(--color-black);
-  outline: none;
-}
-
-.ProseMirror > * + * {
-  margin-top: 16px;
-}
-
-.modal-title {
-  margin: 0 0 24px;
-  font-size: 20px;
-  line-height: 1;
-}
-
-.modal-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 32px;
-  height: 32px;
-
-  border: 0;
-  border-radius: 4px;
-  background-color: transparent;
-  cursor: pointer;
-}
-
-.modal-close:hover {
-  background-color: var(--color-gray-5);
-  color: var(--color-black);
-}
-
-.modal-input {
-  width: 100%;
-  height: 40px;
-
-  margin-bottom: 16px;
-
-  border: 2px solid var(--color-gray-5);
-  border-radius: 4px;
-
-  font-size: inherit;
-}
-
-.modal-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
 }
 
 .dark {
@@ -379,4 +198,22 @@ code {
 
 svg {
   display: inline-block;
+}
+
+/* Custom Styles */
+
+:root {
+  --custom-accent: rgb(4, 153, 4);
+  --custom-accent-dark: rgb(3, 128, 3);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button:hover {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
 }

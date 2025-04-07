@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { ReactNode, useCallback } from "react";
 import classNames from "classnames";
 import { EditorContent, Editor, BubbleMenu } from "@tiptap/react";
 
@@ -11,12 +11,14 @@ import {
   Strikethrough,
   UnderlineIcon,
 } from "lucide-react";
+import { MENU_BUTTON_SIZE } from "@/lib/constants";
 
 type EditorProps = {
   editor: Editor;
+  popupButtons?: ReactNode;
 };
 
-export default function PopupEditor({ editor }: EditorProps) {
+export default function PopupEditor({ editor, popupButtons }: EditorProps) {
   const toggleBold = useCallback(() => {
     editor.chain().focus().toggleBold().run();
   }, [editor]);
@@ -42,14 +44,15 @@ export default function PopupEditor({ editor }: EditorProps) {
   }
 
   return (
-    <div className="editor editor-mini">
+    <div className="relative w-full">
       <BubbleMenu
         pluginKey="bubbleMenuText"
-        className="bubble-menu-dark"
+        className="flex items-center gap-2 p-2 rounded-md bg-secondary border-2 max-w-max"
         tippyOptions={{ duration: 150 }}
         editor={editor}
-        shouldShow={({ editor, view, state, oldState, from, to }) => {
+        shouldShow={({ from, to }) => {
           // only show if range is selected.
+          // other args: editor, view, state, oldState
           return from !== to;
         }}
       >
@@ -58,14 +61,14 @@ export default function PopupEditor({ editor }: EditorProps) {
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
         >
-          <ArrowLeftCircle />
+          <ArrowLeftCircle size={MENU_BUTTON_SIZE} />
         </button>
         <button
           className="menu-button"
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
         >
-          <ArrowRightCircle />
+          <ArrowRightCircle size={MENU_BUTTON_SIZE} />
         </button>
         <button
           className={classNames("menu-button", {
@@ -73,7 +76,7 @@ export default function PopupEditor({ editor }: EditorProps) {
           })}
           onClick={toggleBold}
         >
-          <BoldIcon />
+          <BoldIcon size={MENU_BUTTON_SIZE} />
         </button>
         <button
           className={classNames("menu-button", {
@@ -81,7 +84,7 @@ export default function PopupEditor({ editor }: EditorProps) {
           })}
           onClick={toggleUnderline}
         >
-          <UnderlineIcon />
+          <UnderlineIcon size={MENU_BUTTON_SIZE} />
         </button>
         <button
           className={classNames("menu-button", {
@@ -89,7 +92,7 @@ export default function PopupEditor({ editor }: EditorProps) {
           })}
           onClick={toggleItalic}
         >
-          <ItalicIcon />
+          <ItalicIcon size={MENU_BUTTON_SIZE} />
         </button>
         <button
           className={classNames("menu-button", {
@@ -97,7 +100,7 @@ export default function PopupEditor({ editor }: EditorProps) {
           })}
           onClick={toggleStrike}
         >
-          <Strikethrough />
+          <Strikethrough size={MENU_BUTTON_SIZE} />
         </button>
         <button
           className={classNames("menu-button", {
@@ -105,8 +108,9 @@ export default function PopupEditor({ editor }: EditorProps) {
           })}
           onClick={toggleCode}
         >
-          <CodeIcon />
+          <CodeIcon size={MENU_BUTTON_SIZE} />
         </button>
+        {popupButtons}
       </BubbleMenu>
       <EditorContent editor={editor} />
     </div>
