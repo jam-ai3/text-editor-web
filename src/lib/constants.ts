@@ -32,4 +32,6 @@ export const TOOLS = {
 
 export const PLUGINS = [Blockquote, Paragraph];
 
+export const MAX_CONTEXT_LENGTH = 100;
+
 export const MENU_BUTTON_SIZE = 16;

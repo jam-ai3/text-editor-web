@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { Textarea } from "@/components/ui/textarea";
 import ChatSelection from "./_components/chat-selection";
-import { ChatHandler } from "../_actions/chat";
+import { handleChat } from "../_actions/chat";
 import ChatHistory from "./_components/chat-history";
 
 export default function ChatWindow() {
@@ -32,10 +32,10 @@ function ChatBox() {
   const [input, setInput] = useState("");
   const [isChatLoading, setIsChatLoading] = useState(false);
 
-  async function handleChat() {
+  async function handleChatSubmit() {
     if (!input) return;
     setIsChatLoading(true);
-    await ChatHandler.handleChat(input, context);
+    await handleChat(input, context);
     setInput("");
     setIsChatLoading(false);
   }
@@ -53,7 +53,7 @@ function ChatBox() {
         />
         <Button
           variant="accent"
-          onClick={handleChat}
+          onClick={handleChatSubmit}
           disabled={isChatLoading || !input}
           className="w-full"
         >

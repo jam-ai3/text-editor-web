@@ -3,12 +3,18 @@
 import PopupEditor from "@/components/editor/editor";
 import { EditorContext } from "@/contexts/editor-provider";
 import { useContext, useEffect } from "react";
-import { processKeydown, MetakeyHandler } from "../../_actions/editor";
+import {
+  handleGrammar,
+  handleLengthen,
+  handleShorten,
+  processKeydown,
+} from "../../_actions/editor";
 import { Edit, MessageCircle, Minus, Plus } from "lucide-react";
-import { ChatHandler } from "../../_actions/chat";
+import { chatWithSelection } from "../../_actions/chat";
 import { MENU_BUTTON_SIZE } from "@/lib/constants";
 
 // TODO: make sure selection isn't too long
+// TODO: add buttons to accept and reject autocomplete and diffs
 export default function AllEditor() {
   const context = useContext(EditorContext);
 
@@ -34,28 +40,19 @@ function PopupButtons() {
   return (
     <>
       <span className="text-2xl">|</span>
-      <button
-        className="menu-button"
-        onClick={() => MetakeyHandler.handleShorten(context)}
-      >
+      <button className="menu-button" onClick={() => handleShorten(context)}>
         <Minus size={MENU_BUTTON_SIZE} />
       </button>
-      <button
-        className="menu-button"
-        onClick={() => MetakeyHandler.handleLengthen(context)}
-      >
+      <button className="menu-button" onClick={() => handleLengthen(context)}>
         <Plus size={MENU_BUTTON_SIZE} />
       </button>
-      <button
-        className="menu-button"
-        onClick={() => MetakeyHandler.handleGrammar(context)}
-      >
+      <button className="menu-button" onClick={() => handleGrammar(context)}>
         <Edit size={MENU_BUTTON_SIZE} />
       </button>
       <span className="text-2xl">|</span>
       <button
         className="menu-button"
-        onClick={() => ChatHandler.chatWithSelection(context)}
+        onClick={() => chatWithSelection(context)}
       >
         <MessageCircle size={MENU_BUTTON_SIZE} />
       </button>
