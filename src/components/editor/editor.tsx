@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback } from "react";
+import { ElementType, useCallback } from "react";
 import classNames from "classnames";
 import { EditorContent, Editor, BubbleMenu } from "@tiptap/react";
 
@@ -15,10 +15,10 @@ import { MENU_BUTTON_SIZE } from "@/lib/constants";
 
 type EditorProps = {
   editor: Editor;
-  popupButtons?: ReactNode;
+  PopupButtons?: ElementType;
 };
 
-export default function PopupEditor({ editor, popupButtons }: EditorProps) {
+export default function PopupEditor({ editor, PopupButtons }: EditorProps) {
   const toggleBold = useCallback(() => {
     editor.chain().focus().toggleBold().run();
   }, [editor]);
@@ -110,7 +110,7 @@ export default function PopupEditor({ editor, popupButtons }: EditorProps) {
         >
           <CodeIcon size={MENU_BUTTON_SIZE} />
         </button>
-        {popupButtons}
+        {PopupButtons && <PopupButtons />}
       </BubbleMenu>
       <EditorContent editor={editor} />
     </div>

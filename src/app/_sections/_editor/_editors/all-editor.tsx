@@ -12,7 +12,7 @@ import {
 } from "../../_actions/editor";
 import { ArrowLeftRight, Edit, MessageCircle, Minus, Plus } from "lucide-react";
 import { chatWithSelection } from "../../_actions/chat";
-import { MENU_BUTTON_SIZE } from "@/lib/constants";
+import PopupButton, { PopupDivider } from "@/components/editor/popup-button";
 
 // TODO: make sure selection isn't too long
 // TODO: add buttons to accept and reject autocomplete and diffs
@@ -30,36 +30,19 @@ export default function AllEditor() {
 
   if (!context.editor) return null;
 
-  return (
-    <PopupEditor editor={context.editor} popupButtons={<PopupButtons />} />
-  );
+  return <PopupEditor editor={context.editor} PopupButtons={PopupButtons} />;
 }
 
 function PopupButtons() {
-  const context = useContext(EditorContext);
-
   return (
     <>
-      <span className="text-2xl">|</span>
-      <button className="menu-button" onClick={() => handleShorten(context)}>
-        <Minus size={MENU_BUTTON_SIZE} />
-      </button>
-      <button className="menu-button" onClick={() => handleLengthen(context)}>
-        <Plus size={MENU_BUTTON_SIZE} />
-      </button>
-      <button className="menu-button" onClick={() => handleGrammar(context)}>
-        <Edit size={MENU_BUTTON_SIZE} />
-      </button>
-      <button className="menu-button" onClick={() => handleReorder(context)}>
-        <ArrowLeftRight size={MENU_BUTTON_SIZE} />
-      </button>
-      <span className="text-2xl">|</span>
-      <button
-        className="menu-button"
-        onClick={() => chatWithSelection(context)}
-      >
-        <MessageCircle size={MENU_BUTTON_SIZE} />
-      </button>
+      <PopupDivider />
+      <PopupButton Component={Minus} onClick={handleShorten} />
+      <PopupButton Component={Plus} onClick={handleLengthen} />
+      <PopupButton Component={Edit} onClick={handleGrammar} />
+      <PopupButton Component={ArrowLeftRight} onClick={handleReorder} />
+      <PopupDivider />
+      <PopupButton Component={MessageCircle} onClick={chatWithSelection} />
     </>
   );
 }
