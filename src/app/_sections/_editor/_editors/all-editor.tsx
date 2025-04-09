@@ -6,10 +6,11 @@ import { useContext, useEffect } from "react";
 import {
   handleGrammar,
   handleLengthen,
+  handleReorder,
   handleShorten,
   processKeydown,
 } from "../../_actions/editor";
-import { Edit, MessageCircle, Minus, Plus } from "lucide-react";
+import { ArrowLeftRight, Edit, MessageCircle, Minus, Plus } from "lucide-react";
 import { chatWithSelection } from "../../_actions/chat";
 import { MENU_BUTTON_SIZE } from "@/lib/constants";
 
@@ -48,6 +49,9 @@ function PopupButtons() {
       </button>
       <button className="menu-button" onClick={() => handleGrammar(context)}>
         <Edit size={MENU_BUTTON_SIZE} />
+      </button>
+      <button className="menu-button" onClick={() => handleReorder(context)}>
+        <ArrowLeftRight size={MENU_BUTTON_SIZE} />
       </button>
       <span className="text-2xl">|</span>
       <button

@@ -6,6 +6,7 @@ import {
   getGrammar,
   getLengthened,
   getShortened,
+  reorderParagraph,
 } from "./gemini";
 import { EditorContextType } from "@/contexts/editor-provider";
 
@@ -176,6 +177,14 @@ export async function handleGrammar(context: EditorContextType) {
   const response = await getGrammar("", content);
   showDiff(context, response);
   context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+}
+
+export async function handleReorder(context: EditorContextType) {
+  if (!context.editor) return;
+  const { from, to } = context.editor.state.selection;
+  const content = context.editor.getText().substring(from, to);
+  const response = await reorderParagraph("", content);
+  showDiff(context, response);
 }
 
 // Generic Gemini functions
