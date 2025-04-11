@@ -10,7 +10,7 @@ export default function LockSidebar() {
   const { lock, setLock } = useContext(EditorContext);
 
   return (
-    <ul className="flex flex-col gap-4 bg-secondary py-4 px-2 w-fit h-full">
+    <ul className="flex flex-col gap-4 bg-secondary px-2 py-4 w-fit h-full">
       <li>
         <LockButton lock="produce" currentLock={lock} setLock={setLock}>
           <Edit />

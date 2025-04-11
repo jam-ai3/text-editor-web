@@ -10,7 +10,7 @@ import {
   handleShorten,
   processKeydown,
 } from "../../_actions/editor";
-import { ArrowLeftRight, Edit, MessageCircle, Minus, Plus } from "lucide-react";
+import { ArrowUpDown, Edit, MessageCircle, Minus, Plus } from "lucide-react";
 import { chatWithSelection } from "../../_actions/chat";
 import PopupButton, { PopupDivider } from "@/components/editor/popup-button";
 
@@ -40,7 +40,7 @@ function PopupButtons() {
       <PopupButton Component={Minus} onClick={handleShorten} />
       <PopupButton Component={Plus} onClick={handleLengthen} />
       <PopupButton Component={Edit} onClick={handleGrammar} />
-      <PopupButton Component={ArrowLeftRight} onClick={handleReorder} />
+      <PopupButton Component={ArrowUpDown} onClick={handleReorder} />
       <PopupDivider />
       <PopupButton Component={MessageCircle} onClick={chatWithSelection} />
     </>

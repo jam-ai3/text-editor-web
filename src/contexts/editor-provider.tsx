@@ -27,6 +27,10 @@ export type EditorContextType = {
   setAdditions: Dispatch<SetStateAction<EditorAdditions>>;
 };
 
+export type CheckedEditorContextType = EditorContextType & {
+  editor: Editor;
+};
+
 export const EditorContext = createContext<EditorContextType>({
   editor: null,
   lock: "all",

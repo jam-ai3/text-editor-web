@@ -47,7 +47,7 @@ export default function PopupEditor({ editor, PopupButtons }: EditorProps) {
     <div className="relative w-full">
       <BubbleMenu
         pluginKey="bubbleMenuText"
-        className="flex items-center gap-2 p-2 rounded-md bg-secondary border-2 max-w-max"
+        className="flex items-center gap-2 bg-secondary p-2 border-2 rounded-md max-w-max"
         tippyOptions={{ duration: 150 }}
         editor={editor}
         shouldShow={({ from, to }) => {

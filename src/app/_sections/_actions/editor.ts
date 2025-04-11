@@ -187,7 +187,7 @@ export async function handleReorder(context: EditorContextType) {
   showDiff(context, response);
 }
 
-// Generic Gemini functions
+// Generic Gemini and helper functions
 
 type GeminiOutput = {
   improved: string;

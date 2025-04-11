@@ -7,15 +7,15 @@ const LOGO_SIZE = 32;
 export default function Header() {
   return (
     <header className="p-4 border-b-2">
-      <nav className="grid grid-cols-3 items-center w-full">
+      <nav className="items-center grid grid-cols-3 w-full">
         <Image
           src="/logo-no-bg.png"
           alt="logo"
           width={LOGO_SIZE}
           height={LOGO_SIZE}
         />
-        <h1 className="justify-self-center text-xl font-bold">Text Editor</h1>
-        <ul className="flex gap-4 justify-self-end">
+        <h1 className="justify-self-center font-bold text-xl">Text Editor</h1>
+        <ul className="flex justify-self-end gap-4">
           <li>
             <Button>
               <span>Export</span>
