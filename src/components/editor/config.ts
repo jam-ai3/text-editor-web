@@ -9,6 +9,7 @@ import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
+import Highlight from "@tiptap/extension-highlight";
 
 export const editorConfig = {
   extensions: [
@@ -16,6 +17,7 @@ export const editorConfig = {
     History,
     Paragraph,
     Text,
+    Highlight.configure({ multicolor: true }),
     // Link.configure({
     //   openOnClick: false
     // }),

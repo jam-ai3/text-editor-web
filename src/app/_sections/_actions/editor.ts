@@ -101,7 +101,7 @@ function handleRejectDiff(event: KeyboardEvent, context: EditorContextType) {
       to: start + currentLength + incomingLength,
     })
     .setTextSelection({ from: start, to: start + currentLength })
-    .setColor("#000")
+    .unsetHighlight()
     .setTextSelection({
       from: start + currentLength,
       to: start + currentLength,
@@ -208,13 +208,15 @@ function showDiff(context: EditorContextType, newText: string) {
   if (!context.editor) return;
   const incoming = parseGeminiOutput(newText).improved;
   const { from, to } = context.editor.state.selection;
-  context.editor.chain().focus().setColor("#d00").run();
+  // context.editor.chain().focus().setColor("#d00").run();
+  context.editor.chain().focus().toggleHighlight({ color: "#f006" }).run();
   context.editor
     .chain()
     .focus()
     .insertContentAt(to, incoming)
     .setTextSelection({ from: to, to: to + incoming.length })
-    .setColor("#0b0")
+    .toggleHighlight({ color: "#0d06" })
+    // .setColor("#0b0")
     .setTextSelection({ from, to: from })
     .run();
   const current = context.editor.getText().substring(from, to);
