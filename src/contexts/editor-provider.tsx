@@ -15,6 +15,9 @@ import {
 
 export type EditorContextType = {
   editor: Editor | null;
+  documentId: string;
+  title: string;
+  setTitle: Dispatch<SetStateAction<string>>;
   lock: LockOption;
   setLock: Dispatch<SetStateAction<LockOption>>;
   isChatOpen: boolean;
@@ -33,6 +36,9 @@ export type CheckedEditorContextType = EditorContextType & {
 
 export const EditorContext = createContext<EditorContextType>({
   editor: null,
+  documentId: "",
+  title: "",
+  setTitle: () => {},
   lock: "all",
   setLock: () => {},
   isChatOpen: false,
@@ -46,13 +52,19 @@ export const EditorContext = createContext<EditorContextType>({
 });
 
 type EditorProviderProps = {
+  docId?: string;
   children: ReactNode;
 };
 
 const CHAT_LOCAL_STORAGE_KEY = "isChatOpen";
 
-export default function EditorProvider({ children }: EditorProviderProps) {
+export default function EditorProvider({
+  docId,
+  children,
+}: EditorProviderProps) {
   const editor = useEditor(editorConfig);
+  const [documentId] = useState(docId ?? crypto.randomUUID());
+  const [title, setTitle] = useState("");
   const [lock, setLock] = useState<LockOption>("all");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatSelection, setChatSelection] = useState<string | null>(null);
@@ -82,6 +94,9 @@ export default function EditorProvider({ children }: EditorProviderProps) {
     <EditorContext.Provider
       value={{
         editor,
+        documentId,
+        title,
+        setTitle,
         lock,
         setLock,
         isChatOpen,

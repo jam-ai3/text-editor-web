@@ -18,8 +18,6 @@ export async function processKeydown(
     tabOnKeydown(event, context);
   } else if (event.key === "Escape") {
     escapeOnKeydown(event, context);
-  } else if (context.additions.diff || context.additions.suggestion) {
-    event.preventDefault();
   } else if (event.metaKey) {
     await metakeyOnKeydown(event, context);
   }
@@ -32,12 +30,12 @@ function tabOnKeydown(event: KeyboardEvent, context: EditorContextType) {
   handleAcceptDiff(event, context);
 }
 
-function handleAcceptAutocomplete(
-  event: KeyboardEvent,
+export function handleAcceptAutocomplete(
+  event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
   if (!context.editor || !context.additions.suggestion) return;
-  event.preventDefault();
+  event?.preventDefault();
   const start = context.additions.suggestion.pos;
   const end = start + context.additions.suggestion.content.length;
   context.editor
@@ -50,9 +48,12 @@ function handleAcceptAutocomplete(
   context.setAdditions({ ...context.additions, suggestion: null });
 }
 
-function handleAcceptDiff(event: KeyboardEvent, context: EditorContextType) {
+export function handleAcceptDiff(
+  event: KeyboardEvent | undefined,
+  context: EditorContextType
+) {
   if (!context.editor || !context.additions.diff) return;
-  event.preventDefault();
+  event?.preventDefault();
   const { current, incoming, pos: start } = context.additions.diff;
   const currentEnd = start + current.length;
   const incomingEnd = start + incoming.length;
@@ -61,7 +62,7 @@ function handleAcceptDiff(event: KeyboardEvent, context: EditorContextType) {
     .focus()
     .deleteRange({ from: start, to: currentEnd })
     .setTextSelection({ from: start, to: incomingEnd })
-    .setColor("#000")
+    .unsetHighlight()
     .setTextSelection({ from: incomingEnd, to: incomingEnd })
     .run();
   context.setAdditions({ ...context.additions, diff: null });
@@ -75,21 +76,24 @@ function escapeOnKeydown(event: KeyboardEvent, context: EditorContextType) {
   if (context.additions.suggestion) handleRejectAutocomplete(event, context);
 }
 
-function handleRejectAutocomplete(
-  event: KeyboardEvent,
+export function handleRejectAutocomplete(
+  event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
   if (!context.editor || !context.additions.suggestion) return;
-  event.preventDefault();
+  event?.preventDefault();
   const start = context.additions.suggestion.pos;
   const end = start + context.additions.suggestion.content.length;
   context.editor.chain().focus().deleteRange({ from: start, to: end }).run();
   context.setAdditions({ ...context.additions, suggestion: null });
 }
 
-function handleRejectDiff(event: KeyboardEvent, context: EditorContextType) {
+export function handleRejectDiff(
+  event: KeyboardEvent | undefined,
+  context: EditorContextType
+) {
   if (!context.editor || !context.additions.diff) return;
-  event.preventDefault();
+  event?.preventDefault();
   const start = context.additions.diff.pos;
   const currentLength = context.additions.diff.current.length;
   const incomingLength = context.additions.diff.incoming.length;
@@ -208,15 +212,13 @@ function showDiff(context: EditorContextType, newText: string) {
   if (!context.editor) return;
   const incoming = parseGeminiOutput(newText).improved;
   const { from, to } = context.editor.state.selection;
-  // context.editor.chain().focus().setColor("#d00").run();
-  context.editor.chain().focus().toggleHighlight({ color: "#f006" }).run();
+  context.editor.chain().focus().toggleHighlight({ color: "#f005" }).run();
   context.editor
     .chain()
     .focus()
     .insertContentAt(to, incoming)
     .setTextSelection({ from: to, to: to + incoming.length })
-    .toggleHighlight({ color: "#0d06" })
-    // .setColor("#0b0")
+    .toggleHighlight({ color: "#0d05" })
     .setTextSelection({ from, to: from })
     .run();
   const current = context.editor.getText().substring(from, to);
