@@ -2,6 +2,7 @@
 
 import { editorConfig } from "@/components/editor/config";
 import { ChatMessage, EditorAdditions, LockOption } from "@/lib/types";
+import { Document } from "@prisma/client";
 import { Editor } from "@tiptap/core";
 import { useEditor } from "@tiptap/react";
 import {
@@ -52,19 +53,19 @@ export const EditorContext = createContext<EditorContextType>({
 });
 
 type EditorProviderProps = {
-  docId?: string;
+  document?: Document | null;
   children: ReactNode;
 };
 
 const CHAT_LOCAL_STORAGE_KEY = "isChatOpen";
 
 export default function EditorProvider({
-  docId,
+  document,
   children,
 }: EditorProviderProps) {
-  const editor = useEditor(editorConfig);
-  const [documentId] = useState(docId ?? crypto.randomUUID());
-  const [title, setTitle] = useState("");
+  const editor = useEditor(editorConfig(document?.content ?? ""));
+  const [documentId] = useState(document?.id ?? crypto.randomUUID());
+  const [title, setTitle] = useState(document?.title ?? "");
   const [lock, setLock] = useState<LockOption>("all");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatSelection, setChatSelection] = useState<string | null>(null);

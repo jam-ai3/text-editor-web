@@ -11,7 +11,7 @@ import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import Highlight from "@tiptap/extension-highlight";
 
-export const editorConfig = {
+export const editorConfig = (content: string) => ({
   extensions: [
     Document,
     History,
@@ -32,5 +32,5 @@ export const editorConfig = {
     // OrderedList,
     // ListItem,
   ],
-  content: "",
-};
+  content,
+});

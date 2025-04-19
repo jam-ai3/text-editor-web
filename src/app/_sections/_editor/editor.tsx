@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { EditorContext } from "@/contexts/editor-provider";
 import AllEditor from "./_editors/all-editor";
 import ProduceEditor from "./_editors/produce-editor";
@@ -14,14 +14,22 @@ type EditorProps = {
 
 export default function Editor({ userId }: EditorProps) {
   const { lock, editor, title, documentId } = useContext(EditorContext);
+  const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    function handleSave(prevTitle: string, prevHtml: string) {
-      if (editor && (prevHtml !== editor.getHTML() || prevTitle !== title)) {
-        saveDocument(documentId, editor.getHTML(), title, userId);
-      }
-    }
-  }, []);
+    // use debounce to save document after 3 seconds of no typing
+    if (saveTimer) clearTimeout(saveTimer);
+    setSaveTimer(
+      setTimeout(() => {
+        if (editor) {
+          saveDocument(documentId, editor.getHTML(), title, userId);
+        }
+      }, 3000)
+    );
+    return () => {
+      if (saveTimer) clearTimeout(saveTimer);
+    };
+  }, [editor?.getHTML()]);
 
   function renderEditor() {
     switch (lock) {
