@@ -154,6 +154,10 @@ export function Tooltip({ children, ...props }: TooltipProviderProps) {
   );
 }
 
+interface CustomHTMLProps extends React.HTMLAttributes<HTMLElement> {
+  "data-tooltip-state": string;
+}
+
 export const TooltipTrigger = React.forwardRef<
   HTMLElement,
   TooltipTriggerProps
@@ -173,9 +177,9 @@ export const TooltipTrigger = React.forwardRef<
         ref,
         ...props,
         // TODO: fix type
-        ...(children.props as any),
+        ...(children.props as React.ReactElement),
         "data-tooltip-state": context.open ? "open" : "closed",
-      })
+      } as CustomHTMLProps)
     );
   }
 

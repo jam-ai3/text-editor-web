@@ -144,6 +144,10 @@ interface TriggerElementProps extends React.HTMLProps<HTMLElement> {
   asChild?: boolean;
 }
 
+interface CustomHTMLProps extends React.HTMLAttributes<HTMLElement> {
+  "data-state": string;
+}
+
 const PopoverTrigger = React.forwardRef<HTMLElement, TriggerElementProps>(
   function PopoverTrigger({ children, asChild = false, ...props }, propRef) {
     const context = usePopoverContext();
@@ -161,9 +165,9 @@ const PopoverTrigger = React.forwardRef<HTMLElement, TriggerElementProps>(
           ref,
           ...props,
           // TODO: fix type
-          ...(children.props as any),
+          ...(children.props as React.ReactElement),
           "data-state": context.open ? "open" : "closed",
-        })
+        } as CustomHTMLProps)
       );
     }
 
