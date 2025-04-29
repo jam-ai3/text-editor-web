@@ -1,6 +1,11 @@
 "use client";
 
 import {
+  acceptDiff,
+  insertDiff,
+  rejectDiff,
+} from "@/components/editor/extensions";
+import {
   getAutocomplete,
   getGrammar,
   getLengthened,
@@ -8,7 +13,6 @@ import {
   reorderSentences,
 } from "./gemini";
 import { EditorContextType } from "@/contexts/editor-provider";
-import { ACCEPT_COLOR, REJECT_COLOR } from "@/lib/constants";
 import { Editor } from "@tiptap/core";
 
 export async function processKeydown(
@@ -72,17 +76,8 @@ export function handleAcceptDiff(
 ) {
   if (!context.editor || !context.additions.diff) return;
   event?.preventDefault();
-  const { current, incoming, pos: start } = context.additions.diff;
-  const currentEnd = start + current.length;
-  const incomingEnd = start + incoming.length;
-  context.editor
-    .chain()
-    .focus()
-    .deleteRange({ from: start, to: currentEnd })
-    .setTextSelection({ from: start, to: incomingEnd })
-    .unsetHighlight()
-    .setTextSelection({ from: incomingEnd + 1, to: incomingEnd + 1 })
-    .run();
+  const { current, incoming, pos } = context.additions.diff;
+  acceptDiff(context.editor, pos, current, incoming);
   context.setAdditions({ ...context.additions, diff: null });
   context.setReasoning(null);
 }
@@ -122,23 +117,8 @@ export function handleRejectDiff(
 ) {
   if (!context.editor || !context.additions.diff) return;
   event?.preventDefault();
-  const start = context.additions.diff.pos;
-  const currentLength = context.additions.diff.current.length;
-  const incomingLength = context.additions.diff.incoming.length;
-  context.editor
-    .chain()
-    .focus()
-    .deleteRange({
-      from: start + currentLength,
-      to: start + currentLength + incomingLength + 1,
-    })
-    .setTextSelection({ from: start, to: start + currentLength })
-    .unsetHighlight()
-    .setTextSelection({
-      from: start + currentLength,
-      to: start + currentLength,
-    })
-    .run();
+  const { current, incoming, pos } = context.additions.diff;
+  rejectDiff(context.editor, pos, current, incoming);
   context.setAdditions({ ...context.additions, diff: null });
   context.setReasoning(null);
 }
@@ -191,7 +171,7 @@ async function handleAutocomplete(context: EditorContextType) {
     .deleteRange({
       from: position + improved.length - 1,
       to: position + improved.length,
-    }) // removes newline
+    })
     .run();
   context.setAdditions((prev) => ({
     ...prev,
@@ -255,17 +235,8 @@ function showDiff(context: EditorContextType, newText: string) {
     const yPos = getCaretYPosition(context.editor) ?? 0;
     context.setReasoning({ text: reasoning, yPos });
   }
-  const { from, to } = context.editor.state.selection;
-  context.editor.chain().focus().toggleHighlight({ color: REJECT_COLOR }).run();
-  context.editor
-    .chain()
-    .focus()
-    .insertContentAt(to, incoming)
-    .setTextSelection({ from: to, to: to + incoming.length })
-    .toggleHighlight({ color: ACCEPT_COLOR })
-    .setTextSelection({ from, to: from })
-    .run();
-  const current = context.editor.getText().substring(from, to);
+  if (incoming.trim().length === 0) return;
+  const { current, from } = insertDiff(context.editor, incoming);
   context.setAdditions((prev) => ({
     ...prev,
     diff: { current, incoming, pos: from },

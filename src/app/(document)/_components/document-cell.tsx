@@ -82,7 +82,7 @@ export default function DocumentCell({ document }: DocumentCellProps) {
       <CardContent>{getDocumentPreview(document.content)}</CardContent>
       <CardFooter className="mt-auto">
         <Button asChild className="w-full">
-          <Link href={`/${document.id}`}>
+          <Link href={`/document/${document.id}`}>
             <span>Edit</span>
             <Edit />
           </Link>

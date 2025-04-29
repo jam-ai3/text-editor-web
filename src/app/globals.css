@@ -134,3 +134,8 @@
 button {
   cursor: pointer;
 }
+
+.suggestion-text {
+  color: #777;
+  font-style: italic;
+}

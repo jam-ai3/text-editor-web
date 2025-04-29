@@ -1,6 +1,6 @@
 export const LANDING_PAGE_URL = "/home";
 export const MAIN_SITE_URL = "https://jamai.dev";
-export const UNAUTH_REDIRECT_PATH = `${MAIN_SITE_URL}/login`;
+export const UNAUTH_REDIRECT_PATH = `${MAIN_SITE_URL}/login?from=write`;
 
 export const MD_WIDTH = 768;
 export const MAX_CONTEXT_LENGTH = 100;

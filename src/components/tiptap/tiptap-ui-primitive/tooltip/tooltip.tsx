@@ -176,7 +176,6 @@ export const TooltipTrigger = React.forwardRef<
       context.getReferenceProps({
         ref,
         ...props,
-        // TODO: fix type
         ...(children.props as React.ReactElement),
         "data-tooltip-state": context.open ? "open" : "closed",
       } as CustomHTMLProps)

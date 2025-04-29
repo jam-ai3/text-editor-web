@@ -164,7 +164,6 @@ const PopoverTrigger = React.forwardRef<HTMLElement, TriggerElementProps>(
         context.getReferenceProps({
           ref,
           ...props,
-          // TODO: fix type
           ...(children.props as React.ReactElement),
           "data-state": context.open ? "open" : "closed",
         } as CustomHTMLProps)
