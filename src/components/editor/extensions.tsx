@@ -98,17 +98,19 @@ export function insertSuggestion(editor: Editor, suggestion: string) {
   });
 }
 
-export function accpetSuggestion(
-  editor: Editor,
-  from: number,
-  suggestion: string
-) {}
+// export function accpetSuggestion(
+//   editor: Editor,
+//   from: number,
+//   suggestion: string
+// ) {
+// }
 
-export function rejectSuggestion(
-  editor: Editor,
-  from: number,
-  suggestion: string
-) {}
+// export function rejectSuggestion(
+//   editor: Editor,
+//   from: number,
+//   suggestion: string
+// ) {
+// }
 
 export function insertDiff(editor: Editor, incoming: string) {
   const { from, to } = editor.state.selection;
