@@ -22,6 +22,7 @@ type EmptyDocumentsViewProps = {
 export default function EmptyDocumentsView({
   userId,
 }: EmptyDocumentsViewProps) {
+  const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function EmptyDocumentsView({
     setLoading(true);
     await createDocument(title, userId);
     setLoading(false);
+    setOpen(false);
     router.refresh();
   }
 
@@ -43,7 +45,7 @@ export default function EmptyDocumentsView({
         <p className="text-muted-foreground">
           Create a document to get started
         </p>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
               <span>Create Document</span>

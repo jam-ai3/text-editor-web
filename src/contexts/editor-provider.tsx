@@ -19,6 +19,8 @@ export type EditorContextType = {
   editor: Editor | null;
   additions: EditorAdditions;
   setAdditions: Dispatch<SetStateAction<EditorAdditions>>;
+  noChanges: number | null;
+  setNoChanges: Dispatch<SetStateAction<number | null>>;
   reasoning: Reasoning | null;
   setReasoning: Dispatch<SetStateAction<Reasoning | null>>;
   document: Document;
@@ -33,6 +35,8 @@ export const EditorContext = createContext<EditorContextType>({
     suggestion: null,
   },
   setAdditions: () => {},
+  noChanges: null,
+  setNoChanges: () => {},
   reasoning: null,
   setReasoning: () => {},
   document: {
@@ -66,6 +70,7 @@ export default function EditorProvider({
   });
   const additionsRef = useRef(additions);
   const [reasoning, setReasoning] = useState<Reasoning | null>(null);
+  const [noChanges, setNoChanges] = useState<number | null>(null);
   const [doc, setDocument] = useState<Document>(document);
   const editor = useEditor(editorConfig(document.content, additionsRef));
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
@@ -98,6 +103,8 @@ export default function EditorProvider({
         editor,
         additions,
         setAdditions,
+        noChanges,
+        setNoChanges,
         reasoning,
         setReasoning,
         document: doc,

@@ -231,11 +231,21 @@ function parseGeminiOutput(output: string): GeminiOutput {
 function showDiff(context: EditorContextType, newText: string) {
   if (!context.editor) return;
   const { improved: incoming, reasoning } = parseGeminiOutput(newText);
-  if (reasoning) {
-    const yPos = getCaretYPosition(context.editor) ?? 0;
-    context.setReasoning({ text: reasoning, yPos });
+  const yPos = getCaretYPosition(context.editor) ?? 0;
+
+  // If incoming is empty or no reasoning, show no changes
+  if (
+    incoming.trim().length === 0 ||
+    !reasoning ||
+    context.additions.diff?.current === incoming
+  ) {
+    context.setNoChanges(yPos);
+    return;
   }
-  if (incoming.trim().length === 0) return;
+
+  // Otherwise, show diff
+  context.setNoChanges(null);
+  context.setReasoning({ text: reasoning, yPos });
   const { current, from } = insertDiff(context.editor, incoming);
   context.setAdditions((prev) => ({
     ...prev,
@@ -247,7 +257,7 @@ const MAX_CONTENT = 100;
 
 function getContext(editor: Editor) {
   const { from, to } = editor.state.selection;
-  const selected = editor.getText().substring(from, to);
+  const selected = editor.getText().substring(from - 1, to);
   const before = editor
     .getText()
     .substring(0, from)

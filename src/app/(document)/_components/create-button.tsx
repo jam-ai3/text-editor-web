@@ -21,6 +21,7 @@ type CreateButtonProps = {
 
 export default function CreateButton({ userId }: CreateButtonProps) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,11 +29,12 @@ export default function CreateButton({ userId }: CreateButtonProps) {
     setLoading(true);
     await createDocument(title, userId);
     setLoading(false);
+    setOpen(false);
     router.refresh();
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <span>Create</span>

@@ -22,6 +22,7 @@ import Header from "./header";
 import Image from "next/image";
 import Link from "next/link";
 import PopupMenu from "./bubble-menu";
+import NoChangesPanel from "./no-change-panel";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -148,6 +149,7 @@ export function SimpleEditor() {
           className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
         />
         <ReasoningPanel />
+        <NoChangesPanel />
       </div>
     </EditorContext.Provider>
   );
