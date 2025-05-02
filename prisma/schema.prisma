@@ -19,6 +19,7 @@ model User {
 
   subscriptions Subscription[]
   documents     Document[]
+  analytics     Analytics[]
 }
 
 model Subscription {
@@ -43,6 +44,20 @@ model Document {
   content   String
 
   userId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Analytics {
+  id                String   @id @default(uuid())
+  autocompleteCalls Int      @default(0)
+  shortenCalls      Int      @default(0)
+  lengthenCalls     Int      @default(0)
+  grammarCalls      Int      @default(0)
+  reorderCalls      Int      @default(0)
+  lastUpdated       DateTime @default(now())
+
+  userId String @unique
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

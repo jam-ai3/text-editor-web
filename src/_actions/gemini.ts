@@ -1,5 +1,7 @@
 "use server";
 
+import db from "@/db/db";
+import { getSession } from "@/lib/auth";
 import { promptFlash, promptFlashLite } from "@/lib/gemini";
 
 const autocompletePrompt = (content: string) =>
@@ -16,6 +18,8 @@ const autocompletePrompt = (content: string) =>
 
 export async function getAutocomplete(content: string) {
   const prompt = autocompletePrompt(content);
+  updateAnalytics("autocomplete");
+  console.log("return");
   return await promptFlashLite(prompt);
 }
 
@@ -45,6 +49,7 @@ export async function getShortened(
   selected: string
 ) {
   const prompt = shortenPrompt(contextBefore, contextAfter, selected);
+  updateAnalytics("shorten");
   return await promptFlash(prompt);
 }
 
@@ -74,6 +79,7 @@ export async function getLengthened(
   selected: string
 ) {
   const prompt = lengthenPrompt(contextBefore, contextAfter, selected);
+  updateAnalytics("lengthen");
   return await promptFlash(prompt);
 }
 
@@ -88,6 +94,7 @@ const grammarPrompt = (text: string) =>
 
 export async function getGrammar(selected: string) {
   const prompt = grammarPrompt(selected);
+  updateAnalytics("grammar");
   return await promptFlash(prompt);
 }
 
@@ -103,6 +110,7 @@ const reorderParagraphPrompt = (text: string) =>
 
 export async function reorderParagraph(selected: string) {
   const prompt = reorderParagraphPrompt(selected);
+  updateAnalytics("reorder");
   return await promptFlash(prompt);
 }
 
@@ -119,5 +127,58 @@ const reorderSentencesPrompt = (text: string) =>
 
 export async function reorderSentences(selected: string) {
   const prompt = reorderSentencesPrompt(selected);
+  updateAnalytics("reorder");
   return await promptFlash(prompt);
+}
+
+// analytics
+
+type GeminiAction =
+  | "autocomplete"
+  | "shorten"
+  | "lengthen"
+  | "grammar"
+  | "reorder";
+
+async function updateAnalytics(action: GeminiAction) {
+  const session = await getSession();
+  if (!session) return;
+  const create = getAnalyticsCreate(action);
+  const update = getAnalyticsUpdate(action);
+  await db.analytics.upsert({
+    create: { userId: session.id, ...create },
+    update: { lastUpdated: new Date(), ...update },
+    where: { userId: session.id },
+  });
+  console.log("done");
+}
+
+function getAnalyticsCreate(action: GeminiAction) {
+  switch (action) {
+    case "autocomplete":
+      return { autocompleteCalls: 1 };
+    case "shorten":
+      return { shortenCalls: 1 };
+    case "lengthen":
+      return { lengthenCalls: 1 };
+    case "grammar":
+      return { grammarCalls: 1 };
+    case "reorder":
+      return { reorderCalls: 1 };
+  }
+}
+
+function getAnalyticsUpdate(action: GeminiAction) {
+  switch (action) {
+    case "autocomplete":
+      return { autocompleteCalls: { increment: 1 } };
+    case "shorten":
+      return { shortenCalls: { increment: 1 } };
+    case "lengthen":
+      return { lengthenCalls: { increment: 1 } };
+    case "grammar":
+      return { grammarCalls: { increment: 1 } };
+    case "reorder":
+      return { reorderCalls: { increment: 1 } };
+  }
 }
