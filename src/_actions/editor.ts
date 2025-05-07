@@ -2,8 +2,11 @@
 
 import {
   acceptDiff,
+  accpetSuggestion,
   insertDiff,
+  insertSuggestion,
   rejectDiff,
+  rejectSuggestion,
 } from "@/components/editor/extensions";
 import {
   getAutocomplete,
@@ -14,6 +17,7 @@ import {
 } from "./gemini";
 import { EditorContextType } from "@/contexts/editor-provider";
 import { Editor } from "@tiptap/core";
+import { diffExists, suggestionExists } from "@/components/editor/helpers";
 
 export async function processKeydown(
   event: KeyboardEvent,
@@ -23,7 +27,11 @@ export async function processKeydown(
     tabOnKeydown(event, context);
   } else if (event.key === "Escape") {
     escapeOnKeydown(event, context);
-  } else if (context.additions.diff || context.additions.suggestion) {
+  } else if (
+    context.additions.diff ||
+    context.additions.suggestion ||
+    context.aiResponseLoading
+  ) {
     event.preventDefault();
   } else if (event.metaKey) {
     await metakeyOnKeydown(event, context);
@@ -57,15 +65,11 @@ export function handleAcceptAutocomplete(
 ) {
   if (!context.editor || !context.additions.suggestion) return;
   event?.preventDefault();
-  const start = context.additions.suggestion.pos;
-  const end = start + context.additions.suggestion.content.length;
-  context.editor
-    .chain()
-    .focus()
-    .setTextSelection({ from: start, to: end })
-    .setColor("#000")
-    .setTextSelection({ from: end, to: end })
-    .run();
+  accpetSuggestion(
+    context.editor,
+    context.additions.suggestion.pos,
+    context.additions.suggestion.content
+  );
   context.setAdditions({ ...context.additions, suggestion: null });
   context.setReasoning(null);
 }
@@ -104,9 +108,11 @@ export function handleRejectAutocomplete(
 ) {
   if (!context.editor || !context.additions.suggestion) return;
   event?.preventDefault();
-  const start = context.additions.suggestion.pos;
-  const end = start + context.additions.suggestion.content.length;
-  context.editor.chain().focus().deleteRange({ from: start, to: end }).run();
+  rejectSuggestion(
+    context.editor,
+    context.additions.suggestion.pos,
+    context.additions.suggestion.content
+  );
   context.setAdditions({ ...context.additions, suggestion: null });
   context.setReasoning(null);
 }
@@ -125,6 +131,7 @@ export function handleRejectDiff(
 
 // Metakey handlers
 
+// TODO: handle redo
 async function metakeyOnKeydown(
   event: KeyboardEvent,
   context: EditorContextType
@@ -134,80 +141,113 @@ async function metakeyOnKeydown(
       event.preventDefault();
       await handleAutocomplete(context);
       break;
+    case "z":
+      handleUndo(context);
+      break;
   }
 }
 
 async function handleAutocomplete(context: EditorContextType) {
   if (!context.editor) return;
-  const position = context.editor.state.selection.from;
-  const content =
-    context.editor
-      .getText()
-      .substring(0, position)
-      .split(" ")
-      .slice(-MAX_CONTENT)
-      .join(" ") +
-    "[ADD NEW CONTENT HERE]" +
-    context.editor
-      .getText()
-      .substring(position)
-      .split(" ")
-      .slice(0, MAX_CONTENT)
-      .join(" ");
-
-  const value = await getAutocomplete(content);
-  const { improved, reasoning } = parseGeminiOutput(value);
-  if (reasoning) {
-    const yPos = getCaretYPosition(context.editor) ?? 0;
-    context.setReasoning({ text: reasoning, yPos });
+  try {
+    context.setAiResponseLoading(true);
+    const position = context.editor.state.selection.from;
+    const content =
+      context.editor
+        .getText()
+        .substring(0, position)
+        .split(" ")
+        .slice(-MAX_CONTENT)
+        .join(" ") +
+      "[ADD NEW CONTENT HERE]" +
+      context.editor
+        .getText()
+        .substring(position)
+        .split(" ")
+        .slice(0, MAX_CONTENT)
+        .join(" ");
+    const value = await getAutocomplete(content);
+    const { improved, reasoning } = parseGeminiOutput(value);
+    if (reasoning) {
+      const yPos = getCaretYPosition(context.editor) ?? 0;
+      context.setReasoning({ text: reasoning, yPos });
+    }
+    insertSuggestion(context.editor, improved);
+    context.setAdditions((prev) => ({
+      ...prev,
+      suggestion: { content: improved, pos: position },
+    }));
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
   }
-  context.editor
-    .chain()
-    .focus()
-    .insertContent(improved)
-    .setTextSelection({ from: position, to: position + improved.length })
-    .setColor("#777")
-    .setTextSelection({ from: position, to: position })
-    .deleteRange({
-      from: position + improved.length - 1,
-      to: position + improved.length,
-    })
-    .run();
-  context.setAdditions((prev) => ({
-    ...prev,
-    suggestion: { content: improved, pos: position },
-  }));
 }
 
 export async function handleShorten(context: EditorContextType) {
   if (!context.editor) return;
-  const { selected, before, after, from } = getContext(context.editor);
-  const response = await getShortened(before, after, selected);
-  showDiff(context, response);
-  context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+  try {
+    context.setAiResponseLoading(true);
+    const { selected, before, after, from } = getContext(context.editor);
+    const response = await getShortened(before, after, selected);
+    showDiff(context, response);
+    context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
 }
 
 export async function handleLengthen(context: EditorContextType) {
   if (!context.editor) return;
-  const { selected, before, after, from } = getContext(context.editor);
-  const response = await getLengthened(before, after, selected);
-  showDiff(context, response);
-  context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+  try {
+    context.setAiResponseLoading(true);
+    const { selected, before, after, from } = getContext(context.editor);
+    const response = await getLengthened(before, after, selected);
+    showDiff(context, response);
+    context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
 }
 
 export async function handleGrammar(context: EditorContextType) {
   if (!context.editor) return;
-  const { selected, from } = getContext(context.editor);
-  const response = await getGrammar(selected);
-  showDiff(context, response);
-  context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+  try {
+    context.setAiResponseLoading(true);
+    const { selected, from } = getContext(context.editor);
+    const response = await getGrammar(selected);
+    showDiff(context, response);
+    context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
 }
 
 export async function handleReorder(context: EditorContextType) {
   if (!context.editor) return;
-  const { selected } = getContext(context.editor);
-  const response = await reorderSentences(selected);
-  showDiff(context, response);
+  try {
+    context.setAiResponseLoading(true);
+    const { selected } = getContext(context.editor);
+    const response = await reorderSentences(selected);
+    showDiff(context, response);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
+}
+
+function handleUndo(context: EditorContextType) {
+  if (!context.editor) return;
+  const diff = diffExists(context.editor);
+  const suggestion = suggestionExists(context.editor);
+  if (diff || suggestion) context.editor.commands.undo();
 }
 
 // Generic Gemini and helper functions

@@ -16,7 +16,12 @@ import { Selection } from "@/components/tiptap/tiptap-extension/selection-extens
 import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node-extension";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
-import { DiffBlock, PreventEnter, SuggestionBlock } from "./extensions";
+import {
+  DiffBlock,
+  PreventEnter,
+  PreventUndo,
+  SuggestionBlock,
+} from "./extensions";
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import { EditorAdditions } from "@/lib/types";
 import { RefObject } from "react";
@@ -60,6 +65,11 @@ const editorConfig = (
     // Custom
     PreventEnter.configure({
       shouldPreventEnter: () =>
+        additions.current.diff !== null ||
+        additions.current.suggestion !== null,
+    }),
+    PreventUndo.configure({
+      shouldPreventUndo: () =>
         additions.current.diff !== null ||
         additions.current.suggestion !== null,
     }),

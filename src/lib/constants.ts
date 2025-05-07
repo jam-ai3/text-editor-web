@@ -10,6 +10,7 @@ export const REJECT_COLOR = "#f005";
 export const REJECT_COLOR_STRONG = "#d00e";
 export const ACCEPT_COLOR = "#0d05";
 export const ACCEPT_COLOR_STRONG = "#0b0e";
+export const SUGGESTION_COLOR = "#777";
 
 export type Product = {
   id: string;

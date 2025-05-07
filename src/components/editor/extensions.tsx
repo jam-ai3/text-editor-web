@@ -1,4 +1,4 @@
-import { ACCEPT_COLOR, REJECT_COLOR } from "@/lib/constants";
+import { ACCEPT_COLOR, REJECT_COLOR, SUGGESTION_COLOR } from "@/lib/constants";
 import { Editor, Extension } from "@tiptap/core";
 
 export const PreventEnter = Extension.create<{
@@ -15,6 +15,24 @@ export const PreventEnter = Extension.create<{
   addKeyboardShortcuts() {
     return {
       Enter: () => this.options.shouldPreventEnter(),
+    };
+  },
+});
+
+export const PreventUndo = Extension.create<{
+  shouldPreventUndo: () => boolean;
+}>({
+  name: "preventUndo",
+
+  addOptions() {
+    return {
+      shouldPreventUndo: () => false,
+    };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "mod-z": () => this.options.shouldPreventUndo(),
     };
   },
 });
@@ -63,7 +81,7 @@ export const SuggestionBlock = Extension.create({
 
   addOptions() {
     return {
-      suggestionClass: "suggestion-text",
+      suggestionColor: SUGGESTION_COLOR,
     };
   },
 
@@ -80,7 +98,7 @@ export const SuggestionBlock = Extension.create({
               attributes.suggestion
                 ? {
                     "data-suggestion": "true",
-                    class: this.options.suggestionClass,
+                    style: `color: ${this.options.suggestionColor};`,
                   }
                 : {},
           },
@@ -93,24 +111,44 @@ export const SuggestionBlock = Extension.create({
 export function insertSuggestion(editor: Editor, suggestion: string) {
   const { from } = editor.state.selection;
   editor.commands.insertContentAt(from, {
-    type: "suggestionBlock",
+    type: "text",
     text: suggestion,
+    marks: [
+      {
+        type: "textStyle",
+        attrs: { suggestion: true },
+      },
+    ],
   });
 }
 
-// export function accpetSuggestion(
-//   editor: Editor,
-//   from: number,
-//   suggestion: string
-// ) {
-// }
+export function accpetSuggestion(
+  editor: Editor,
+  from: number,
+  suggestion: string
+) {
+  editor
+    .chain()
+    .setTextSelection({ from: from - 1, to: from + suggestion.length })
+    .setMark("textStyle", { suggestion: false })
+    .setTextSelection({
+      from: from + suggestion.length,
+      to: from + suggestion.length,
+    })
+    .run();
+}
 
-// export function rejectSuggestion(
-//   editor: Editor,
-//   from: number,
-//   suggestion: string
-// ) {
-// }
+export function rejectSuggestion(
+  editor: Editor,
+  from: number,
+  suggestion: string
+) {
+  editor
+    .chain()
+    .focus()
+    .deleteRange({ from, to: from + suggestion.length })
+    .run();
+}
 
 export function insertDiff(editor: Editor, incoming: string) {
   const { from, to } = editor.state.selection;

@@ -17,6 +17,8 @@ import editorConfig from "@/components/editor/editor-config";
 
 export type EditorContextType = {
   editor: Editor | null;
+  aiResponseLoading: boolean;
+  setAiResponseLoading: Dispatch<SetStateAction<boolean>>;
   additions: EditorAdditions;
   setAdditions: Dispatch<SetStateAction<EditorAdditions>>;
   noChanges: number | null;
@@ -30,6 +32,8 @@ export type EditorContextType = {
 
 export const EditorContext = createContext<EditorContextType>({
   editor: null,
+  aiResponseLoading: false,
+  setAiResponseLoading: () => {},
   additions: {
     diff: null,
     suggestion: null,
@@ -75,6 +79,7 @@ export default function EditorProvider({
   const editor = useEditor(editorConfig(document.content, additionsRef));
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
+  const [aiResponseLoading, setAiResponseLoading] = useState(false);
 
   useEffect(() => {
     additionsRef.current = additions;
@@ -101,6 +106,8 @@ export default function EditorProvider({
     <EditorContext.Provider
       value={{
         editor,
+        aiResponseLoading,
+        setAiResponseLoading,
         additions,
         setAdditions,
         noChanges,

@@ -12,6 +12,7 @@ import {
   handleReorder,
   handleShorten,
 } from "@/_actions/editor";
+import { Button } from "../ui/button";
 
 export default function PopupMenu() {
   const context = useContext(EditorContext);
@@ -23,7 +24,7 @@ export default function PopupMenu() {
   return (
     <BubbleMenu
       pluginKey="bubbleMenuText"
-      className="flex items-center bg-secondary border-2 rounded-md max-w-max"
+      className="flex flex-col bg-secondary border-2 rounded-md max-w-max"
       tippyOptions={{ duration: 150 }}
       editor={context.editor}
       shouldShow={({ from, to }) => {
@@ -32,26 +33,36 @@ export default function PopupMenu() {
         return from !== to;
       }}
     >
-      <MenuButton
-        onClick={handleShorten.bind(null, context)}
-        icon={Minus}
-        description="Shorten"
-      />
-      <MenuButton
-        onClick={handleLengthen.bind(null, context)}
-        icon={Plus}
-        description="Lengthen"
-      />
-      <MenuButton
-        onClick={handleGrammar.bind(null, context)}
-        icon={Edit}
-        description="Grammar"
-      />
-      <MenuButton
-        onClick={handleReorder.bind(null, context)}
-        icon={ArrowUpDown}
-        description="Reorder"
-      />
+      <div className="flex items-center border-b-2">
+        <MenuButton
+          onClick={handleShorten.bind(null, context)}
+          icon={Minus}
+          description="Shorten"
+        />
+        <MenuButton
+          onClick={handleLengthen.bind(null, context)}
+          icon={Plus}
+          description="Lengthen"
+        />
+        <MenuButton
+          onClick={handleGrammar.bind(null, context)}
+          icon={Edit}
+          description="Grammar"
+        />
+        <MenuButton
+          onClick={handleReorder.bind(null, context)}
+          icon={ArrowUpDown}
+          description="Reorder"
+        />
+      </div>
+      <div className="flex flex-col">
+        <textarea
+          placeholder="Custom Prompt"
+          className="m-0 p-2 text-xs resize-none"
+        />
+        {/* TODO: change "Submit" */}
+        <Button size="sm">Submit</Button>
+      </div>
     </BubbleMenu>
   );
 }
@@ -64,18 +75,16 @@ type MenuButtonProps = {
 
 function MenuButton({ onClick, icon: Icon, description }: MenuButtonProps) {
   return (
-    <>
-      <div className="relative">
-        <button
-          className="flex justify-center items-center p-2 hover:bg-border menu-btn"
-          onClick={onClick}
-        >
-          <Icon size={MENU_BUTTON_SIZE} />
-        </button>
-        <div className="hidden top-[120%] left-[50%] absolute bg-primary px-2 border-2 rounded-md translate-x-[-50%] menu-btn-description">
-          <span className="text-background text-sm">{description}</span>
-        </div>
+    <div className="relative flex-1">
+      <button
+        className="flex justify-center items-center p-2 hover:bg-border w-full menu-btn"
+        onClick={onClick}
+      >
+        <Icon size={MENU_BUTTON_SIZE} />
+      </button>
+      <div className="hidden top-[120%] left-[50%] absolute bg-primary px-2 border-2 rounded-md translate-x-[-50%] menu-btn-description">
+        <span className="text-background text-sm">{description}</span>
       </div>
-    </>
+    </div>
   );
 }

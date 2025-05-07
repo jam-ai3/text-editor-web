@@ -131,6 +131,29 @@ export async function reorderSentences(selected: string) {
   return await promptFlash(prompt);
 }
 
+const customRequestPrompt = (
+  prompt: string,
+  contextBefore: string,
+  contextAfter: string,
+  selected: string
+) => ``;
+
+export async function customRequest(
+  request: string,
+  contextBefore: string,
+  contextAfter: string,
+  selected: string
+) {
+  const prompt = customRequestPrompt(
+    request,
+    contextBefore,
+    contextAfter,
+    selected
+  );
+  updateAnalytics("custom");
+  return await promptFlash(prompt);
+}
+
 // analytics
 
 type GeminiAction =
@@ -138,7 +161,8 @@ type GeminiAction =
   | "shorten"
   | "lengthen"
   | "grammar"
-  | "reorder";
+  | "reorder"
+  | "custom";
 
 async function updateAnalytics(action: GeminiAction) {
   const session = await getSession();
@@ -165,6 +189,8 @@ function getAnalyticsCreate(action: GeminiAction) {
       return { grammarCalls: 1 };
     case "reorder":
       return { reorderCalls: 1 };
+    case "custom":
+      return { customCalls: 1 };
   }
 }
 
@@ -180,5 +206,7 @@ function getAnalyticsUpdate(action: GeminiAction) {
       return { grammarCalls: { increment: 1 } };
     case "reorder":
       return { reorderCalls: { increment: 1 } };
+    case "custom":
+      return { customCalls: { increment: 1 } };
   }
 }

@@ -23,6 +23,7 @@ import Image from "next/image";
 import Link from "next/link";
 import PopupMenu from "./bubble-menu";
 import NoChangesPanel from "./no-change-panel";
+import { removeDiff, removeSuggestion } from "./helpers";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -107,6 +108,13 @@ export function SimpleEditor() {
     document.addEventListener("keydown", handleKeydown);
     return () => document.removeEventListener("keydown", handleKeydown);
   }, [context]);
+
+  // check for diff / autocomplete blocks
+  React.useEffect(() => {
+    if (!editor) return;
+    removeSuggestion(editor);
+    removeDiff(editor);
+  }, [editor]);
 
   return (
     <EditorContext.Provider value={{ editor }}>

@@ -55,6 +55,7 @@ model Analytics {
   lengthenCalls     Int      @default(0)
   grammarCalls      Int      @default(0)
   reorderCalls      Int      @default(0)
+  customCalls       Int      @default(0)
   lastUpdated       DateTime @default(now())
 
   userId String @unique

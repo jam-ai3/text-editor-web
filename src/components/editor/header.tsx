@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { EditorContext } from "@/contexts/editor-provider";
 import { CheckCircle, Loader2, Share, XCircle } from "lucide-react";
 import { useContext } from "react";
+import { getWordcount } from "./helpers";
 
 export default function Header() {
-  const { document, setDocument, saveStatus } = useContext(EditorContext);
+  const { document, setDocument, saveStatus, editor } =
+    useContext(EditorContext);
 
   function renderSaveStatus() {
     switch (saveStatus) {
@@ -18,6 +20,17 @@ export default function Header() {
       case "pending":
         return <Loader2 className="animate-spin" size={16} />;
     }
+  }
+
+  function showWordcount() {
+    const selected = editor?.state.selection;
+    if (!selected || selected.from === selected.to) {
+      return getWordcount(editor?.getText() ?? "");
+    }
+    const selectedText = editor
+      ?.getText()
+      .substring(selected.from - 1, selected.to);
+    return getWordcount(selectedText ?? "");
   }
 
   return (
@@ -31,6 +44,9 @@ export default function Header() {
             setDocument((prev) => ({ ...prev, title: e.target.value }))
           }
         />
+        <span className="text-muted-foreground text-sm">
+          {showWordcount()} Words
+        </span>
       </div>
       <Button onClick={() => handleExport(document.title, document.content)}>
         <span>Export</span>

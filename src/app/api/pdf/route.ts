@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   await page.setContent(html);
-  const pdfBuffer = await page.pdf({ path: title + ".pdf", format: "A4" });
+  const pdfBuffer = await page.pdf({ format: "A4" });
   await browser.close();
 
   return new NextResponse(pdfBuffer, {

@@ -30,18 +30,22 @@ export default function ReasoningPanel() {
       </CardHeader>
       <CardFooter className="flex gap-4">
         <Button
+          className="flex items-center gap-2"
           style={{ backgroundColor: REJECT_COLOR_STRONG }}
           onClick={() => handleRejectChanges(undefined, context)}
         >
           <X />
           <span>Reject</span>
+          <span className="text-xs">{"(Esc)"}</span>
         </Button>
         <Button
+          className="flex items-center gap-2"
           style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
           onClick={() => handleAcceptChanges(undefined, context)}
         >
           <Check />
           <span>Accept</span>
+          <span className="text-xs">{"(Tab)"}</span>
         </Button>
       </CardFooter>
     </Card>
