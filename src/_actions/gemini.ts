@@ -136,7 +136,7 @@ const customRequestPrompt = (
   contextBefore: string,
   contextAfter: string,
   selected: string
-) => ``;
+) => `${prompt}${contextBefore}${selected}${contextAfter}`;
 
 export async function customRequest(
   request: string,
