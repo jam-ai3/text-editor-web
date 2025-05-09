@@ -1,9 +1,9 @@
 "use client";
 
-// import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EditorContext } from "@/contexts/editor-provider";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, Share, XCircle } from "lucide-react";
 import { useContext } from "react";
 import { getWordcount } from "./helpers";
 
@@ -48,26 +48,35 @@ export default function Header() {
           {showWordcount()} Words
         </span>
       </div>
-      {/* <Button onClick={() => handleExport(document.title, document.content)}>
+      <Button
+        onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}
+      >
         <span>Export</span>
         <Share />
-      </Button> */}
+      </Button>
     </div>
   );
 }
 
 async function handleExport(title: string, html: string) {
-  fetch("/api/pdf", {
-    method: "POST",
-    body: JSON.stringify({ title, html }),
-  })
-    .then((res) => res.blob())
-    .then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = title + ".pdf";
-      a.click();
-      window.URL.revokeObjectURL(url);
+  const serverUrl = process.env.NEXT_PUBLIC_PYTHON_SERVER_URL;
+  if (!serverUrl) return;
+  try {
+    const res = await fetch(`${serverUrl}/pdf`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, html }),
     });
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = title + ".pdf";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error(error);
+  }
 }
