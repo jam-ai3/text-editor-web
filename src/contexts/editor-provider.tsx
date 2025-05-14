@@ -10,13 +10,15 @@ import {
   useState,
 } from "react";
 import { Editor, useEditor } from "@tiptap/react";
-import { EditorAdditions, Reasoning } from "@/lib/types";
+import { EditorAdditions, EditorType, Reasoning } from "@/lib/types";
 import { Document } from "@prisma/client";
 import { saveDocument } from "@/_actions/document";
 import editorConfig from "@/components/editor/editor-config";
 
 export type EditorContextType = {
   editor: Editor | null;
+  editorType: EditorType;
+  setEditorType: Dispatch<SetStateAction<EditorType>>;
   aiResponseLoading: boolean;
   setAiResponseLoading: Dispatch<SetStateAction<boolean>>;
   additions: EditorAdditions;
@@ -32,6 +34,8 @@ export type EditorContextType = {
 
 export const EditorContext = createContext<EditorContextType>({
   editor: null,
+  editorType: "produce",
+  setEditorType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
   additions: {
@@ -68,6 +72,7 @@ export default function EditorProvider({
   document,
   userId,
 }: EditorProviderProps) {
+  const [editorType, setEditorType] = useState<EditorType>("produce");
   const [additions, setAdditions] = useState<EditorAdditions>({
     diff: null,
     suggestion: null,
@@ -106,6 +111,8 @@ export default function EditorProvider({
     <EditorContext.Provider
       value={{
         editor,
+        editorType,
+        setEditorType,
         aiResponseLoading,
         setAiResponseLoading,
         additions,

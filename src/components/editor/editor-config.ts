@@ -1,4 +1,4 @@
-import { ImageUploadNode } from "@/components/tiptap/tiptap-node/image-upload-node";
+// import { ImageUploadNode } from "@/components/tiptap/tiptap-node/image-upload-node";
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
 import { Image } from "@tiptap/extension-image";
@@ -22,7 +22,7 @@ import {
   PreventUndo,
   SuggestionBlock,
 } from "./extensions";
-import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
+// import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import { EditorAdditions } from "@/lib/types";
 import { RefObject } from "react";
 
@@ -51,13 +51,13 @@ const editorConfig = (
     Superscript,
     Subscript,
     Selection,
-    ImageUploadNode.configure({
-      accept: "image/*",
-      maxSize: MAX_FILE_SIZE,
-      limit: 3,
-      upload: handleImageUpload,
-      onError: (error) => console.error("Upload failed:", error),
-    }),
+    // ImageUploadNode.configure({
+    //   accept: "image/*",
+    //   maxSize: MAX_FILE_SIZE,
+    //   limit: 3,
+    //   upload: handleImageUpload,
+    //   onError: (error) => console.error("Upload failed:", error),
+    // }),
     TrailingNode,
     Link.configure({ openOnClick: false }),
     Color,

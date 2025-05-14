@@ -8,8 +8,14 @@ import { useContext } from "react";
 import { getWordcount } from "./helpers";
 
 export default function Header() {
-  const { document, setDocument, saveStatus, editor } =
-    useContext(EditorContext);
+  const {
+    document,
+    setDocument,
+    saveStatus,
+    editor,
+    editorType,
+    setEditorType,
+  } = useContext(EditorContext);
 
   function renderSaveStatus() {
     switch (saveStatus) {
@@ -48,12 +54,22 @@ export default function Header() {
           {showWordcount()} Words
         </span>
       </div>
-      <Button
-        onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}
-      >
-        <span>Export</span>
-        <Share />
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button
+          variant="outline"
+          onClick={() =>
+            setEditorType((prev) => (prev === "produce" ? "edit" : "produce"))
+          }
+        >
+          <span>{editorType === "produce" ? "Edit" : "Produce"}</span>
+        </Button>
+        <Button
+          onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}
+        >
+          <span>Export</span>
+          <Share />
+        </Button>
+      </div>
     </div>
   );
 }

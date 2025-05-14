@@ -18,6 +18,8 @@ import { MarkButton } from "@/components/tiptap/tiptap-ui/mark-button";
 import { NodeButton } from "@/components/tiptap/tiptap-ui/node-button";
 import { TextAlignButton } from "@/components/tiptap/tiptap-ui/text-align-button";
 import { UndoRedoButton } from "@/components/tiptap/tiptap-ui/undo-redo-button";
+import { EditorContext } from "@/contexts/editor-provider";
+import { useContext } from "react";
 // import { ThemeToggle } from "./theme-toggle";
 
 export default function MainToolbarContent({
@@ -29,8 +31,12 @@ export default function MainToolbarContent({
   onLinkClick: () => void;
   isMobile: boolean;
 }) {
+  const { editorType } = useContext(EditorContext);
+
   return (
     <>
+      {editorType === "produce" && <Spacer />}
+
       <ToolbarGroup>
         <UndoRedoButton action="undo" />
         <UndoRedoButton action="redo" />
@@ -77,19 +83,12 @@ export default function MainToolbarContent({
         <TextAlignButton align="justify" />
       </ToolbarGroup>
 
-      <ToolbarSeparator />
-
+      {/* <ToolbarSeparator />
       <ToolbarGroup>
         <ImageUploadButton text="Add" />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
       <Spacer />
-
-      {isMobile && <ToolbarSeparator />}
-
-      {/* <ToolbarGroup>
-        <ThemeToggle />
-      </ToolbarGroup> */}
     </>
   );
 }

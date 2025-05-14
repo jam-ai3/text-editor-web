@@ -149,15 +149,18 @@ export function SimpleEditor() {
           </Toolbar>
         </div>
       </div>
-      <div className="relative grid grid-cols-[2fr_1fr] content-wrapper">
+      <div className="relative flex content-wrapper">
         <PopupMenu />
-        <EditorContent
-          editor={editor}
-          role="presentation"
-          className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
-        />
-        <ReasoningPanel />
-        <NoChangesPanel />
+        <div className="flex-1 overflow-y-scroll">
+          <EditorContent
+            editor={editor}
+            role="presentation"
+            className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
+          />
+        </div>
+        {context.editorType === "edit" && (
+          <div className="bg-secondary border-l-2 w-[400px]"></div>
+        )}
       </div>
     </EditorContext.Provider>
   );
