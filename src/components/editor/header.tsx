@@ -3,7 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EditorContext } from "@/contexts/editor-provider";
-import { CheckCircle, Loader2, Share, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  Computer,
+  Loader2,
+  Pencil,
+  Share,
+  XCircle,
+} from "lucide-react";
 import { useContext } from "react";
 import { getWordcount } from "./helpers";
 
@@ -56,12 +63,14 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-4">
         <Button
-          variant="outline"
+          className="w-[100px]"
+          variant={editorType === "produce" ? "accent" : "outline"}
           onClick={() =>
             setEditorType((prev) => (prev === "produce" ? "edit" : "produce"))
           }
         >
-          <span>{editorType === "produce" ? "Edit" : "Produce"}</span>
+          <span>{editorType === "produce" ? "AI Edit" : "Produce"}</span>
+          {editorType === "produce" ? <Computer /> : <Pencil />}
         </Button>
         <Button
           onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}

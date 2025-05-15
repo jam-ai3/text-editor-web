@@ -84,7 +84,7 @@ export function findAutocompleteBlock(editor: Editor): AutocompleteInfo | null {
 }
 
 export function setActiveBlock(editor: Editor, selectedChange: Change) {
-  const { state, view, schema } = editor;
+  const { state, schema } = editor;
   const { tr, doc } = state;
   let transaction = tr;
 

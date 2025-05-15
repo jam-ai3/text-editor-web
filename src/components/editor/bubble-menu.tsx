@@ -12,7 +12,7 @@ import {
   handleReorder,
   handleShorten,
 } from "@/_actions/editor";
-import { Button } from "../ui/button";
+// import { Button } from "../ui/button";
 
 export default function PopupMenu() {
   const context = useContext(EditorContext);
@@ -55,14 +55,13 @@ export default function PopupMenu() {
           description="Reorder"
         />
       </div>
-      <div className="flex flex-col">
+      {/* <div className="flex flex-col">
         <textarea
           placeholder="Custom Prompt"
           className="m-0 p-2 text-xs resize-none"
         />
-        {/* TODO: change "Submit" */}
         <Button size="sm">Submit</Button>
-      </div>
+      </div> */}
     </BubbleMenu>
   );
 }

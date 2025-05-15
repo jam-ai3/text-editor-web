@@ -8,7 +8,7 @@ import {
   HighlightPopover,
   HighlighterButton,
 } from "@/components/tiptap/tiptap-ui/highlight-popover";
-import { ImageUploadButton } from "@/components/tiptap/tiptap-ui/image-upload-button";
+// import { ImageUploadButton } from "@/components/tiptap/tiptap-ui/image-upload-button";
 import {
   LinkPopover,
   LinkButton,
