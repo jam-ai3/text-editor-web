@@ -64,7 +64,7 @@ export default function ChangesPanel() {
           >
             <X />
             <span className="font-semibold">Reject</span>
-            <span className="text-xs">{"(Tab)"}</span>
+            <span className="text-xs">{"(Esc)"}</span>
           </Button>
         </div>
       </div>

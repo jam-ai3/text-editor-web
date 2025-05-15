@@ -79,7 +79,7 @@ function MenuButton({ onClick, icon: Icon, description }: MenuButtonProps) {
     <div className="relative flex-1">
       <button
         disabled={aiResponseLoading}
-        className="flex justify-center items-center p-2 hover:bg-border w-full menu-btn"
+        className="flex justify-center items-center disabled:opacity-50 p-2 hover:bg-border w-full disabled:cursor-not-allowed menu-btn"
         onClick={onClick}
       >
         <Icon size={MENU_BUTTON_SIZE} />
