@@ -23,7 +23,7 @@ export default function ChangesPanel() {
     );
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-y-scroll">
       <div className="flex border-b-2 w-full overflow-x-auto">
         {context.changes.length > 1 &&
           context.changes.map((change, i) => (

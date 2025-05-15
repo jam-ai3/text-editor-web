@@ -3,7 +3,7 @@
 import { ComponentType, useContext } from "react";
 import { BubbleMenu } from "@tiptap/react";
 
-import { ArrowUpDown, Edit, Minus, Plus } from "lucide-react";
+import { ArrowUpDown, Edit, Loader2, Minus, Plus } from "lucide-react";
 import { EditorContext } from "@/contexts/editor-provider";
 import { MENU_BUTTON_SIZE } from "@/lib/constants";
 import {
@@ -34,26 +34,35 @@ export default function PopupMenu() {
       }}
     >
       <div className="flex items-center border-b-2">
-        <MenuButton
-          onClick={handleShorten.bind(null, context)}
-          icon={Minus}
-          description="Shorten"
-        />
-        <MenuButton
-          onClick={handleLengthen.bind(null, context)}
-          icon={Plus}
-          description="Lengthen"
-        />
-        <MenuButton
-          onClick={handleGrammar.bind(null, context)}
-          icon={Edit}
-          description="Grammar"
-        />
-        <MenuButton
-          onClick={handleReorder.bind(null, context)}
-          icon={ArrowUpDown}
-          description="Reorder"
-        />
+        {context.aiResponseLoading ? (
+          <div className="flex items-center gap-2 px-2">
+            <span className="text-muted-foreground text-sm">Generating</span>
+            <Loader2 className="text-muted-foreground animate-spin" size={16} />
+          </div>
+        ) : (
+          <>
+            <MenuButton
+              onClick={handleShorten.bind(null, context)}
+              icon={Minus}
+              description="Shorten"
+            />
+            <MenuButton
+              onClick={handleLengthen.bind(null, context)}
+              icon={Plus}
+              description="Lengthen"
+            />
+            <MenuButton
+              onClick={handleGrammar.bind(null, context)}
+              icon={Edit}
+              description="Grammar"
+            />
+            <MenuButton
+              onClick={handleReorder.bind(null, context)}
+              icon={ArrowUpDown}
+              description="Reorder"
+            />
+          </>
+        )}
       </div>
       {/* <div className="flex flex-col">
         <textarea
