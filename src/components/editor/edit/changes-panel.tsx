@@ -13,7 +13,7 @@ export default function ChangesPanel() {
   if (context.selectedChange === null)
     return (
       <div className="place-items-center grid h-full">
-        <div>
+        <div className="flex flex-col items-center gap-2">
           <p className="font-semibold">No Change Selected</p>
           <p className="text-muted-foreground">
             Select some portion of your text to see AI features

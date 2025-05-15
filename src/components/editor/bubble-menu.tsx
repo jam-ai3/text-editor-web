@@ -73,9 +73,12 @@ type MenuButtonProps = {
 };
 
 function MenuButton({ onClick, icon: Icon, description }: MenuButtonProps) {
+  const { aiResponseLoading } = useContext(EditorContext);
+
   return (
     <div className="relative flex-1">
       <button
+        disabled={aiResponseLoading}
         className="flex justify-center items-center p-2 hover:bg-border w-full menu-btn"
         onClick={onClick}
       >
