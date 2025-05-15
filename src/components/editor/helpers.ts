@@ -1,130 +1,122 @@
-import { Editor, JSONContent } from "@tiptap/react";
-import { rejectDiff, rejectSuggestion } from "./extensions";
+import { Editor } from "@tiptap/react";
+import { Mark } from "prosemirror-model";
+import { rejectAutocomplete, rejectChanges } from "./extensions";
+import { Change } from "@/lib/types";
 
 export function getWordcount(text: string) {
   return text.trim().split(" ").length;
 }
 
-export function removeSuggestion(editor: Editor) {
-  const json = editor.getJSON();
-
-  function traverse(
-    editor: Editor,
-    node: JSONContent,
-    offset = 0
-  ): true | number {
-    const length = node.text?.length ?? 0;
-
-    if (node.marks && node.text) {
-      for (const mark of node.marks) {
-        if (mark.type === "textStyle" && mark.attrs?.suggestion === true) {
-          rejectSuggestion(editor, offset, node.text);
-          return true;
-        }
-      }
-    }
-
-    if (node.content && Array.isArray(node.content)) {
-      let off = 0;
-      for (const content of node.content) {
-        const res = traverse(editor, content, offset + off);
-        if (typeof res !== "number") return true;
-        else off += res;
-      }
-    }
-
-    return length;
+export function removeAutocomplete(editor: Editor) {
+  const block = findAutocompleteBlock(editor);
+  if (block) {
+    rejectAutocomplete(editor, block.pos, block.text);
+    removeAutocomplete(editor);
   }
-
-  traverse(editor, json);
 }
 
-export function removeDiff(editor: Editor) {
-  const json = editor.getJSON();
-
-  function traverse(
-    editor: Editor,
-    node: JSONContent,
-    offset = 0,
-    prevStart = 0
-  ) {
-    const length = node.text?.length ?? 0;
-
-    if (node.marks && node.text) {
-      for (const mark of node.marks) {
-        if (mark.type === "textStyle" && mark.attrs?.diffType === "accept") {
-          const current = editor.getText().substring(prevStart - 1, offset);
-          const incoming = node.text;
-          rejectDiff(editor, prevStart, current, incoming);
-          return true;
-        }
-      }
-    }
-
-    if (node.content && Array.isArray(node.content)) {
-      let off = 0;
-      let lastOffset = 0;
-      for (const content of node.content) {
-        const res = traverse(
-          editor,
-          content,
-          offset + off,
-          offset + off - lastOffset
-        );
-        if (typeof res !== "number") return true;
-        else {
-          off += res;
-          lastOffset = res;
-        }
-      }
-    }
-
-    return length;
+export function removeChanges(editor: Editor) {
+  const block = findChangeBlock(editor);
+  if (block) {
+    console.log(block);
+    rejectChanges(
+      editor,
+      block.current.from,
+      block.current.text,
+      block.incoming.text
+    );
+    removeChanges(editor);
   }
-
-  traverse(editor, json);
 }
 
-export function suggestionExists(editor: Editor) {
-  const json = editor.getJSON();
+type ChangeBlockInfo = {
+  from: number;
+  to: number;
+  text: string;
+};
 
-  function traverse(node: JSONContent): boolean {
-    if (node.marks && node.text) {
-      for (const mark of node.marks) {
-        if (mark.type === "textStyle" && mark.attrs?.suggestion === true) {
-          return true;
+type ChangeBlockResult = {
+  current: ChangeBlockInfo;
+  incoming: ChangeBlockInfo;
+};
+
+export function findChangeBlock(editor: Editor): ChangeBlockResult | null {
+  let current: ChangeBlockInfo | null = null;
+  let incoming: ChangeBlockInfo | null = null;
+
+  editor.state.doc.descendants((node, pos) => {
+    if (!node.isText) return;
+    node.marks.forEach((mark: Mark) => {
+      if (mark.type.name === "textStyle" && mark.attrs?.diffType) {
+        const to = pos + node.nodeSize;
+        if (mark.attrs.diffType === "reject") {
+          current = { from: pos, to, text: node.text ?? "" };
+        } else if (mark.attrs.diffType === "accept") {
+          incoming = { from: pos, to, text: node.text ?? "" };
         }
       }
-    }
+    });
 
-    if (node.content && Array.isArray(node.content)) {
-      return node.content.map(traverse).some((r) => r);
-    }
+    return;
+  });
 
-    return false;
-  }
-
-  return traverse(json);
+  return current === null || incoming === null ? null : { current, incoming };
 }
 
-export function diffExists(editor: Editor) {
-  const json = editor.getJSON();
+type AutocompleteInfo = {
+  pos: number;
+  text: string;
+};
 
-  function traverse(node: JSONContent): boolean {
-    if (node.marks && node.text) {
-      for (const mark of node.marks) {
-        if (mark.type === "textStyle" && mark.attrs?.diffType === "accept") {
-          return true;
+export function findAutocompleteBlock(editor: Editor): AutocompleteInfo | null {
+  let result: AutocompleteInfo | null = null;
+
+  editor.state.doc.descendants((node, pos) => {
+    if (!node.isText) return;
+    node.marks.forEach((mark: Mark) => {
+      if (mark.type.name === "textStyle" && mark.attrs?.suggestion === true) {
+        result = { pos, text: node.text ?? "" };
+      }
+    });
+  });
+
+  return result;
+}
+
+export function setActiveBlock(editor: Editor, selectedChange: Change) {
+  const { state, view, schema } = editor;
+  const { tr, doc } = state;
+  let transaction = tr;
+
+  doc.descendants((node, pos) => {
+    if (!node.isText) return;
+
+    node.marks.forEach((mark) => {
+      if (mark.type.name === "textStyle" && mark.attrs.diffType) {
+        const oldId = mark.attrs.id;
+        const isActive =
+          oldId === selectedChange.current.id ||
+          oldId === selectedChange.incoming.id;
+
+        // Only update if `active` is changing
+        if (mark.attrs.active !== isActive) {
+          const from = pos;
+          const to = pos + node.nodeSize;
+
+          const newAttrs = {
+            ...mark.attrs,
+            active: isActive,
+          };
+
+          const newMark = schema.marks.textStyle.create(newAttrs);
+          transaction = transaction.removeMark(from, to, mark);
+          transaction = transaction.addMark(from, to, newMark);
         }
       }
-    }
+    });
+  });
 
-    if (node.content && Array.isArray(node.content)) {
-      return node.content.map(traverse).some((r) => r);
-    }
-
-    return false;
+  if (transaction.docChanged) {
+    editor.view.dispatch(transaction);
   }
-
-  return traverse(json);
 }

@@ -17,18 +17,19 @@ import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import {
-  DiffBlock,
+  AutocompleteBlock,
+  ChangeBlock,
   PreventEnter,
   PreventUndo,
-  SuggestionBlock,
 } from "./extensions";
 // import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
-import { EditorAdditions } from "@/lib/types";
+import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
 
 const editorConfig = (
   content: string,
-  additions: RefObject<EditorAdditions>
+  changes: RefObject<Change[]>,
+  autocomplete: RefObject<Autocomplete | null>
 ) => ({
   immediatelyRender: false,
   editorProps: {
@@ -65,16 +66,14 @@ const editorConfig = (
     // Custom
     PreventEnter.configure({
       shouldPreventEnter: () =>
-        additions.current.diff !== null ||
-        additions.current.suggestion !== null,
+        changes.current.length !== 0 || autocomplete.current !== null,
     }),
     PreventUndo.configure({
       shouldPreventUndo: () =>
-        additions.current.diff !== null ||
-        additions.current.suggestion !== null,
+        changes.current.length !== 0 || autocomplete.current !== null,
     }),
-    DiffBlock,
-    SuggestionBlock,
+    ChangeBlock,
+    AutocompleteBlock,
   ],
   content,
 });

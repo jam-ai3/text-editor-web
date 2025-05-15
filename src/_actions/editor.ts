@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  acceptDiff,
-  accpetSuggestion,
-  insertDiff,
-  insertSuggestion,
-  rejectDiff,
-  rejectSuggestion,
-} from "@/components/editor/extensions";
-import {
   getAutocomplete,
   getGrammar,
   getLengthened,
@@ -17,7 +9,19 @@ import {
 } from "./gemini";
 import { EditorContextType } from "@/contexts/editor-provider";
 import { Editor } from "@tiptap/core";
-import { diffExists, suggestionExists } from "@/components/editor/helpers";
+import { v4 } from "uuid";
+import {
+  acceptAutocomplete,
+  acceptChanges,
+  insertAutocomplete,
+  insertChanges,
+  rejectAutocomplete,
+  rejectChanges,
+} from "@/components/editor/extensions";
+import {
+  findAutocompleteBlock,
+  findChangeBlock,
+} from "@/components/editor/helpers";
 
 export async function processKeydown(
   event: KeyboardEvent,
@@ -28,8 +32,8 @@ export async function processKeydown(
   } else if (event.key === "Escape") {
     escapeOnKeydown(event, context);
   } else if (
-    context.additions.diff ||
-    context.additions.suggestion ||
+    context.selectedChange ||
+    context.autocomplete ||
     context.aiResponseLoading
   ) {
     event.preventDefault();
@@ -41,60 +45,62 @@ export async function processKeydown(
 // Tab handlers
 
 function tabOnKeydown(event: KeyboardEvent, context: EditorContextType) {
-  if (context.additions.suggestion) {
+  if (context.autocomplete !== null) {
     handleAcceptAutocomplete(event, context);
-  } else if (context.additions.diff) {
-    handleAcceptDiff(event, context);
+  } else if (context.selectedChange !== null) {
+    handleAcceptChange(event, context);
   } else {
     event.preventDefault();
     context.editor?.commands.insertContent("\t");
   }
 }
 
-export function handleAcceptChanges(
+export function handleAccept(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
   handleAcceptAutocomplete(event, context);
-  handleAcceptDiff(event, context);
+  handleAcceptChange(event, context);
 }
 
 export function handleAcceptAutocomplete(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
-  if (!context.editor || !context.additions.suggestion) return;
+  if (!context.editor || context.autocomplete === null) return;
   event?.preventDefault();
-  accpetSuggestion(
+  acceptAutocomplete(
     context.editor,
-    context.additions.suggestion.pos,
-    context.additions.suggestion.content
+    context.autocomplete.pos,
+    context.autocomplete.text
   );
-  context.setAdditions({ ...context.additions, suggestion: null });
-  context.setReasoning(null);
+  context.setAutocomplete(null);
 }
 
-export function handleAcceptDiff(
+export function handleAcceptChange(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
-  if (!context.editor || !context.additions.diff) return;
+  if (!context.editor || context.selectedChange === null) return;
   event?.preventDefault();
-  const { current, incoming, pos } = context.additions.diff;
-  acceptDiff(context.editor, pos, current, incoming);
-  context.setAdditions({ ...context.additions, diff: null });
-  context.setReasoning(null);
+  const { current, incoming, pos } = context.selectedChange;
+  acceptChanges(context.editor, pos, current.text, incoming.text);
+  const newChanges = context.changes.filter(
+    (change) => change.current.id !== current.id
+  );
+  context.setChanges(newChanges);
+  context.setSelectedChange(newChanges.length > 0 ? newChanges[0] : null);
 }
 
 // Escape handlers
 
 function escapeOnKeydown(event: KeyboardEvent, context: EditorContextType) {
   if (!context.editor) return;
-  if (context.additions.diff) handleRejectDiff(event, context);
-  if (context.additions.suggestion) handleRejectAutocomplete(event, context);
+  if (context.selectedChange) handleRejectDiff(event, context);
+  if (context.autocomplete) handleRejectAutocomplete(event, context);
 }
 
-export function handleRejectChanges(
+export function handleReject(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
@@ -106,27 +112,29 @@ export function handleRejectAutocomplete(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
-  if (!context.editor || !context.additions.suggestion) return;
+  if (!context.editor || context.autocomplete === null) return;
   event?.preventDefault();
-  rejectSuggestion(
+  rejectAutocomplete(
     context.editor,
-    context.additions.suggestion.pos,
-    context.additions.suggestion.content
+    context.autocomplete.pos,
+    context.autocomplete.text
   );
-  context.setAdditions({ ...context.additions, suggestion: null });
-  context.setReasoning(null);
+  context.setAutocomplete(null);
 }
 
 export function handleRejectDiff(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
-  if (!context.editor || !context.additions.diff) return;
+  if (!context.editor || context.selectedChange === null) return;
   event?.preventDefault();
-  const { current, incoming, pos } = context.additions.diff;
-  rejectDiff(context.editor, pos, current, incoming);
-  context.setAdditions({ ...context.additions, diff: null });
-  context.setReasoning(null);
+  const { current, incoming, pos } = context.selectedChange;
+  rejectChanges(context.editor, pos, current.text, incoming.text);
+  const newChanges = context.changes.filter(
+    (change) => change.current.id !== current.id
+  );
+  context.setChanges(newChanges);
+  context.setSelectedChange(newChanges.length > 0 ? newChanges[0] : null);
 }
 
 // Metakey handlers
@@ -167,16 +175,9 @@ async function handleAutocomplete(context: EditorContextType) {
         .slice(0, MAX_CONTENT)
         .join(" ");
     const value = await getAutocomplete(content);
-    const { improved, reasoning } = parseGeminiOutput(value);
-    if (reasoning) {
-      const yPos = getCaretYPosition(context.editor) ?? 0;
-      context.setReasoning({ text: reasoning, yPos });
-    }
-    insertSuggestion(context.editor, improved);
-    context.setAdditions((prev) => ({
-      ...prev,
-      suggestion: { content: improved, pos: position },
-    }));
+    const { improved } = parseGeminiOutput(value);
+    insertAutocomplete(context.editor, improved);
+    context.setAutocomplete({ text: improved, pos: position });
   } catch (error) {
     console.error(error);
   } finally {
@@ -245,19 +246,70 @@ export async function handleReorder(context: EditorContextType) {
 
 function handleUndo(context: EditorContextType) {
   if (!context.editor) return;
-  const diff = diffExists(context.editor);
-  const suggestion = suggestionExists(context.editor);
-  if (diff || suggestion) context.editor.commands.undo();
+  const changeBlock = findChangeBlock(context.editor);
+  const autocompleteBlock = findAutocompleteBlock(context.editor);
+  if (changeBlock || autocompleteBlock) context.editor.commands.undo();
+}
+
+function showDiff(context: EditorContextType, newText: string) {
+  if (!context.editor) return;
+  const { improved: incoming, reasoning } = parseGeminiOutput(newText);
+  context.setEditorType("edit");
+
+  // If incoming is empty or no reasoning, show no changes
+  if (incoming.trim().length === 0 || !reasoning) {
+    context.setChanges([
+      {
+        current: {
+          text: "",
+          id: "",
+        },
+        incoming: {
+          text: "",
+          id: "",
+        },
+        pos: 0,
+        reasoning: "No changes were made.",
+      },
+    ]);
+    return;
+  }
+
+  // Otherwise, show diff
+  const currentId = v4();
+  const incomingId = v4();
+  const { current, from } = insertChanges(
+    context.editor,
+    incoming,
+    currentId,
+    incomingId
+  );
+  const newChange = {
+    current: {
+      id: currentId,
+      text: current,
+    },
+    incoming: {
+      id: incomingId,
+      text: incoming,
+    },
+    pos: from,
+    reasoning,
+  };
+  context.setChanges((prev) => [...prev, newChange]);
+  context.setSelectedChange(newChange);
 }
 
 // Generic Gemini and helper functions
 
-type GeminiOutput = {
+export type GeminiOutput = {
   improved: string;
   reasoning: string | null;
 };
 
-function parseGeminiOutput(output: string): GeminiOutput {
+const MAX_CONTENT = 100;
+
+export function parseGeminiOutput(output: string): GeminiOutput {
   try {
     return JSON.parse(
       output.replaceAll("```json", "").replaceAll("```", "")
@@ -268,34 +320,7 @@ function parseGeminiOutput(output: string): GeminiOutput {
   }
 }
 
-function showDiff(context: EditorContextType, newText: string) {
-  if (!context.editor) return;
-  const { improved: incoming, reasoning } = parseGeminiOutput(newText);
-  const yPos = getCaretYPosition(context.editor) ?? 0;
-
-  // If incoming is empty or no reasoning, show no changes
-  if (
-    incoming.trim().length === 0 ||
-    !reasoning ||
-    context.additions.diff?.current === incoming
-  ) {
-    context.setNoChanges(yPos);
-    return;
-  }
-
-  // Otherwise, show diff
-  context.setNoChanges(null);
-  context.setReasoning({ text: reasoning, yPos });
-  const { current, from } = insertDiff(context.editor, incoming);
-  context.setAdditions((prev) => ({
-    ...prev,
-    diff: { current, incoming, pos: from },
-  }));
-}
-
-const MAX_CONTENT = 100;
-
-function getContext(editor: Editor) {
+export function getContext(editor: Editor) {
   const { from, to } = editor.state.selection;
   const selected = editor.getText().substring(from - 1, to);
   const before = editor
@@ -311,24 +336,4 @@ function getContext(editor: Editor) {
     .slice(0, MAX_CONTENT)
     .join(" ");
   return { selected, before, after, from, to };
-}
-
-function getCaretYPosition(editor: Editor) {
-  if (!editor) return null;
-  const { state, view } = editor;
-  const pos = state.selection.$anchor.pos;
-
-  let coords;
-  try {
-    coords = view.coordsAtPos(pos);
-  } catch (e) {
-    console.error("Failed to get caret coordinates:", e);
-    return null;
-  }
-
-  if (!coords) return null;
-  const editorElement = view.dom;
-  const editorRect = editorElement.getBoundingClientRect();
-  const yInsideEditor = coords.top - editorRect.top + editorElement.scrollTop;
-  return yInsideEditor;
 }

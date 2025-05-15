@@ -19,7 +19,6 @@ const autocompletePrompt = (content: string) =>
 export async function getAutocomplete(content: string) {
   const prompt = autocompletePrompt(content);
   updateAnalytics("autocomplete");
-  console.log("return");
   return await promptFlashLite(prompt);
 }
 
@@ -174,7 +173,6 @@ async function updateAnalytics(action: GeminiAction) {
     update: { lastUpdated: new Date(), ...update },
     where: { userId: session.id },
   });
-  console.log("done");
 }
 
 function getAnalyticsCreate(action: GeminiAction) {

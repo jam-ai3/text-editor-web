@@ -102,3 +102,21 @@ body {
 .menu-btn:hover + .menu-btn-description {
   display: block;
 }
+
+.reject {
+  background-color: #f005;
+  cursor: pointer;
+}
+
+.accept {
+  background-color: #0d05;
+  cursor: pointer;
+}
+
+.change-block-active.reject {
+  background-color: #f009;
+}
+
+.change-block-active.accept {
+  background-color: #0d09;
+}

@@ -37,7 +37,7 @@ export const PreventUndo = Extension.create<{
   },
 });
 
-export const DiffBlock = Extension.create({
+export const ChangeBlock = Extension.create({
   name: "diffBlock",
 
   addOptions() {
@@ -56,18 +56,38 @@ export const DiffBlock = Extension.create({
             default: null,
             parseHTML: (element) => element.getAttribute("data-diff-type"),
             renderHTML: (attributes) => {
+              const base: Record<string, string> = {};
               if (attributes.diffType === "accept") {
-                return {
-                  "data-diff-type": "accept",
-                  style: `background-color: ${this.options.acceptColor};`,
-                };
+                base["data-diff-type"] = "accept";
+                base["class"] = `accept`;
               } else if (attributes.diffType === "reject") {
-                return {
-                  "data-diff-type": "reject",
-                  style: `background-color: ${this.options.rejectColor};`,
-                };
+                base["data-diff-type"] = "reject";
+                base["class"] = `reject`;
               }
-              return {};
+              return base;
+            },
+          },
+          id: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("id"),
+            renderHTML: (attributes) => {
+              if (!attributes.id) return {};
+              return { id: attributes.id };
+            },
+          },
+          active: {
+            default: false,
+            parseHTML: (element) =>
+              element.getAttribute("data-active") === "true",
+            renderHTML: (attributes) => {
+              const base: Record<string, string> = {};
+              if (attributes.active) {
+                base["data-active"] = "true";
+                base["class"] = `change-block-active`;
+              } else {
+                base["data-active"] = "false";
+              }
+              return base;
             },
           },
         },
@@ -76,7 +96,7 @@ export const DiffBlock = Extension.create({
   },
 });
 
-export const SuggestionBlock = Extension.create({
+export const AutocompleteBlock = Extension.create({
   name: "suggestionBlock",
 
   addOptions() {
@@ -108,11 +128,15 @@ export const SuggestionBlock = Extension.create({
   },
 });
 
-export function insertSuggestion(editor: Editor, suggestion: string) {
+export function insertAutocomplete(
+  editor: Editor,
+  autocomplete: string,
+  at?: number
+) {
   const { from } = editor.state.selection;
-  editor.commands.insertContentAt(from, {
+  editor.commands.insertContentAt(at ?? from, {
     type: "text",
-    text: suggestion,
+    text: autocomplete,
     marks: [
       {
         type: "textStyle",
@@ -122,35 +146,40 @@ export function insertSuggestion(editor: Editor, suggestion: string) {
   });
 }
 
-export function accpetSuggestion(
+export function acceptAutocomplete(
   editor: Editor,
   from: number,
-  suggestion: string
+  autocomplete: string
 ) {
   editor
     .chain()
-    .setTextSelection({ from: from - 1, to: from + suggestion.length })
+    .setTextSelection({ from: from - 1, to: from + autocomplete.length })
     .setMark("textStyle", { suggestion: false })
     .setTextSelection({
-      from: from + suggestion.length,
-      to: from + suggestion.length,
+      from: from + autocomplete.length,
+      to: from + autocomplete.length,
     })
     .run();
 }
 
-export function rejectSuggestion(
+export function rejectAutocomplete(
   editor: Editor,
   from: number,
-  suggestion: string
+  autocomplete: string
 ) {
   editor
     .chain()
     .focus()
-    .deleteRange({ from, to: from + suggestion.length })
+    .deleteRange({ from, to: from + autocomplete.length })
     .run();
 }
 
-export function insertDiff(editor: Editor, incoming: string) {
+export function insertChanges(
+  editor: Editor,
+  incoming: string,
+  currentId: string,
+  incomingId: string
+) {
   const { from, to } = editor.state.selection;
   const current = editor.state.doc.textBetween(from, to, "");
   editor.commands.deleteRange({ from, to });
@@ -163,21 +192,23 @@ export function insertDiff(editor: Editor, incoming: string) {
       marks: [
         {
           type: "textStyle",
-          attrs: { diffType: "reject" },
+          attrs: {
+            diffType: "reject",
+            id: currentId,
+          },
         },
       ],
     })
-    .run();
-  editor
-    .chain()
-    .focus()
     .insertContentAt(from + current.trim().length, {
       type: "text",
       text: incoming.trim(),
       marks: [
         {
           type: "textStyle",
-          attrs: { diffType: "accept" },
+          attrs: {
+            diffType: "accept",
+            id: incomingId,
+          },
         },
       ],
     })
@@ -185,7 +216,48 @@ export function insertDiff(editor: Editor, incoming: string) {
   return { current, from };
 }
 
-export function acceptDiff(
+export function insertChangesAt(
+  editor: Editor,
+  current: string,
+  incoming: string,
+  currentId: string,
+  incomingId: string,
+  pos: number
+) {
+  editor.commands.deleteRange({ from: pos, to: pos + current.length });
+  editor
+    .chain()
+    .focus()
+    .insertContentAt(pos, {
+      type: "text",
+      text: current.trim(),
+      marks: [
+        {
+          type: "textStyle",
+          attrs: {
+            diffType: "reject",
+            id: currentId,
+          },
+        },
+      ],
+    })
+    .insertContentAt(pos + current.trim().length, {
+      type: "text",
+      text: incoming.trim(),
+      marks: [
+        {
+          type: "textStyle",
+          attrs: {
+            diffType: "accept",
+            id: incomingId,
+          },
+        },
+      ],
+    })
+    .run();
+}
+
+export function acceptChanges(
   editor: Editor,
   from: number,
   current: string,
@@ -205,7 +277,7 @@ export function acceptDiff(
     .run();
 }
 
-export function rejectDiff(
+export function rejectChanges(
   editor: Editor,
   from: number,
   current: string,

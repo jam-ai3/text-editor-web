@@ -10,23 +10,26 @@ import {
   useState,
 } from "react";
 import { Editor, useEditor } from "@tiptap/react";
-import { EditorAdditions, EditorType, Reasoning } from "@/lib/types";
+import { Autocomplete, Change, EditorType, EditType } from "@/lib/types";
 import { Document } from "@prisma/client";
 import { saveDocument } from "@/_actions/document";
 import editorConfig from "@/components/editor/editor-config";
+import { SHOULD_SAVE } from "@/lib/constants";
 
 export type EditorContextType = {
   editor: Editor | null;
   editorType: EditorType;
   setEditorType: Dispatch<SetStateAction<EditorType>>;
+  editType: EditType;
+  setEditType: Dispatch<SetStateAction<EditType>>;
   aiResponseLoading: boolean;
   setAiResponseLoading: Dispatch<SetStateAction<boolean>>;
-  additions: EditorAdditions;
-  setAdditions: Dispatch<SetStateAction<EditorAdditions>>;
-  noChanges: number | null;
-  setNoChanges: Dispatch<SetStateAction<number | null>>;
-  reasoning: Reasoning | null;
-  setReasoning: Dispatch<SetStateAction<Reasoning | null>>;
+  autocomplete: Autocomplete | null;
+  setAutocomplete: Dispatch<SetStateAction<Autocomplete | null>>;
+  changes: Change[];
+  setChanges: Dispatch<SetStateAction<Change[]>>;
+  selectedChange: Change | null;
+  setSelectedChange: Dispatch<SetStateAction<Change | null>>;
   document: Document;
   setDocument: Dispatch<SetStateAction<Document>>;
   saveStatus: SaveStatus;
@@ -36,17 +39,16 @@ export const EditorContext = createContext<EditorContextType>({
   editor: null,
   editorType: "produce",
   setEditorType: () => {},
+  editType: "changes",
+  setEditType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
-  additions: {
-    diff: null,
-    suggestion: null,
-  },
-  setAdditions: () => {},
-  noChanges: null,
-  setNoChanges: () => {},
-  reasoning: null,
-  setReasoning: () => {},
+  autocomplete: null,
+  setAutocomplete: () => {},
+  changes: [],
+  setChanges: () => {},
+  selectedChange: null,
+  setSelectedChange: () => {},
   document: {
     id: "",
     title: "",
@@ -73,25 +75,28 @@ export default function EditorProvider({
   userId,
 }: EditorProviderProps) {
   const [editorType, setEditorType] = useState<EditorType>("produce");
-  const [additions, setAdditions] = useState<EditorAdditions>({
-    diff: null,
-    suggestion: null,
-  });
-  const additionsRef = useRef(additions);
-  const [reasoning, setReasoning] = useState<Reasoning | null>(null);
-  const [noChanges, setNoChanges] = useState<number | null>(null);
+  const [editType, setEditType] = useState<EditType>("changes");
+  const [autocomplete, setAutocomplete] = useState<Autocomplete | null>(null);
+  const autocompleteRef = useRef(autocomplete);
+  const [changes, setChanges] = useState<Change[]>([]);
+  const changesRef = useRef(changes);
+  const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [doc, setDocument] = useState<Document>(document);
-  const editor = useEditor(editorConfig(document.content, additionsRef));
+  const editor = useEditor(
+    editorConfig(document.content, changesRef, autocompleteRef)
+  );
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
 
   useEffect(() => {
-    additionsRef.current = additions;
-  }, [additions]);
+    changesRef.current = changes;
+  }, [changes]);
 
   useEffect(() => {
     // use debounce to save document after 2 seconds of no typing
+    if (!SHOULD_SAVE) return setSaveStatus("error");
+
     if (saveTimer) clearTimeout(saveTimer);
     setSaveTimer(
       setTimeout(() => {
@@ -113,14 +118,16 @@ export default function EditorProvider({
         editor,
         editorType,
         setEditorType,
+        editType,
+        setEditType,
         aiResponseLoading,
         setAiResponseLoading,
-        additions,
-        setAdditions,
-        noChanges,
-        setNoChanges,
-        reasoning,
-        setReasoning,
+        autocomplete,
+        setAutocomplete,
+        changes,
+        setChanges,
+        selectedChange,
+        setSelectedChange,
         document: doc,
         setDocument,
         saveStatus,

@@ -17,13 +17,12 @@ import "@/components/editor/simple-editor.scss";
 import { processKeydown } from "@/_actions/editor";
 import MobileToolbarContent from "./mobile-toolbar";
 import MainToolbarContent from "./main-toolbar";
-import ReasoningPanel from "./reasoning-panel";
 import Header from "./header";
 import Image from "next/image";
 import Link from "next/link";
 import PopupMenu from "./bubble-menu";
-import NoChangesPanel from "./no-change-panel";
-import { removeDiff, removeSuggestion } from "./helpers";
+import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
+import EditPanel from "./edit/edit-panel";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -105,16 +104,40 @@ export function SimpleEditor() {
       processKeydown(event, context);
     }
 
+    function handleClick(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      console.log(target);
+      if (target.dataset?.diffType) {
+        event.preventDefault();
+        context.setEditType("changes");
+        context.setSelectedChange(
+          context.changes.find(
+            (c) => c.current.id === target.id || c.incoming.id === target.id
+          ) ?? null
+        );
+      }
+    }
+
     document.addEventListener("keydown", handleKeydown);
-    return () => document.removeEventListener("keydown", handleKeydown);
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+      document.removeEventListener("click", handleClick);
+    };
   }, [context]);
 
   // check for diff / autocomplete blocks
   React.useEffect(() => {
     if (!editor) return;
-    removeSuggestion(editor);
-    removeDiff(editor);
+    removeAutocomplete(editor);
+    removeChanges(editor);
   }, [editor]);
+
+  React.useEffect(() => {
+    if (!context.selectedChange || !context.editor) return;
+    setActiveBlock(context.editor, context.selectedChange);
+  }, [context.selectedChange]);
 
   return (
     <EditorContext.Provider value={{ editor }}>
@@ -158,9 +181,7 @@ export function SimpleEditor() {
             className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
           />
         </div>
-        {context.editorType === "edit" && (
-          <div className="bg-secondary border-l-2 w-[400px]"></div>
-        )}
+        {context.editorType === "edit" && <EditPanel />}
       </div>
     </EditorContext.Provider>
   );
