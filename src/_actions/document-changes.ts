@@ -13,9 +13,9 @@ export async function processSentences(context: EditorContextType) {
     .map((s) => s.trim() + (s[s.length - 1] === "." ? "" : ". ")); // add period back to each sentence
 
   const timeBefore = Date.now();
-  const results = (await Promise.all(sentences.map(getGrammar))).map(
-    parseGeminiOutput
-  );
+  const results = (
+    await Promise.all(sentences.map((s) => getGrammar(s, true)))
+  ).map(parseGeminiOutput);
   const timeAfter = Date.now();
 
   const duration = (timeAfter - timeBefore) / 1000;

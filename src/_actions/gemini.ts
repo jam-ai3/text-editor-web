@@ -91,9 +91,12 @@ const grammarPrompt = (text: string) =>
   `If there are not any grammatic errors, return empty strings in the JSON. ` +
   `TARGET TEXT: ${text}`;
 
-export async function getGrammar(selected: string) {
+export async function getGrammar(
+  selected: string,
+  fullDocument: boolean = false
+) {
   const prompt = grammarPrompt(selected);
-  updateAnalytics("grammar");
+  if (!fullDocument) updateAnalytics("grammar");
   return await promptFlash(prompt);
 }
 
@@ -168,11 +171,19 @@ async function updateAnalytics(action: GeminiAction) {
   if (!session) return;
   const create = getAnalyticsCreate(action);
   const update = getAnalyticsUpdate(action);
-  await db.analytics.upsert({
-    create: { userId: session.id, ...create },
-    update: { lastUpdated: new Date(), ...update },
-    where: { userId: session.id },
-  });
+  await Promise.all([
+    db.analytics.upsert({
+      create: { userId: session.id, ...create },
+      update: { lastUpdated: new Date(), ...update },
+      where: { userId: session.id },
+    }),
+    db.individualCall.create({
+      data: {
+        type: action,
+        userId: session.id,
+      },
+    }),
+  ]);
 }
 
 function getAnalyticsCreate(action: GeminiAction) {

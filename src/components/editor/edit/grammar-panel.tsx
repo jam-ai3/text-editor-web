@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { Loader2 } from "lucide-react";
 import { useContext, useState } from "react";
+import { UnresolvedChanges } from "./edit-panel";
 
 export default function GrammarPanel() {
   const context = useContext(EditorContext);
@@ -13,6 +14,8 @@ export default function GrammarPanel() {
     await processSentences(context);
     setIsLoading(false);
   }
+
+  if (context.changes.length !== 0) return <UnresolvedChanges />;
 
   return (
     <div>

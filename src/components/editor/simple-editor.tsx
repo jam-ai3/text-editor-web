@@ -137,6 +137,8 @@ export function SimpleEditor() {
 
   React.useEffect(() => {
     if (!context.selectedChange || !context.editor) return;
+    context.setEditorType("edit");
+    context.setEditType("changes");
     setActiveBlock(context.editor, context.selectedChange);
   }, [context.selectedChange]);
 
