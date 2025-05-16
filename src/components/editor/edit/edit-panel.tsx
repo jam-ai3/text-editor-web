@@ -21,10 +21,10 @@ export default function EditPanel() {
   }
 
   return (
-    <div className="flex flex-col bg-secondary border-l-2 w-[400px]">
+    <div className="flex flex-col bg-secondary border-l-2 w-[400px] h-full">
       <div className="flex border-b-2">
-        {/* <EditOption text="Reorder" value="reorder" />
-        <EditOption text="Grammar" value="grammar" /> */}
+        <EditOption text="Reorder" value="reorder" />
+        <EditOption text="Grammar" value="grammar" />
         <EditOption text="Changes" value="changes" isLast />
       </div>
       {renderPanel()}

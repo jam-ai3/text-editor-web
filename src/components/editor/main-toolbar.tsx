@@ -85,7 +85,7 @@ export default function MainToolbarContent({
 
       {/* <ToolbarSeparator />
       <ToolbarGroup>
-        <ImageUploadButton text="Add" />
+      <ImageUploadButton text="Add" />
       </ToolbarGroup> */}
 
       <Spacer />

@@ -230,7 +230,7 @@ export function insertChangesAt(
     .focus()
     .insertContentAt(pos, {
       type: "text",
-      text: current.trim(),
+      text: current,
       marks: [
         {
           type: "textStyle",
@@ -241,9 +241,9 @@ export function insertChangesAt(
         },
       ],
     })
-    .insertContentAt(pos + current.trim().length, {
+    .insertContentAt(pos + current.length, {
       type: "text",
-      text: incoming.trim(),
+      text: incoming,
       marks: [
         {
           type: "textStyle",
@@ -268,11 +268,11 @@ export function acceptChanges(
     .focus()
     .deleteRange({
       from,
-      to: from + current.trim().length + incoming.trim().length,
+      to: from + current.length + incoming.length,
     })
     .insertContentAt(from, {
       type: "text",
-      text: incoming.trim(),
+      text: incoming,
     })
     .run();
 }
@@ -288,11 +288,11 @@ export function rejectChanges(
     .focus()
     .deleteRange({
       from,
-      to: from + current.trim().length + incoming.trim().length,
+      to: from + current.length + incoming.length,
     })
     .insertContentAt(from, {
       type: "text",
-      text: current.trim(),
+      text: current,
     })
     .run();
 }

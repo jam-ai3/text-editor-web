@@ -2,7 +2,6 @@ import { EditorContextType } from "@/contexts/editor-provider";
 import { getGrammar } from "./gemini";
 import { GeminiOutput, parseGeminiOutput } from "./editor";
 import { zip } from "@/lib/utils";
-import { insertChangesAt } from "@/components/editor/extensions";
 import { Change } from "@/lib/types";
 import { v4 } from "uuid";
 
@@ -11,7 +10,7 @@ export async function processSentences(context: EditorContextType) {
   const sentences = context.editor
     .getText()
     .split(/\.\s+/) // split on period followed by any whitespace
-    .map((s) => s.trim() + (s[s.length - 1] === "." ? "" : ".")); // add period back to each sentence
+    .map((s) => s.trim() + (s[s.length - 1] === "." ? "" : ". ")); // add period back to each sentence
 
   const timeBefore = Date.now();
   const results = (await Promise.all(sentences.map(getGrammar))).map(
@@ -33,8 +32,10 @@ function showChanges(
   changes: GeminiOutput[]
 ) {
   if (!context.editor) return;
+  context.editor.chain().focus().clearContent().run();
+
   const diffs = zip(sentences, changes);
-  let offset = 0; // offset for the current sentence
+  let offset = 1; // offset for the current sentence
 
   const batchChanges: Change[] = [];
 
@@ -43,21 +44,57 @@ function showChanges(
 
     // if improved is empty, skip
     if (improved.trim().length === 0 || sentence === improved) {
-      offset += sentence.length + 1;
+      context.editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: "text",
+          text: sentence,
+          marks: [
+            {
+              type: "textStyle",
+              attrs: {},
+            },
+          ],
+        })
+        .run();
+      offset += sentence.length;
       continue;
     }
 
     // show diff and update offset
     const currentId = v4();
     const incomingId = v4();
-    insertChangesAt(
-      context.editor,
-      sentence,
-      improved,
-      currentId,
-      incomingId,
-      offset
-    );
+    context.editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "text",
+        text: sentence,
+        marks: [
+          {
+            type: "textStyle",
+            attrs: {
+              diffType: "reject",
+              id: currentId,
+            },
+          },
+        ],
+      })
+      .insertContent({
+        type: "text",
+        text: improved + " ",
+        marks: [
+          {
+            type: "textStyle",
+            attrs: {
+              diffType: "accept",
+              id: incomingId,
+            },
+          },
+        ],
+      })
+      .run();
     batchChanges.push({
       current: {
         id: currentId,
@@ -65,12 +102,12 @@ function showChanges(
       },
       incoming: {
         id: incomingId,
-        text: improved,
+        text: improved + " ",
       },
       pos: offset,
       reasoning: reasoning ?? "",
     });
-    offset += sentence.length + improved.length + 2;
+    offset += sentence.length + improved.length;
   }
 
   context.setChanges(batchChanges);

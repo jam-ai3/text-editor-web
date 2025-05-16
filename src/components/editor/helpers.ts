@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/react";
+import { Editor, JSONContent } from "@tiptap/react";
 import { Mark } from "prosemirror-model";
 import { rejectAutocomplete, rejectChanges } from "./extensions";
 import { Change } from "@/lib/types";
@@ -18,7 +18,6 @@ export function removeAutocomplete(editor: Editor) {
 export function removeChanges(editor: Editor) {
   const block = findChangeBlock(editor);
   if (block) {
-    console.log(block);
     rejectChanges(
       editor,
       block.current.from,
@@ -61,6 +60,21 @@ export function findChangeBlock(editor: Editor): ChangeBlockResult | null {
   });
 
   return current === null || incoming === null ? null : { current, incoming };
+}
+
+export function findChangeBlockById(editor: Editor, id: string) {
+  let pos = 0;
+
+  editor.state.doc.descendants((node, p) => {
+    if (!node.isText) return;
+    node.marks.forEach((mark: Mark) => {
+      if (mark.type.name === "textStyle" && mark.attrs?.id === id) {
+        pos = p;
+      }
+    });
+  });
+
+  return pos;
 }
 
 type AutocompleteInfo = {
@@ -119,4 +133,18 @@ export function setActiveBlock(editor: Editor, selectedChange: Change) {
   if (transaction.docChanged) {
     editor.view.dispatch(transaction);
   }
+}
+
+export type JSONContentWithText = JSONContent & { text: string };
+
+export function getBlocks(node: JSONContent) {
+  const blocks: JSONContentWithText[] = [];
+
+  if (!Array.isArray(node.content)) {
+    return node.text ? [node as JSONContentWithText] : [];
+  }
+
+  node.content.forEach((child) => blocks.push(...getBlocks(child)));
+
+  return blocks;
 }

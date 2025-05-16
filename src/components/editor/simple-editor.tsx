@@ -23,6 +23,8 @@ import Link from "next/link";
 import PopupMenu from "./bubble-menu";
 import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
 import EditPanel from "./edit/edit-panel";
+// framer motion
+import { AnimatePresence, motion } from "framer-motion";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -106,7 +108,6 @@ export function SimpleEditor() {
 
     function handleClick(event: MouseEvent) {
       const target = event.target as HTMLElement;
-      console.log(target);
       if (target.dataset?.diffType) {
         event.preventDefault();
         context.setEditType("changes");
@@ -181,7 +182,20 @@ export function SimpleEditor() {
             className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
           />
         </div>
-        {context.editorType === "edit" && <EditPanel />}
+        <AnimatePresence>
+          {context.editorType === "edit" && (
+            <motion.div
+              key="edit-panel"
+              initial={{ opacity: 1, x: "100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 1, x: "100%" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="h-full"
+            >
+              <EditPanel />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </EditorContext.Provider>
   );

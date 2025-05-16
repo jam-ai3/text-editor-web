@@ -15,6 +15,7 @@ import { Document } from "@prisma/client";
 import { saveDocument } from "@/_actions/document";
 import editorConfig from "@/components/editor/editor-config";
 import { SHOULD_SAVE } from "@/lib/constants";
+import { findChangeBlockById } from "@/components/editor/helpers";
 
 export type EditorContextType = {
   editor: Editor | null;
@@ -92,6 +93,13 @@ export default function EditorProvider({
   useEffect(() => {
     changesRef.current = changes;
   }, [changes]);
+
+  useEffect(() => {
+    if (!selectedChange || !editor) return;
+    const start = findChangeBlockById(editor, selectedChange.current.id);
+    if (start !== selectedChange.pos)
+      setSelectedChange({ ...selectedChange, pos: start });
+  }, [selectedChange]);
 
   useEffect(() => {
     // use debounce to save document after 2 seconds of no typing
