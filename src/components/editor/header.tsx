@@ -11,26 +11,14 @@ import {
   Share,
   XCircle,
 } from "lucide-react";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { getWordcount } from "./helpers";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ACCENT_COLOR } from "@/lib/constants";
 export default function Header() {
-  const {
-    document,
-    setDocument,
-    saveStatus,
-    editor,
-    editorType,
-    setEditorType,
-  } = useContext(EditorContext);
+  const { document, setDocument, saveStatus, editor } =
+    useContext(EditorContext);
 
   function renderSaveStatus() {
     switch (saveStatus) {
