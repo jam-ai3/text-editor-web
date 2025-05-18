@@ -175,7 +175,7 @@ export function SimpleEditor() {
       </div>
       <div className="relative flex content-wrapper">
         <PopupMenu />
-        <div className="flex-1 overflow-y-scroll">
+        <div className="flex-1 overflow-y-scroll bg-neutral-200">
           <EditorContent
             editor={editor}
             role="presentation"
