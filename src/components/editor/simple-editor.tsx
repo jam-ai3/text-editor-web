@@ -141,13 +141,14 @@ export function SimpleEditor() {
 
   return (
     <EditorContext.Provider value={{ editor }}>
-      <div className="flex items-center gap-4 px-4 border-b-2 w-full">
+      <div className="flex items-center gap-4 px-4 border-b-2 w-full bg-neutral-100">
         <Link href="/">
           <Image src="/logo-no-bg.png" alt="Logo" width={64} height={64} />
         </Link>
         <div className="w-full">
           <Header />
           <Toolbar
+            className="!bg-neutral-100"
             ref={toolbarRef}
             style={
               isMobile
@@ -172,13 +173,13 @@ export function SimpleEditor() {
           </Toolbar>
         </div>
       </div>
-      <div className="relative flex content-wrapper">
+      <div className="relative flex content-wrapper bg-neutral-200">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
           <EditorContent
             editor={editor}
             role="presentation"
-            className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
+            className="mx-auto my-8 border border-gray-300 w-full max-w-[720px] shadow-md bg-white simple-editor-content"
           />
         </div>
         {context.editorType === "edit" && <EditPanel />}
