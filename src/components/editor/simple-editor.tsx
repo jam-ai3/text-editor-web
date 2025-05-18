@@ -173,7 +173,7 @@ export function SimpleEditor() {
           </Toolbar>
         </div>
       </div>
-      <div className="relative flex content-wrapper bg-neutral-200">
+      <div className="relative flex content-wrapper">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
           <EditorContent
