@@ -11,9 +11,10 @@ import {
   Share,
   XCircle,
 } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { getWordcount } from "./helpers";
-
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 export default function Header() {
   const {
     document,
@@ -62,16 +63,7 @@ export default function Header() {
         </span>
       </div>
       <div className="flex items-center gap-4">
-        <Button
-          className="w-[100px]"
-          variant={editorType === "produce" ? "accent" : "outline"}
-          onClick={() =>
-            setEditorType((prev) => (prev === "produce" ? "edit" : "produce"))
-          }
-        >
-          <span>{editorType === "produce" ? "AI Edit" : "Produce"}</span>
-          {editorType === "produce" ? <Computer /> : <Pencil />}
-        </Button>
+        <EditorToggle />
         <Button
           onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}
         >
@@ -104,4 +96,40 @@ async function handleExport(title: string, html: string) {
   } catch (error) {
     console.error(error);
   }
+}
+
+export function EditorToggle() {
+  const { editorType, setEditorType } = useContext(EditorContext);
+
+  return (
+    <div className="relative flex rounded-lg items-center bg-white shadow-sm border border-gray-200">
+      <motion.div
+        transition={{ type: "easeInOut", duration: 0.2 }}
+        animate={{ left: editorType === "edit" ? "49%" : "1%" }}
+        className="absolute top-0.5 bottom-0.5 w-1/2 bg-green-600 rounded-md"
+      ></motion.div>
+      <Button
+        onClick={() => setEditorType("produce")}
+        variant="ghost"
+        className={cn(
+          "hover:bg-transparent hover:text-black text-gray-500 flex items-center gap-2 transition",
+          editorType === "produce" && "text-black z-10"
+        )}
+      >
+        Produce
+        <Computer className="h-4 w-4" />
+      </Button>
+      <Button
+        onClick={() => setEditorType("edit")}
+        variant="ghost"
+        className={cn(
+          "hover:bg-transparent hover:text-black text-sm text-gray-600 flex items-center gap-2 transition",
+          editorType === "edit" && "text-black z-10"
+        )}
+      >
+        AI Edit
+        <Pencil className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 }
