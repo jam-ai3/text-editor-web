@@ -11,10 +11,17 @@ import {
   Share,
   XCircle,
 } from "lucide-react";
-import { useContext, useLayoutEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { getWordcount } from "./helpers";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { ACCENT_COLOR } from "@/lib/constants";
 export default function Header() {
   const {
     document,
@@ -100,31 +107,58 @@ async function handleExport(title: string, html: string) {
 
 export function EditorToggle() {
   const { editorType, setEditorType } = useContext(EditorContext);
+  const b1Ref = useRef<HTMLButtonElement>(null);
+  const b2Ref = useRef<HTMLButtonElement>(null);
+  const [pillLeft, setPillLeft] = useState(0);
+  const [pillWidth, setPillWidth] = useState(0);
+  useEffect(() => {
+    if (!b1Ref.current || !b2Ref.current) return;
+    const b1Info = b1Ref.current.getBoundingClientRect();
+    const b2Info = b2Ref.current.getBoundingClientRect();
+    if (editorType === "produce") {
+      setPillLeft(b1Ref.current.offsetLeft);
+      setPillWidth(b1Info.width);
+      return;
+    }
+    if (editorType === "edit") {
+      setPillLeft(b2Ref.current.offsetLeft);
+      setPillWidth(b2Info.width);
+      return;
+    }
+  }, [editorType]);
 
   return (
-    <div className="relative flex rounded-lg items-center bg-white shadow-sm border border-gray-200">
+    <div className="relative flex rounded-lg items-center bg-white shadow-sm border border-gray-200 p-0.5">
       <motion.div
         transition={{ type: "easeInOut", duration: 0.2 }}
-        animate={{ left: editorType === "edit" ? "49%" : "1%" }}
-        className="absolute top-0.5 bottom-0.5 w-1/2 bg-green-600 rounded-md"
+        animate={{
+          left: pillLeft,
+          width: pillWidth,
+        }}
+        style={{
+          background: ACCENT_COLOR,
+        }}
+        className="absolute top-0.5 bottom-0.5 rounded-md z-0"
       ></motion.div>
       <Button
+        ref={b1Ref}
         onClick={() => setEditorType("produce")}
         variant="ghost"
         className={cn(
-          "hover:bg-transparent hover:text-black text-gray-500 flex items-center gap-2 transition",
-          editorType === "produce" && "text-black z-10"
+          "hover:bg-transparent hover:text-black text-gray-500 flex items-center gap-2 transition z-10",
+          editorType === "produce" && "text-black"
         )}
       >
         Produce
         <Computer className="h-4 w-4" />
       </Button>
       <Button
+        ref={b2Ref}
         onClick={() => setEditorType("edit")}
         variant="ghost"
         className={cn(
-          "hover:bg-transparent hover:text-black text-sm text-gray-600 flex items-center gap-2 transition",
-          editorType === "edit" && "text-black z-10"
+          "hover:bg-transparent hover:text-black text-sm text-gray-600 flex items-center gap-2 transition z-10",
+          editorType === "edit" && "text-black"
         )}
       >
         AI Edit
