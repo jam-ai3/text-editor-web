@@ -1,4 +1,4 @@
-import { processSentences } from "@/_actions/document-changes";
+import { checkFullPaperGrammar } from "@/ai-actions/document-changes";
 import { Button } from "@/components/ui/button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { Loader2 } from "lucide-react";
@@ -11,7 +11,7 @@ export default function GrammarPanel() {
 
   async function handleCheckGrammar() {
     setIsLoading(true);
-    await processSentences(context);
+    await checkFullPaperGrammar(context);
     setIsLoading(false);
   }
 

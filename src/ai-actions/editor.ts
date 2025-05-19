@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  getAutocomplete,
-  getGrammar,
-  getLengthened,
-  getShortened,
-  reorderSentences,
-} from "./gemini";
+import Gemini from "./gemini/functions";
 import { EditorContextType } from "@/contexts/editor-provider";
 import { Editor } from "@tiptap/core";
 import { v4 } from "uuid";
@@ -14,7 +8,7 @@ import {
   acceptAutocomplete,
   acceptChanges,
   insertAutocomplete,
-  insertChanges,
+  insertChangesAtSelection,
   rejectAutocomplete,
   rejectChanges,
 } from "@/components/editor/extensions";
@@ -174,7 +168,7 @@ async function handleAutocomplete(context: EditorContextType) {
         .split(" ")
         .slice(0, MAX_CONTENT)
         .join(" ");
-    const value = await getAutocomplete(content);
+    const value = await Gemini.getAutocomplete(content);
     const { improved } = parseGeminiOutput(value);
     insertAutocomplete(context.editor, improved);
     context.setAutocomplete({ text: improved, pos: position });
@@ -190,7 +184,7 @@ export async function handleShorten(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, before, after, from } = getContext(context.editor);
-    const response = await getShortened(before, after, selected);
+    const response = await Gemini.getShortened(before, after, selected);
     showDiff(context, response);
     context.editor.chain().focus().setTextSelection({ from, to: from }).run();
   } catch (error) {
@@ -205,7 +199,7 @@ export async function handleLengthen(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, before, after, from } = getContext(context.editor);
-    const response = await getLengthened(before, after, selected);
+    const response = await Gemini.getLengthened(before, after, selected);
     showDiff(context, response);
     context.editor.chain().focus().setTextSelection({ from, to: from }).run();
   } catch (error) {
@@ -220,7 +214,7 @@ export async function handleGrammar(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, from } = getContext(context.editor);
-    const response = await getGrammar(selected);
+    const response = await Gemini.getGrammar(selected);
     showDiff(context, response);
     context.editor.chain().focus().setTextSelection({ from, to: from }).run();
   } catch (error) {
@@ -235,7 +229,7 @@ export async function handleReorder(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected } = getContext(context.editor);
-    const response = await reorderSentences(selected);
+    const response = await Gemini.reorderSentences(selected);
     showDiff(context, response);
   } catch (error) {
     console.error(error);
@@ -278,7 +272,7 @@ function showDiff(context: EditorContextType, newText: string) {
   // Otherwise, show diff
   const currentId = v4();
   const incomingId = v4();
-  const { current, from } = insertChanges(
+  const { current, from } = insertChangesAtSelection(
     context.editor,
     incoming,
     currentId,

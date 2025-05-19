@@ -14,7 +14,7 @@ import { useMobile } from "@/hooks/use-mobile";
 import { useWindowSize } from "@/hooks/use-window-size";
 // --- Styles ---
 import "@/components/editor/simple-editor.scss";
-import { processKeydown } from "@/_actions/editor";
+import { processKeydown } from "@/ai-actions/editor";
 import MobileToolbarContent from "./mobile-toolbar";
 import MainToolbarContent from "./main-toolbar";
 import Header from "./header";

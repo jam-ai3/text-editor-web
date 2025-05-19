@@ -11,18 +11,15 @@ import {
   Share,
   XCircle,
 } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { getWordcount } from "./helpers";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { ACCENT_COLOR } from "@/lib/constants";
 
 export default function Header() {
-  const {
-    document,
-    setDocument,
-    saveStatus,
-    editor,
-    editorType,
-    setEditorType,
-  } = useContext(EditorContext);
+  const { document, setDocument, saveStatus, editor } =
+    useContext(EditorContext);
 
   function renderSaveStatus() {
     switch (saveStatus) {
@@ -62,16 +59,7 @@ export default function Header() {
         </span>
       </div>
       <div className="flex items-center gap-4">
-        <Button
-          className="w-[100px]"
-          variant={editorType === "produce" ? "accent" : "outline"}
-          onClick={() =>
-            setEditorType((prev) => (prev === "produce" ? "edit" : "produce"))
-          }
-        >
-          <span>{editorType === "produce" ? "AI Edit" : "Produce"}</span>
-          {editorType === "produce" ? <Computer /> : <Pencil />}
-        </Button>
+        <EditorToggle />
         <Button
           onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}
         >
@@ -104,4 +92,68 @@ async function handleExport(title: string, html: string) {
   } catch (error) {
     console.error(error);
   }
+}
+
+export function EditorToggle() {
+  const { editorType, setEditorType } = useContext(EditorContext);
+  const b1Ref = useRef<HTMLButtonElement>(null);
+  const b2Ref = useRef<HTMLButtonElement>(null);
+  const [pillLeft, setPillLeft] = useState(0);
+  const [pillWidth, setPillWidth] = useState(0);
+  useEffect(() => {
+    if (!b1Ref.current || !b2Ref.current) return;
+    const b1Info = b1Ref.current.getBoundingClientRect();
+    const b2Info = b2Ref.current.getBoundingClientRect();
+    if (editorType === "produce") {
+      setPillLeft(b1Ref.current.offsetLeft);
+      setPillWidth(b1Info.width);
+      return;
+    }
+    if (editorType === "edit") {
+      setPillLeft(b2Ref.current.offsetLeft);
+      setPillWidth(b2Info.width);
+      return;
+    }
+  }, [editorType]);
+
+  return (
+    <div className="relative flex items-center bg-white shadow-sm p-0.5 border border-gray-200 rounded-lg">
+      <motion.div
+        transition={{ type: "easeInOut", duration: 0.2 }}
+        animate={{
+          left: pillLeft,
+          width: pillWidth,
+        }}
+        style={{
+          background: ACCENT_COLOR,
+        }}
+        className="top-0.5 bottom-0.5 z-0 absolute rounded-md"
+      ></motion.div>
+      <p className="text-background"></p>
+      <Button
+        ref={b1Ref}
+        onClick={() => setEditorType("produce")}
+        variant="ghost"
+        className={cn(
+          "hover:bg-transparent text-gray-500 flex items-center gap-2 transition z-10",
+          editorType === "produce" && "text-background hover:text-background"
+        )}
+      >
+        <span>Produce</span>
+        <Computer />
+      </Button>
+      <Button
+        ref={b2Ref}
+        onClick={() => setEditorType("edit")}
+        variant="ghost"
+        className={cn(
+          "hover:bg-transparent text-gray-600 flex items-center gap-2 transition z-10",
+          editorType === "edit" && "text-background hover:text-background"
+        )}
+      >
+        <span>AI Edit</span>
+        <Pencil />
+      </Button>
+    </div>
+  );
 }

@@ -11,7 +11,7 @@ import {
   handleLengthen,
   handleReorder,
   handleShorten,
-} from "@/_actions/editor";
+} from "@/ai-actions/editor";
 // import { Button } from "../ui/button";
 
 export default function PopupMenu() {

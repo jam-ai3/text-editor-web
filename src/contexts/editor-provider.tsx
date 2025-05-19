@@ -12,7 +12,7 @@ import {
 import { Editor, useEditor } from "@tiptap/react";
 import { Autocomplete, Change, EditorType, EditType } from "@/lib/types";
 import { Document } from "@prisma/client";
-import { saveDocument } from "@/_actions/document";
+import { saveDocument } from "@/ai-actions/document";
 import editorConfig from "@/components/editor/editor-config";
 import { SHOULD_SAVE } from "@/lib/constants";
 import { findChangeBlockById } from "@/components/editor/helpers";

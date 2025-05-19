@@ -120,3 +120,29 @@ body {
 .change-block-active.accept {
   background-color: #0d09;
 }
+
+.reject {
+  position: relative;
+}
+
+.reject::after {
+  content: attr(data-incoming);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  max-width: 100%;
+  padding: 0.125em 0.25em;
+  translate: -50% 30%;
+  background-color: var(--secondary);
+  border: 2px solid var(--border);
+  border-radius: 0.5em;
+  opacity: 0;
+  transition: 0.3s ease-in-out;
+}
+
+.reject:hover::after,
+.reject:focus::after,
+.change-block-active.reject::after {
+  opacity: 1;
+  translate: -50% 0;
+}

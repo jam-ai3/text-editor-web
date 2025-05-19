@@ -1,6 +1,6 @@
 "use client";
 
-import { createDocument } from "@/_actions/document";
+import { createDocument } from "@/ai-actions/document";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -1,5 +1,6 @@
 import { ACCEPT_COLOR, REJECT_COLOR, SUGGESTION_COLOR } from "@/lib/constants";
 import { Editor, Extension } from "@tiptap/core";
+import { v4 } from "uuid";
 
 export const PreventEnter = Extension.create<{
   shouldPreventEnter: () => boolean;
@@ -36,6 +37,8 @@ export const PreventUndo = Extension.create<{
     };
   },
 });
+
+// ------------------- CHANGE BLOCK -------------------
 
 export const ChangeBlock = Extension.create({
   name: "diffBlock",
@@ -90,37 +93,13 @@ export const ChangeBlock = Extension.create({
               return base;
             },
           },
-        },
-      },
-    ];
-  },
-});
-
-export const AutocompleteBlock = Extension.create({
-  name: "suggestionBlock",
-
-  addOptions() {
-    return {
-      suggestionColor: SUGGESTION_COLOR,
-    };
-  },
-
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["textStyle"],
-        attributes: {
-          suggestion: {
-            default: false,
-            parseHTML: (element) =>
-              element.getAttribute("data-suggestion") === "true",
-            renderHTML: (attributes) =>
-              attributes.suggestion
-                ? {
-                    "data-suggestion": "true",
-                    style: `color: ${this.options.suggestionColor};`,
-                  }
-                : {},
+          incoming: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("data-incoming"),
+            renderHTML: (attributes) => {
+              if (!attributes.incoming) return {};
+              return { "data-incoming": attributes.incoming };
+            },
           },
         },
       },
@@ -128,53 +107,48 @@ export const AutocompleteBlock = Extension.create({
   },
 });
 
-export function insertAutocomplete(
+export function insertChanges(
   editor: Editor,
-  autocomplete: string,
-  at?: number
+  current: string,
+  incoming: string
 ) {
-  const { from } = editor.state.selection;
-  editor.commands.insertContentAt(at ?? from, {
-    type: "text",
-    text: autocomplete,
-    marks: [
-      {
-        type: "textStyle",
-        attrs: { suggestion: true },
-      },
-    ],
-  });
-}
-
-export function acceptAutocomplete(
-  editor: Editor,
-  from: number,
-  autocomplete: string
-) {
-  editor
-    .chain()
-    .setTextSelection({ from: from - 1, to: from + autocomplete.length })
-    .setMark("textStyle", { suggestion: false })
-    .setTextSelection({
-      from: from + autocomplete.length,
-      to: from + autocomplete.length,
-    })
-    .run();
-}
-
-export function rejectAutocomplete(
-  editor: Editor,
-  from: number,
-  autocomplete: string
-) {
+  const currentId = v4();
+  const incomingId = v4();
   editor
     .chain()
     .focus()
-    .deleteRange({ from, to: from + autocomplete.length })
+    .insertContent({
+      type: "text",
+      text: current,
+      marks: [
+        {
+          type: "textStyle",
+          attrs: {
+            diffType: "reject",
+            id: currentId,
+            incoming: "test",
+          },
+        },
+      ],
+    })
+    .insertContent({
+      type: "text",
+      text: incoming,
+      marks: [
+        {
+          type: "textStyle",
+          attrs: {
+            diffType: "accept",
+            id: incomingId,
+          },
+        },
+      ],
+    })
     .run();
+  return { currentId, incomingId };
 }
 
-export function insertChanges(
+export function insertChangesAtSelection(
   editor: Editor,
   incoming: string,
   currentId: string,
@@ -293,6 +267,105 @@ export function rejectChanges(
     .insertContentAt(from, {
       type: "text",
       text: current,
+    })
+    .run();
+}
+
+// ------------------- AUTOCOMPLETE -------------------
+
+export const AutocompleteBlock = Extension.create({
+  name: "suggestionBlock",
+
+  addOptions() {
+    return {
+      suggestionColor: SUGGESTION_COLOR,
+    };
+  },
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["textStyle"],
+        attributes: {
+          suggestion: {
+            default: false,
+            parseHTML: (element) =>
+              element.getAttribute("data-suggestion") === "true",
+            renderHTML: (attributes) =>
+              attributes.suggestion
+                ? {
+                    "data-suggestion": "true",
+                    style: `color: ${this.options.suggestionColor};`,
+                  }
+                : {},
+          },
+        },
+      },
+    ];
+  },
+});
+
+export function insertAutocomplete(
+  editor: Editor,
+  autocomplete: string,
+  at?: number
+) {
+  const { from } = editor.state.selection;
+  editor.commands.insertContentAt(at ?? from, {
+    type: "text",
+    text: autocomplete,
+    marks: [
+      {
+        type: "textStyle",
+        attrs: { suggestion: true },
+      },
+    ],
+  });
+}
+
+export function acceptAutocomplete(
+  editor: Editor,
+  from: number,
+  autocomplete: string
+) {
+  editor
+    .chain()
+    .setTextSelection({ from: from - 1, to: from + autocomplete.length })
+    .setMark("textStyle", { suggestion: false })
+    .setTextSelection({
+      from: from + autocomplete.length,
+      to: from + autocomplete.length,
+    })
+    .run();
+}
+
+export function rejectAutocomplete(
+  editor: Editor,
+  from: number,
+  autocomplete: string
+) {
+  editor
+    .chain()
+    .focus()
+    .deleteRange({ from, to: from + autocomplete.length })
+    .run();
+}
+
+// ------------------- PLAIN TEXT -------------------
+
+export function insertText(editor: Editor, text: string) {
+  editor
+    .chain()
+    .focus()
+    .insertContent({
+      type: "text",
+      text: text,
+      marks: [
+        {
+          type: "textStyle",
+          attrs: {},
+        },
+      ],
     })
     .run();
 }

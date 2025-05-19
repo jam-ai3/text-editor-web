@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { Button } from "../../ui/button";
 import { Check, X } from "lucide-react";
 import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
-import { handleAcceptChange, handleReject } from "@/_actions/editor";
+import { handleAcceptChange, handleReject } from "@/ai-actions/editor";
 import { cn } from "@/lib/utils";
 import { Change } from "@/lib/types";
 
