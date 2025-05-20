@@ -91,6 +91,14 @@ const GeminiPrompts = {
     `CONTEXT BEFORE: ${contextBefore} ` +
     `WORD: ${word} ` +
     `CONTEXT AFTER: ${contextAfter}`,
+
+  paraphrase: {
+    academic: (selected: string) => ``,
+    persuasive: (selected: string) => ``,
+    professional: (selected: string) => ``,
+    simple: (selected: string) => ``,
+    custom: (selected: string) => ``,
+  },
 };
 
 export default GeminiPrompts;

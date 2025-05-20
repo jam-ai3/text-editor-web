@@ -19,6 +19,7 @@ import {
   findChangeBlock,
 } from "@/components/editor/helpers";
 import { MAX_CONTEXT_LENGTH } from "@/lib/constants";
+import { ParaphraseLanguageType } from "@/lib/types";
 
 export async function processKeydown(
   event: KeyboardEvent,
@@ -237,6 +238,23 @@ export async function handleReorder(context: EditorContextType) {
     context.setAiResponseLoading(true);
     const { selected } = getContext(context.editor);
     const response = await Gemini.reorderSentences(selected);
+    showDiff(context, response);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
+}
+
+export async function handleParaphrase(
+  context: EditorContextType,
+  style: ParaphraseLanguageType
+) {
+  if (!context.editor) return;
+  try {
+    context.setAiResponseLoading(true);
+    const { selected } = getContext(context.editor);
+    const response = await Gemini.paraphrase(selected, style);
     showDiff(context, response);
   } catch (error) {
     console.error(error);

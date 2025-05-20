@@ -1,3 +1,4 @@
+import { ParaphraseLanguageType } from "@/lib/types";
 import { updateAnalytics } from "./analytics";
 import { promptFlash, promptFlashLite } from "./gemini";
 import GeminiPrompts from "./prompts";
@@ -71,6 +72,11 @@ const Gemini = {
       contextAfter
     );
     return await promptFlashLite(prompt);
+  },
+
+  paraphrase: async (selected: string, style: ParaphraseLanguageType) => {
+    const prompt = GeminiPrompts.paraphrase[style](selected);
+    return await promptFlash(prompt);
   },
 };
 

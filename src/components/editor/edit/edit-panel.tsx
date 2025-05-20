@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 import { useContext } from "react";
 import ChangesPanel from "./changes-panel";
 import GrammarPanel from "./grammar-panel";
-import ReorderPanel from "./reorder-panel";
+// import ReorderPanel from "./reorder-panel";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import ParaphrasePanel from "./paraphrase-panel";
 
 export const EDIT_PANEL_WIDTH = 400;
 
@@ -15,12 +16,14 @@ export default function EditPanel() {
 
   function renderPanel() {
     switch (editType) {
-      case "reorder": // TODO: implement
-        return <ReorderPanel />;
+      // case "reorder": // TODO: implement
+      //   return <ReorderPanel />;
       case "changes":
         return <ChangesPanel />;
       case "grammar":
         return <GrammarPanel />;
+      case "paraphrase":
+        return <ParaphrasePanel />;
     }
   }
 
@@ -30,7 +33,8 @@ export default function EditPanel() {
       style={{ width: EDIT_PANEL_WIDTH }}
     >
       <div className="flex border-b-2">
-        <EditOption text="Reorder" value="reorder" />
+        <EditOption text="Paraphrase" value="paraphrase" />
+        {/* <EditOption text="Reorder" value="reorder" /> */}
         <EditOption text="Grammar" value="grammar" />
         <EditOption text="Changes" value="changes" isLast />
       </div>

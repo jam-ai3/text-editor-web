@@ -18,4 +18,11 @@ export type Change = {
   reasoning: string;
 };
 
-export type EditType = "changes" | "grammar" | "reorder";
+export type EditType = "changes" | "grammar" | "reorder" | "paraphrase";
+
+export type ParaphraseLanguageType =
+  | "academic"
+  | "persuasive"
+  | "professional"
+  | "simple"
+  | "custom";

@@ -23,7 +23,12 @@ export default function ChangesPanel() {
   return (
     <div className="flex flex-col overflow-y-scroll">
       <div className="space-y-4 p-4">
-        <div>
+        <div className="flex justify-end">
+          <span className="text-muted-foreground text-xs">
+            Total Changes {context.changes.length}
+          </span>
+        </div>
+        <div className="space-y-2">
           <p className="font-semibold">Current</p>
           {context.selectedChange.current.length === 0 ? (
             <p className="font-semibold text-sm text-center">No Current Text</p>
@@ -31,7 +36,7 @@ export default function ChangesPanel() {
             <p className="text-sm">{context.selectedChange?.current}</p>
           )}
         </div>
-        <div>
+        <div className="space-y-2">
           <p className="font-semibold">Incoming</p>
           {context.selectedChange.incoming.length === 0 ? (
             <p className="font-semibold text-sm text-center">
@@ -41,7 +46,7 @@ export default function ChangesPanel() {
             <p className="text-sm">{context.selectedChange?.incoming}</p>
           )}
         </div>
-        {/* <div> TODO: add reasoning
+        {/* <div className="space-y-2"> TODO: add reasoning
           <p className="font-semibold">Reasoning</p>
           <p className="text-sm">{context.selectedChange?.reasoning}</p>
         </div> */}
