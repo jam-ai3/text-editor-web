@@ -9,7 +9,7 @@ interface FontSizeDropdownProps extends Omit<ButtonProps, "type"> {
 }
 
 const BUTTON_SIZE = "16";
-const DEFAULT_FONT_SIZE = "12";
+const DEFAULT_FONT_SIZE = "16";
 
 export default function FontSizeInput({
   editor: providedEditor,
@@ -24,7 +24,6 @@ export default function FontSizeInput({
       const newSize = parseInt(inputSize);
       if (isNaN(newSize)) return setInputSize(trueSize);
       setTrueSize(newSize.toString());
-      // editor.chain().focus().setFontSize(`${newSize}px`).run();
     } catch {
       setInputSize(trueSize);
     }
