@@ -10,6 +10,8 @@ import { Highlight } from "@tiptap/extension-highlight";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { Underline } from "@tiptap/extension-underline";
+import { FontFamily } from "@tiptap/extension-font-family";
+import { FontSize } from "tiptap-extension-font-size";
 // --- Custom Extensions ---
 import { Link } from "@/components/tiptap/tiptap-extension/link-extension";
 import { Selection } from "@/components/tiptap/tiptap-extension/selection-extension";
@@ -44,6 +46,8 @@ const editorConfig = (
   extensions: [
     StarterKit,
     TextAlign.configure({ types: ["heading", "paragraph"] }),
+    FontFamily,
+    FontSize.configure({ types: ["textStyle"] }),
     Underline,
     TaskList,
     TaskItem.configure({ nested: true }),
@@ -61,10 +65,12 @@ const editorConfig = (
     //   onError: (error) => console.error("Upload failed:", error),
     // }),
     TrailingNode,
-    Link.configure({ openOnClick: false }),
     Color,
-    TextStyle,
+    Link.configure({ openOnClick: false }),
+    TextStyle.configure({ mergeNestedSpanStyles: true }),
+
     // Custom
+
     PreventEnter.configure({
       shouldPreventEnter: () =>
         changes.current.length !== 0 || autocomplete.current !== null,

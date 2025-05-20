@@ -15,10 +15,11 @@ import { UndoRedoButton } from "@/components/tiptap/tiptap-ui/undo-redo-button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { useContext } from "react";
 import { EDIT_PANEL_WIDTH } from "./edit/edit-panel";
+import FontSizeInput from "../tiptap/tiptap-ui/font-size-input/font-size-input";
 // import { ThemeToggle } from "./theme-toggle";
 
 export default function MainToolbarContent() {
-  const { editorType } = useContext(EditorContext);
+  const { editorType, editor } = useContext(EditorContext);
 
   return (
     <>
@@ -32,10 +33,15 @@ export default function MainToolbarContent() {
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} />
         <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} />
         <NodeButton type="codeBlock" />
         <NodeButton type="blockquote" />
+      </ToolbarGroup>
+
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <FontSizeInput editor={editor} />
       </ToolbarGroup>
 
       <ToolbarSeparator />

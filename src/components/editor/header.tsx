@@ -99,6 +99,7 @@ export default function Header({ toolbarRef }: HeaderProps) {
 }
 
 async function handleExport(title: string, html: string) {
+  console.log(html);
   const serverUrl = process.env.NEXT_PUBLIC_PYTHON_SERVER_URL;
   if (!serverUrl) return;
   try {
