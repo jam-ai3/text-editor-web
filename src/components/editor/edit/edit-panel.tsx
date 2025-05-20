@@ -8,6 +8,8 @@ import ReorderPanel from "./reorder-panel";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+export const EDIT_PANEL_WIDTH = 400;
+
 export default function EditPanel() {
   const { editType } = useContext(EditorContext);
 
@@ -23,7 +25,10 @@ export default function EditPanel() {
   }
 
   return (
-    <div className="flex flex-col bg-secondary border-l-2 w-[400px] h-full">
+    <div
+      className="flex flex-col bg-secondary border-l-2 h-full"
+      style={{ width: EDIT_PANEL_WIDTH }}
+    >
       <div className="flex border-b-2">
         <EditOption text="Reorder" value="reorder" />
         <EditOption text="Grammar" value="grammar" />

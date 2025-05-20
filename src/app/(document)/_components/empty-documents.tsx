@@ -11,9 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type EmptyDocumentsViewProps = {
   userId: string;
@@ -28,12 +28,26 @@ export default function EmptyDocumentsView({
   const router = useRouter();
 
   async function handleCreate() {
+    if (loading || !title) return;
     setLoading(true);
     await createDocument(title, userId);
     setLoading(false);
     setOpen(false);
     router.refresh();
   }
+
+  useEffect(() => {
+    function handleKeydown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+      } else if (e.key === "Enter") {
+        handleCreate();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeydown);
+    return () => document.removeEventListener("keydown", handleKeydown);
+  }, [title, loading]);
 
   return (
     <main
@@ -64,7 +78,7 @@ export default function EmptyDocumentsView({
             <div className="flex gap-4">
               <DialogClose asChild className="flex-1">
                 <Button>
-                  <ArrowLeft />
+                  <X />
                   <span>Cancel</span>
                 </Button>
               </DialogClose>

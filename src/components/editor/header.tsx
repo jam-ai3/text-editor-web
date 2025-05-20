@@ -16,8 +16,18 @@ import { getWordcount } from "./helpers";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ACCENT_COLOR } from "@/lib/constants";
+import Link from "next/link";
+import Image from "next/image";
+import { Toolbar } from "../tiptap/tiptap-ui-primitive/toolbar/toolbar";
+import MainToolbarContent from "./main-toolbar";
 
-export default function Header() {
+type HeaderProps = {
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+};
+
+const LOGO_SIZE = 48;
+
+export default function Header({ toolbarRef }: HeaderProps) {
   const { document, setDocument, saveStatus, editor } =
     useContext(EditorContext);
 
@@ -44,29 +54,46 @@ export default function Header() {
   }
 
   return (
-    <div className="flex justify-between items-center p-4 h-[var(--header-height)]">
-      <div className="flex items-center gap-4">
-        {renderSaveStatus()}
-        <Input
-          className="w-[256px]"
-          value={document.title}
-          onChange={(e) =>
-            setDocument((prev) => ({ ...prev, title: e.target.value }))
-          }
-        />
-        <span className="text-muted-foreground text-sm">
-          {showWordcount()} Words
-        </span>
+    <div className="px-4 border-b-2 w-full">
+      <div className="flex justify-between items-center p-4 h-[var(--header-height)]">
+        <div className="flex items-center gap-16">
+          <Link href="/">
+            <Image
+              src="/logo-no-bg.png"
+              alt="Logo"
+              width={LOGO_SIZE}
+              height={LOGO_SIZE}
+            />
+          </Link>
+          <div className="flex items-center gap-4">
+            {renderSaveStatus()}
+            <Input
+              className="w-[256px]"
+              value={document.title}
+              onChange={(e) =>
+                setDocument((prev) => ({ ...prev, title: e.target.value }))
+              }
+            />
+            <span className="text-muted-foreground text-sm">
+              {showWordcount()} Words
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <EditorToggle />
+          <Button
+            onClick={() =>
+              handleExport(document.title, editor?.getHTML() ?? "")
+            }
+          >
+            <span>Export</span>
+            <Share />
+          </Button>
+        </div>
       </div>
-      <div className="flex items-center gap-4">
-        <EditorToggle />
-        <Button
-          onClick={() => handleExport(document.title, editor?.getHTML() ?? "")}
-        >
-          <span>Export</span>
-          <Share />
-        </Button>
-      </div>
+      <Toolbar ref={toolbarRef}>
+        <MainToolbarContent />
+      </Toolbar>
     </div>
   );
 }

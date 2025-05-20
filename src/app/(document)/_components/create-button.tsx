@@ -11,9 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type CreateButtonProps = {
   userId: string;
@@ -26,12 +26,26 @@ export default function CreateButton({ userId }: CreateButtonProps) {
   const [loading, setLoading] = useState(false);
 
   async function handleCreate() {
+    if (loading || !title) return;
     setLoading(true);
     await createDocument(title, userId);
     setLoading(false);
     setOpen(false);
     router.refresh();
   }
+
+  useEffect(() => {
+    function handleKeydown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+      } else if (e.key === "Enter") {
+        handleCreate();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeydown);
+    return () => document.removeEventListener("keydown", handleKeydown);
+  }, [title, loading]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -53,7 +67,7 @@ export default function CreateButton({ userId }: CreateButtonProps) {
         <div className="flex gap-4">
           <DialogClose asChild className="flex-1">
             <Button>
-              <ArrowLeft />
+              <X />
               <span>Cancel</span>
             </Button>
           </DialogClose>

@@ -144,37 +144,7 @@ export function SimpleEditor() {
 
   return (
     <EditorContext.Provider value={{ editor }}>
-      <div className="flex items-center gap-4 px-4 border-b-2 w-full">
-        <Link href="/">
-          <Image src="/logo-no-bg.png" alt="Logo" width={64} height={64} />
-        </Link>
-        <div className="w-full">
-          <Header />
-          <Toolbar
-            ref={toolbarRef}
-            style={
-              isMobile
-                ? {
-                    bottom: `calc(100% - ${windowSize.height - rect.y}px)`,
-                  }
-                : {}
-            }
-          >
-            {mobileView === "main" ? (
-              <MainToolbarContent
-                onHighlighterClick={() => setMobileView("highlighter")}
-                onLinkClick={() => setMobileView("link")}
-                isMobile={isMobile}
-              />
-            ) : (
-              <MobileToolbarContent
-                type={mobileView === "highlighter" ? "highlighter" : "link"}
-                onBack={() => setMobileView("main")}
-              />
-            )}
-          </Toolbar>
-        </div>
-      </div>
+      <Header toolbarRef={toolbarRef} />
       <div className="relative flex bg-secondary content-wrapper">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
