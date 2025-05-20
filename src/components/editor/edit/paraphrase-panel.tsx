@@ -13,6 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { handleParaphrase } from "@/ai-actions/editor";
 
 const MAX_CUSTOM_STYLE_LENGTH = 20;
 
@@ -21,6 +22,7 @@ export default function ParaphrasePanel() {
   const [languageStyle, setLanguageStyle] =
     useState<ParaphraseLanguageType>("academic");
   const [customStyle, setCustomStyle] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   if (context.changes.length !== 0) return <UnresolvedChanges />;
   if (!context.editor) return null;
@@ -36,6 +38,12 @@ export default function ParaphrasePanel() {
   function handleStyleChange(event: ChangeEvent<HTMLInputElement>) {
     const text = event.target.value;
     if (text.length < MAX_CUSTOM_STYLE_LENGTH) setCustomStyle(text);
+  }
+
+  async function handleParaphraseClick() {
+    setIsLoading(true);
+    await handleParaphrase(context, languageStyle);
+    setIsLoading(false);
   }
 
   return (
@@ -73,7 +81,12 @@ export default function ParaphrasePanel() {
           onChange={handleStyleChange}
         />
       )}
-      <Button variant="accent" className="w-full">
+      <Button
+        variant="accent"
+        className="w-full"
+        disabled={isLoading}
+        onClick={handleParaphraseClick}
+      >
         <span>Paraphrase</span>
       </Button>
     </div>

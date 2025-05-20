@@ -141,7 +141,6 @@ export function handleRejectChange(
 
 // Metakey handlers
 
-// TODO: handle redo
 async function metakeyOnKeydown(
   event: KeyboardEvent,
   context: EditorContextType

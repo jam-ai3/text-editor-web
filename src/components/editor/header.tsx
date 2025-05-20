@@ -56,7 +56,7 @@ export default function Header({ toolbarRef }: HeaderProps) {
   return (
     <div className="px-4 border-b-2 w-full">
       <div className="flex justify-between items-center p-4 h-[var(--header-height)]">
-        <div className="flex items-center gap-16">
+        <div className="flex items-center gap-4">
           <Link href="/">
             <Image
               src="/logo-no-bg.png"
@@ -65,30 +65,29 @@ export default function Header({ toolbarRef }: HeaderProps) {
               height={LOGO_SIZE}
             />
           </Link>
-          <div className="flex items-center gap-4">
-            {renderSaveStatus()}
-            <Input
-              className="w-[256px]"
-              value={document.title}
-              onChange={(e) =>
-                setDocument((prev) => ({ ...prev, title: e.target.value }))
-              }
-            />
-            <span className="text-muted-foreground text-sm">
-              {showWordcount()} Words
-            </span>
-          </div>
+          <Input
+            className="w-[256px]"
+            value={document.title}
+            onChange={(e) =>
+              setDocument((prev) => ({ ...prev, title: e.target.value }))
+            }
+          />
+          {renderSaveStatus()}
+          <span className="text-muted-foreground text-sm">
+            {showWordcount()} Words
+          </span>
+          {/* TODO: add tools dropdown for export etc */}
         </div>
         <div className="flex items-center gap-4">
           <EditorToggle />
-          <Button
+          {/* <Button
             onClick={() =>
               handleExport(document.title, editor?.getHTML() ?? "")
             }
           >
             <span>Export</span>
             <Share />
-          </Button>
+          </Button> */}
         </div>
       </div>
       <Toolbar ref={toolbarRef}>

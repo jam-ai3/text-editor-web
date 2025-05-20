@@ -96,7 +96,6 @@ export function buildDiff(current: string, incoming: string): DiffBlock[] {
   return result;
 }
 
-// TODO: handle insertions with empty current
 function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   if (!context.editor) return;
 

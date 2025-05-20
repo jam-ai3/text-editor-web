@@ -106,40 +106,14 @@ body {
 // Custom Styles
 
 .change-block {
-  background-color: #f005;
+  background-color: #ff05;
   cursor: pointer;
   position: relative;
   text-decoration: dashed underline;
 }
 .change-block.active {
-  background-color: #f009;
+  background-color: #ff0d;
 }
-
-// .change-block::after {
-//   content: attr(data-incoming);
-//   position: absolute;
-//   bottom: calc(100% + 8px);
-//   left: 0;
-
-//   pointer-events: none;
-
-//   max-width: 80px;
-//   padding: 0.125em 0.25em;
-//   background-color: var(--primary);
-//   color: var(--background);
-//   // border: 2px solid var(--border);
-//   border-radius: 0.5em;
-
-//   translate: 0 30%;
-//   opacity: 0;
-//   transition: 0.3s ease-in-out;
-// }
-
-// .change-block.active::after {
-//   opacity: 1;
-//   // translate: -50% 0;
-//   translate: 0;
-// }
 
 .incoming-block {
   background-color: #0c07;

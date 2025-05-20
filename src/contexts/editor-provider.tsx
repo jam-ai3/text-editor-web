@@ -122,6 +122,8 @@ export default function EditorProvider({
     };
   }, [editor?.getHTML(), doc.title]);
 
+  // TODO: add changes to local storage so users can still accept or decline on ctrl + z
+
   return (
     <EditorContext.Provider
       value={{
