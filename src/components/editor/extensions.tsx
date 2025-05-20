@@ -2,9 +2,11 @@ import { ACCEPT_COLOR, REJECT_COLOR, SUGGESTION_COLOR } from "@/lib/constants";
 import { Editor, Extension } from "@tiptap/core";
 import { v4 } from "uuid";
 
-export const PreventEnter = Extension.create<{
+type PreventEnterMethods = {
   shouldPreventEnter: () => boolean;
-}>({
+};
+
+export const PreventEnter = Extension.create<PreventEnterMethods>({
   name: "preventEnter",
 
   addOptions() {
@@ -20,9 +22,11 @@ export const PreventEnter = Extension.create<{
   },
 });
 
-export const PreventUndo = Extension.create<{
+type PreventUndoMethods = {
   shouldPreventUndo: () => boolean;
-}>({
+};
+
+export const PreventUndo = Extension.create<PreventUndoMethods>({
   name: "preventUndo",
 
   addOptions() {
@@ -41,41 +45,28 @@ export const PreventUndo = Extension.create<{
 // ------------------- CHANGE BLOCK -------------------
 
 export const ChangeBlock = Extension.create({
-  name: "diffBlock",
-
-  addOptions() {
-    return {
-      acceptColor: ACCEPT_COLOR,
-      rejectColor: REJECT_COLOR,
-    };
-  },
+  name: "changeBlock",
 
   addGlobalAttributes() {
     return [
       {
         types: ["textStyle"],
         attributes: {
-          diffType: {
-            default: null,
-            parseHTML: (element) => element.getAttribute("data-diff-type"),
-            renderHTML: (attributes) => {
-              const base: Record<string, string> = {};
-              if (attributes.diffType === "accept") {
-                base["data-diff-type"] = "accept";
-                base["class"] = `accept`;
-              } else if (attributes.diffType === "reject") {
-                base["data-diff-type"] = "reject";
-                base["class"] = `reject`;
-              }
-              return base;
-            },
-          },
           id: {
-            default: null,
             parseHTML: (element) => element.getAttribute("id"),
             renderHTML: (attributes) => {
-              if (!attributes.id) return {};
               return { id: attributes.id };
+            },
+          },
+          changeBlock: {
+            parseHTML: (element) =>
+              element.getAttribute("class") === "change-block",
+            renderHTML: (attributes) => {
+              if (!attributes.changeBlock) return {};
+              return {
+                "data-change-block": "true",
+                class: "change-block",
+              };
             },
           },
           active: {
@@ -86,7 +77,7 @@ export const ChangeBlock = Extension.create({
               const base: Record<string, string> = {};
               if (attributes.active) {
                 base["data-active"] = "true";
-                base["class"] = `change-block-active`;
+                base["class"] = `active`;
               } else {
                 base["data-active"] = "false";
               }
@@ -94,11 +85,12 @@ export const ChangeBlock = Extension.create({
             },
           },
           incoming: {
-            default: null,
             parseHTML: (element) => element.getAttribute("data-incoming"),
             renderHTML: (attributes) => {
               if (!attributes.incoming) return {};
-              return { "data-incoming": attributes.incoming };
+              return {
+                "data-incoming": attributes.incoming,
+              };
             },
           },
         },
@@ -112,8 +104,7 @@ export function insertChanges(
   current: string,
   incoming: string
 ) {
-  const currentId = v4();
-  const incomingId = v4();
+  const id = v4();
   editor
     .chain()
     .focus()
@@ -122,70 +113,31 @@ export function insertChanges(
       text: current,
       marks: [
         {
+          changeBlock: true,
           type: "textStyle",
           attrs: {
-            diffType: "reject",
-            id: currentId,
-            incoming: "test",
-          },
-        },
-      ],
-    })
-    .insertContent({
-      type: "text",
-      text: incoming,
-      marks: [
-        {
-          type: "textStyle",
-          attrs: {
-            diffType: "accept",
-            id: incomingId,
+            id,
+            incoming,
           },
         },
       ],
     })
     .run();
-  return { currentId, incomingId };
+  return { id };
 }
 
 export function insertChangesAtSelection(
   editor: Editor,
   incoming: string,
-  currentId: string,
-  incomingId: string
+  id: string
 ) {
   const { from, to } = editor.state.selection;
   const current = editor.state.doc.textBetween(from, to, "");
-  editor.commands.deleteRange({ from, to });
   editor
     .chain()
     .focus()
-    .insertContentAt(from, {
-      type: "text",
-      text: current.trim(),
-      marks: [
-        {
-          type: "textStyle",
-          attrs: {
-            diffType: "reject",
-            id: currentId,
-          },
-        },
-      ],
-    })
-    .insertContentAt(from + current.trim().length, {
-      type: "text",
-      text: incoming.trim(),
-      marks: [
-        {
-          type: "textStyle",
-          attrs: {
-            diffType: "accept",
-            id: incomingId,
-          },
-        },
-      ],
-    })
+    .setMark("textStyle", { changeBlock: true, id, incoming })
+    .setTextSelection({ from: to, to })
     .run();
   return { current, from };
 }
@@ -194,40 +146,15 @@ export function insertChangesAt(
   editor: Editor,
   current: string,
   incoming: string,
-  currentId: string,
-  incomingId: string,
+  id: string,
   pos: number
 ) {
-  editor.commands.deleteRange({ from: pos, to: pos + current.length });
   editor
     .chain()
     .focus()
-    .insertContentAt(pos, {
-      type: "text",
-      text: current,
-      marks: [
-        {
-          type: "textStyle",
-          attrs: {
-            diffType: "reject",
-            id: currentId,
-          },
-        },
-      ],
-    })
-    .insertContentAt(pos + current.length, {
-      type: "text",
-      text: incoming,
-      marks: [
-        {
-          type: "textStyle",
-          attrs: {
-            diffType: "accept",
-            id: incomingId,
-          },
-        },
-      ],
-    })
+    .setTextSelection({ from: pos, to: pos + current.length })
+    .setMark("textStyle", { changeBlock: true, id, incoming })
+    .setTextSelection({ from: pos + current.length, to: pos + current.length })
     .run();
 }
 
@@ -237,37 +164,96 @@ export function acceptChanges(
   current: string,
   incoming: string
 ) {
+  const length = editor.getText().length + 1;
+  const to = from + current.length > length ? length : from + current.length;
   editor
     .chain()
     .focus()
-    .deleteRange({
-      from,
-      to: from + current.length + incoming.length,
-    })
-    .insertContentAt(from, {
-      type: "text",
-      text: incoming,
+    .deleteRange({ from, to })
+    .insertContentAt(from, { type: "text", text: incoming })
+    .run();
+}
+
+export function rejectChanges(editor: Editor, from: number, current: string) {
+  editor
+    .chain()
+    .focus()
+    .setTextSelection({ from, to: from + current.length })
+    .unsetMark("textStyle")
+    .setTextSelection({
+      from: from + current.length,
+      to: from + current.length,
     })
     .run();
 }
 
-export function rejectChanges(
+// ------------------- INCOMING BLOCK -------------------
+
+export const IncomingBlock = Extension.create({
+  name: "incomingBlock",
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["textStyle"],
+        attributes: {
+          incomingBlock: {
+            parseHTML: (element) =>
+              element.getAttribute("data-incoming-block") === "true",
+            renderHTML: (attributes) => {
+              if (!attributes.incomingBlock) return {};
+              return {
+                "data-incoming-block": "true",
+                class: "incoming-block",
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+});
+
+export function insertIncoming(
   editor: Editor,
-  from: number,
-  current: string,
-  incoming: string
+  text: string,
+  id: string,
+  pos: number
 ) {
   editor
     .chain()
     .focus()
-    .deleteRange({
-      from,
-      to: from + current.length + incoming.length,
-    })
-    .insertContentAt(from, {
+    .insertContentAt(pos, {
       type: "text",
-      text: current,
+      text,
+      marks: [
+        {
+          type: "textStyle",
+          attrs: {
+            incomingBlock: true,
+            id,
+          },
+        },
+      ],
     })
+    .run();
+}
+
+export function acceptIncoming(editor: Editor, from: number, text: string) {
+  editor
+    .chain()
+    .focus()
+    .setTextSelection({ from, to: from + text.length })
+    .unsetMark("textStyle")
+    .setTextSelection({ from: from + text.length, to: from + text.length })
+    .run();
+}
+
+export function rejectIncoming(editor: Editor, from: number, text: string) {
+  editor
+    .chain()
+    .focus()
+    .deleteRange({ from, to: from + text.length })
     .run();
 }
 
@@ -316,6 +302,7 @@ export function insertAutocomplete(
     text: autocomplete,
     marks: [
       {
+        changeBlock: true,
         type: "textStyle",
         attrs: { suggestion: true },
       },

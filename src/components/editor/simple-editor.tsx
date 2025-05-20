@@ -108,12 +108,12 @@ export function SimpleEditor() {
 
     function handleClick(event: MouseEvent) {
       const target = event.target as HTMLElement;
-      if (target.dataset?.diffType) {
+      if (target.dataset.changeBlock || target.dataset.incomingBlock) {
         event.preventDefault();
         context.setEditType("changes");
         context.setSelectedChange(
           context.changes.find(
-            (c) => c.current.id === target.id || c.incoming.id === target.id
+            (c) => c.id === target.id || c.id === target.id
           ) ?? null
         );
       }
@@ -175,22 +175,22 @@ export function SimpleEditor() {
           </Toolbar>
         </div>
       </div>
-      <div className="relative flex content-wrapper">
+      <div className="relative flex bg-secondary content-wrapper">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
           <EditorContent
             editor={editor}
             role="presentation"
-            className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
+            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[720px] simple-editor-content"
           />
         </div>
         <AnimatePresence>
           {context.editorType === "edit" && (
             <motion.div
               key="edit-panel"
-              initial={{ opacity: 1, x: "100%" }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 1, x: "100%" }}
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="h-full"
             >

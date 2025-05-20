@@ -4,8 +4,6 @@ import { Button } from "../../ui/button";
 import { Check, X } from "lucide-react";
 import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
 import { handleAcceptChange, handleReject } from "@/ai-actions/editor";
-import { cn } from "@/lib/utils";
-import { Change } from "@/lib/types";
 
 export default function ChangesPanel() {
   const context = useContext(EditorContext);
@@ -24,24 +22,24 @@ export default function ChangesPanel() {
 
   return (
     <div className="flex flex-col overflow-y-scroll">
-      <div className="flex border-b-2 w-full overflow-x-auto">
-        {context.changes.length > 1 &&
-          context.changes.map((change, i) => (
-            <ChangeTab
-              key={change.current.id}
-              change={change}
-              isLast={i === context.changes.length - 1}
-            />
-          ))}
-      </div>
       <div className="space-y-4 p-4">
         <div>
           <p className="font-semibold">Current</p>
-          <p className="text-sm">{context.selectedChange?.current.text}</p>
+          {context.selectedChange.current.length === 0 ? (
+            <p className="font-semibold text-sm text-center">No Current Text</p>
+          ) : (
+            <p className="text-sm">{context.selectedChange?.current}</p>
+          )}
         </div>
         <div>
           <p className="font-semibold">Incoming</p>
-          <p className="text-sm">{context.selectedChange?.incoming.text}</p>
+          {context.selectedChange.incoming.length === 0 ? (
+            <p className="font-semibold text-sm text-center">
+              No Incoming Text
+            </p>
+          ) : (
+            <p className="text-sm">{context.selectedChange?.incoming}</p>
+          )}
         </div>
         <div>
           <p className="font-semibold">Reasoning</p>
@@ -69,29 +67,5 @@ export default function ChangesPanel() {
         </div>
       </div>
     </div>
-  );
-}
-
-type ChangeTabProps = {
-  change: Change;
-  isLast?: boolean;
-};
-
-function ChangeTab({ change, isLast }: ChangeTabProps) {
-  const context = useContext(EditorContext);
-
-  return (
-    <button
-      className={cn(
-        "min-w-[100px] grow text-xs",
-        !isLast && "border-r-2",
-        context.selectedChange?.current.id === change.current.id &&
-          "bg-border font-semibold"
-      )}
-      onClick={() => context.setSelectedChange(change)}
-    >
-      {change.current.text.slice(0, 10).split(" ").slice(0, -1).join(" ") +
-        "..."}
-    </button>
   );
 }

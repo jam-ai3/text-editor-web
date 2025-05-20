@@ -96,9 +96,11 @@ export default function EditorProvider({
 
   useEffect(() => {
     if (!selectedChange || !editor) return;
-    const start = findChangeBlockById(editor, selectedChange.current.id);
-    if (start !== selectedChange.pos)
+    const start = findChangeBlockById(editor, selectedChange.id);
+    if (start !== selectedChange.pos) {
       setSelectedChange({ ...selectedChange, pos: start });
+      editor.chain().focus().setTextSelection({ from: start, to: start }).run();
+    }
   }, [selectedChange]);
 
   useEffect(() => {

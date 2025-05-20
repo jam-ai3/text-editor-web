@@ -18,12 +18,7 @@ export function removeAutocomplete(editor: Editor) {
 export function removeChanges(editor: Editor) {
   const block = findChangeBlock(editor);
   if (block) {
-    rejectChanges(
-      editor,
-      block.current.from,
-      block.current.text,
-      block.incoming.text
-    );
+    rejectChanges(editor, block.current.from, block.current.text);
     removeChanges(editor);
   }
 }
@@ -46,13 +41,13 @@ export function findChangeBlock(editor: Editor): ChangeBlockResult | null {
   editor.state.doc.descendants((node, pos) => {
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
-      if (mark.type.name === "textStyle" && mark.attrs?.diffType) {
-        const to = pos + node.nodeSize;
-        if (mark.attrs.diffType === "reject") {
-          current = { from: pos, to, text: node.text ?? "" };
-        } else if (mark.attrs.diffType === "accept") {
-          incoming = { from: pos, to, text: node.text ?? "" };
-        }
+      if (mark.type.name === "textStyle" && mark.attrs?.changeBlock) {
+        // const to = pos + node.nodeSize;
+        // if (mark.attrs.diffType === "reject") {
+        //   current = { from: pos, to, text: node.text ?? "" };
+        // } else if (mark.attrs.diffType === "accept") {
+        //   incoming = { from: pos, to, text: node.text ?? "" };
+        // }
       }
     });
 
@@ -63,15 +58,16 @@ export function findChangeBlock(editor: Editor): ChangeBlockResult | null {
 }
 
 export function findChangeBlockById(editor: Editor, id: string) {
-  let pos = 0;
+  let pos = -1;
 
   editor.state.doc.descendants((node, p) => {
-    if (!node.isText) return;
-    node.marks.forEach((mark: Mark) => {
+    if (!node.isText || pos !== -1) return;
+    for (const mark of node.marks) {
       if (mark.type.name === "textStyle" && mark.attrs?.id === id) {
         pos = p;
+        return;
       }
-    });
+    }
   });
 
   return pos;
@@ -106,11 +102,13 @@ export function setActiveBlock(editor: Editor, selectedChange: Change) {
     if (!node.isText) return;
 
     node.marks.forEach((mark) => {
-      if (mark.type.name === "textStyle" && mark.attrs.diffType) {
+      if (
+        mark.type.name === "textStyle" &&
+        (mark.attrs.changeBlock || mark.attrs.incomingBlock)
+      ) {
         const oldId = mark.attrs.id;
         const isActive =
-          oldId === selectedChange.current.id ||
-          oldId === selectedChange.incoming.id;
+          oldId === selectedChange.id || oldId === selectedChange.id;
 
         // Only update if `active` is changing
         if (mark.attrs.active !== isActive) {

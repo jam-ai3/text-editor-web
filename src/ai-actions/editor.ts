@@ -7,10 +7,12 @@ import { v4 } from "uuid";
 import {
   acceptAutocomplete,
   acceptChanges,
+  acceptIncoming,
   insertAutocomplete,
   insertChangesAtSelection,
   rejectAutocomplete,
   rejectChanges,
+  rejectIncoming,
 } from "@/components/editor/extensions";
 import {
   findAutocompleteBlock,
@@ -77,11 +79,13 @@ export function handleAcceptChange(
 ) {
   if (!context.editor || context.selectedChange === null) return;
   event?.preventDefault();
-  const { current, incoming, pos } = context.selectedChange;
-  acceptChanges(context.editor, pos, current.text, incoming.text);
-  const newChanges = context.changes.filter(
-    (change) => change.current.id !== current.id
-  );
+  const { current, incoming, pos, id } = context.selectedChange;
+  if (current.length === 0) {
+    acceptIncoming(context.editor, pos, incoming);
+  } else {
+    acceptChanges(context.editor, pos, current, incoming);
+  }
+  const newChanges = context.changes.filter((change) => change.id !== id);
   context.setChanges(newChanges);
   context.setSelectedChange(newChanges.length > 0 ? newChanges[0] : null);
 }
@@ -90,7 +94,7 @@ export function handleAcceptChange(
 
 function escapeOnKeydown(event: KeyboardEvent, context: EditorContextType) {
   if (!context.editor) return;
-  if (context.selectedChange) handleRejectDiff(event, context);
+  if (context.selectedChange) handleRejectChange(event, context);
   if (context.autocomplete) handleRejectAutocomplete(event, context);
 }
 
@@ -99,7 +103,7 @@ export function handleReject(
   context: EditorContextType
 ) {
   handleRejectAutocomplete(event, context);
-  handleRejectDiff(event, context);
+  handleRejectChange(event, context);
 }
 
 export function handleRejectAutocomplete(
@@ -116,17 +120,19 @@ export function handleRejectAutocomplete(
   context.setAutocomplete(null);
 }
 
-export function handleRejectDiff(
+export function handleRejectChange(
   event: KeyboardEvent | undefined,
   context: EditorContextType
 ) {
   if (!context.editor || context.selectedChange === null) return;
   event?.preventDefault();
-  const { current, incoming, pos } = context.selectedChange;
-  rejectChanges(context.editor, pos, current.text, incoming.text);
-  const newChanges = context.changes.filter(
-    (change) => change.current.id !== current.id
-  );
+  const { current, incoming, pos, id } = context.selectedChange;
+  if (current.length === 0) {
+    rejectIncoming(context.editor, pos, incoming);
+  } else {
+    rejectChanges(context.editor, pos, current);
+  }
+  const newChanges = context.changes.filter((change) => change.id !== id);
   context.setChanges(newChanges);
   context.setSelectedChange(newChanges.length > 0 ? newChanges[0] : null);
 }
@@ -254,14 +260,9 @@ function showDiff(context: EditorContextType, newText: string) {
   if (incoming.trim().length === 0 || !reasoning) {
     context.setChanges([
       {
-        current: {
-          text: "",
-          id: "",
-        },
-        incoming: {
-          text: "",
-          id: "",
-        },
+        id: "",
+        current: "",
+        incoming: "",
         pos: 0,
         reasoning: "No changes were made.",
       },
@@ -270,23 +271,16 @@ function showDiff(context: EditorContextType, newText: string) {
   }
 
   // Otherwise, show diff
-  const currentId = v4();
-  const incomingId = v4();
+  const id = v4();
   const { current, from } = insertChangesAtSelection(
     context.editor,
     incoming,
-    currentId,
-    incomingId
+    id
   );
   const newChange = {
-    current: {
-      id: currentId,
-      text: current,
-    },
-    incoming: {
-      id: incomingId,
-      text: incoming,
-    },
+    id,
+    current,
+    incoming,
     pos: from,
     reasoning,
   };

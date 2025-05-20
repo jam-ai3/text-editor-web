@@ -17,6 +17,7 @@ import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import {
+  IncomingBlock,
   AutocompleteBlock,
   ChangeBlock,
   PreventEnter,
@@ -73,6 +74,7 @@ const editorConfig = (
         changes.current.length !== 0 || autocomplete.current !== null,
     }),
     ChangeBlock,
+    IncomingBlock,
     AutocompleteBlock,
   ],
   content,
