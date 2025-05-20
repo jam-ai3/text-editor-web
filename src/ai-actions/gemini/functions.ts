@@ -59,6 +59,44 @@ const Gemini = {
     updateAnalytics("reorder");
     return await promptFlash(prompt);
   },
+
+  getSynonyms: async (
+    word: string,
+    contextBefore: string,
+    contextAfter: string
+  ) => {
+    const prompt = GeminiPrompts.synonymsPrompt(
+      word,
+      contextBefore,
+      contextAfter
+    );
+    return await promptFlashLite(prompt);
+  },
 };
 
 export default Gemini;
+
+export type GeminiOutput = {
+  improved: string;
+  reasoning: string | null;
+};
+
+export function parseGeminiOutput(output: string): GeminiOutput {
+  try {
+    return JSON.parse(
+      output.replaceAll("```json", "").replaceAll("```", "")
+    ) as GeminiOutput;
+  } catch (error) {
+    console.error("Failed to parse Gemini output:", error);
+    return { improved: "", reasoning: null };
+  }
+}
+
+export function parseGeminiSynonymOutput(output: string): string[] {
+  try {
+    return JSON.parse(output);
+  } catch (error) {
+    console.error("Failed to parse Gemini output:", error);
+    return [];
+  }
+}

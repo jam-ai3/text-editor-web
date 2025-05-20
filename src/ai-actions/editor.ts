@@ -1,6 +1,6 @@
 "use client";
 
-import Gemini from "./gemini/functions";
+import Gemini, { parseGeminiOutput } from "./gemini/functions";
 import { EditorContextType } from "@/contexts/editor-provider";
 import { Editor } from "@tiptap/core";
 import { v4 } from "uuid";
@@ -18,6 +18,7 @@ import {
   findAutocompleteBlock,
   findChangeBlock,
 } from "@/components/editor/helpers";
+import { MAX_CONTEXT_LENGTH } from "@/lib/constants";
 
 export async function processKeydown(
   event: KeyboardEvent,
@@ -165,14 +166,14 @@ async function handleAutocomplete(context: EditorContextType) {
         .getText()
         .substring(0, position)
         .split(" ")
-        .slice(-MAX_CONTENT)
+        .slice(-MAX_CONTEXT_LENGTH)
         .join(" ") +
       "[ADD NEW CONTENT HERE]" +
       context.editor
         .getText()
         .substring(position)
         .split(" ")
-        .slice(0, MAX_CONTENT)
+        .slice(0, MAX_CONTEXT_LENGTH)
         .join(" ");
     const value = await Gemini.getAutocomplete(content);
     const { improved } = parseGeminiOutput(value);
@@ -290,24 +291,6 @@ function showDiff(context: EditorContextType, newText: string) {
 
 // Generic Gemini and helper functions
 
-export type GeminiOutput = {
-  improved: string;
-  reasoning: string | null;
-};
-
-const MAX_CONTENT = 100;
-
-export function parseGeminiOutput(output: string): GeminiOutput {
-  try {
-    return JSON.parse(
-      output.replaceAll("```json", "").replaceAll("```", "")
-    ) as GeminiOutput;
-  } catch (error) {
-    console.error("Failed to parse Gemini output:", error);
-    return { improved: "", reasoning: null };
-  }
-}
-
 export function getContext(editor: Editor) {
   const { from, to } = editor.state.selection;
   const selected = editor.getText().substring(from - 1, to);
@@ -315,13 +298,13 @@ export function getContext(editor: Editor) {
     .getText()
     .substring(0, from)
     .split(" ")
-    .slice(-MAX_CONTENT)
+    .slice(-MAX_CONTEXT_LENGTH)
     .join(" ");
   const after = editor
     .getText()
     .substring(to)
     .split(" ")
-    .slice(0, MAX_CONTENT)
+    .slice(0, MAX_CONTEXT_LENGTH)
     .join(" ");
   return { selected, before, after, from, to };
 }
