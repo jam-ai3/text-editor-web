@@ -1,4 +1,4 @@
-import { ACCEPT_COLOR, REJECT_COLOR, SUGGESTION_COLOR } from "@/lib/constants";
+import { SUGGESTION_COLOR } from "@/lib/constants";
 import { Editor, Extension } from "@tiptap/core";
 import { v4 } from "uuid";
 

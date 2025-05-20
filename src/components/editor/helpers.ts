@@ -18,7 +18,7 @@ export function removeAutocomplete(editor: Editor) {
 export function removeChanges(editor: Editor) {
   const block = findChangeBlock(editor);
   if (block) {
-    rejectChanges(editor, block.current.from, block.current.text);
+    rejectChanges(editor, block.from, block.text);
     removeChanges(editor);
   }
 }
@@ -29,32 +29,25 @@ type ChangeBlockInfo = {
   text: string;
 };
 
-type ChangeBlockResult = {
-  current: ChangeBlockInfo;
-  incoming: ChangeBlockInfo;
-};
-
-export function findChangeBlock(editor: Editor): ChangeBlockResult | null {
-  let current: ChangeBlockInfo | null = null;
-  let incoming: ChangeBlockInfo | null = null;
+export function findChangeBlock(editor: Editor): ChangeBlockInfo | null {
+  let change: ChangeBlockInfo | null = null;
 
   editor.state.doc.descendants((node, pos) => {
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
-      if (mark.type.name === "textStyle" && mark.attrs?.changeBlock) {
-        // const to = pos + node.nodeSize;
-        // if (mark.attrs.diffType === "reject") {
-        //   current = { from: pos, to, text: node.text ?? "" };
-        // } else if (mark.attrs.diffType === "accept") {
-        //   incoming = { from: pos, to, text: node.text ?? "" };
-        // }
+      if (
+        (mark.type.name === "textStyle" && mark.attrs?.changeBlock) ||
+        mark.attrs?.incomingBlock
+      ) {
+        const to = pos + node.nodeSize;
+        change = { from: pos, to, text: node.text ?? "" };
       }
     });
 
     return;
   });
 
-  return current === null || incoming === null ? null : { current, incoming };
+  return change;
 }
 
 export function findChangeBlockById(editor: Editor, id: string) {

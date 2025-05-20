@@ -18,11 +18,17 @@ export default function GrammarPanel() {
   if (context.changes.length !== 0) return <UnresolvedChanges />;
 
   return (
-    <div>
-      <Button onClick={handleCheckGrammar}>
-        <span>{isLoading ? "Checking..." : "Check Grammar"}</span>
-        {isLoading && <Loader2 className="animate-spin" size={16} />}
-      </Button>
+    <div className="place-items-center grid h-full">
+      <div className="flex flex-col items-center gap-4 max-w-4/5">
+        <p className="font-semibold text-lg">Grammar</p>
+        <p className="text-muted-foreground text-center">
+          Check the grammar of your entire document for errors
+        </p>
+        <Button onClick={handleCheckGrammar}>
+          <span>{isLoading ? "Checking..." : "Check Grammar"}</span>
+          {isLoading && <Loader2 className="animate-spin" size={16} />}
+        </Button>
+      </div>
     </div>
   );
 }

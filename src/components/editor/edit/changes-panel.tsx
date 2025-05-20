@@ -41,10 +41,10 @@ export default function ChangesPanel() {
             <p className="text-sm">{context.selectedChange?.incoming}</p>
           )}
         </div>
-        <div>
+        {/* <div> TODO: add reasoning
           <p className="font-semibold">Reasoning</p>
           <p className="text-sm">{context.selectedChange?.reasoning}</p>
-        </div>
+        </div> */}
         <div className="flex gap-2">
           <Button
             onClick={() => handleAcceptChange(undefined, context)}

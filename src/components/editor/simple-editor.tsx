@@ -4,7 +4,6 @@ import * as React from "react";
 import { EditorContent, EditorContext } from "@tiptap/react";
 import { EditorContext as CustomEditorContext } from "@/contexts/editor-provider";
 // --- UI Primitives ---
-import { Toolbar } from "@/components/tiptap/tiptap-ui-primitive/toolbar";
 // --- Tiptap Node ---
 import "@/components/tiptap/tiptap-node/code-block-node/code-block-node.scss";
 import "@/components/tiptap/tiptap-node/list-node/list-node.scss";
@@ -15,11 +14,7 @@ import { useWindowSize } from "@/hooks/use-window-size";
 // --- Styles ---
 import "@/components/editor/simple-editor.scss";
 import { processKeydown } from "@/ai-actions/editor";
-import MobileToolbarContent from "./mobile-toolbar";
-import MainToolbarContent from "./main-toolbar";
 import Header from "./header";
-import Image from "next/image";
-import Link from "next/link";
 import PopupMenu from "./bubble-menu";
 import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
 import EditPanel from "./edit/edit-panel";
