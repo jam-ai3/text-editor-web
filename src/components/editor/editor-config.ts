@@ -22,8 +22,7 @@ import {
   IncomingBlock,
   AutocompleteBlock,
   ChangeBlock,
-  PreventEnter,
-  PreventUndo,
+  Keyhandler,
 } from "./extensions";
 // import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import { Autocomplete, Change } from "@/lib/types";
@@ -68,15 +67,9 @@ const editorConfig = (
     Color,
     Link.configure({ openOnClick: false }),
     TextStyle.configure({ mergeNestedSpanStyles: true }),
-
     // Custom
-
-    PreventEnter.configure({
-      shouldPreventEnter: () =>
-        changes.current.length !== 0 || autocomplete.current !== null,
-    }),
-    PreventUndo.configure({
-      shouldPreventUndo: () =>
+    Keyhandler.configure({
+      shouldPreventKeys: () =>
         changes.current.length !== 0 || autocomplete.current !== null,
     }),
     ChangeBlock,

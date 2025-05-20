@@ -2,6 +2,8 @@ import { Editor, JSONContent } from "@tiptap/react";
 import { Mark } from "prosemirror-model";
 import { rejectAutocomplete, rejectChanges } from "./extensions";
 import { Change } from "@/lib/types";
+import { EditorContextType } from "@/contexts/editor-provider";
+import { Dispatch, SetStateAction } from "react";
 
 export function getWordcount(text: string) {
   return text.trim().split(" ").length;
@@ -138,4 +140,33 @@ export function getBlocks(node: JSONContent) {
   node.content.forEach((child) => blocks.push(...getBlocks(child)));
 
   return blocks;
+}
+
+export function updateChanges(context: EditorContextType) {
+  console.log("update called");
+  const ids: string[] = [];
+
+  if (!context.editor) return;
+  context.editor.state.doc.descendants((node, pos) => {
+    if (!node.isText) return;
+    node.marks.forEach((mark: Mark) => {
+      if (
+        (mark.type.name === "textStyle" && mark.attrs?.changeBlock) ||
+        mark.attrs?.incomingBlock
+      ) {
+        ids.push(mark.attrs.id);
+      }
+    });
+  });
+
+  const existingChanges: Change[] = JSON.parse(
+    localStorage.getItem("changes") || "[]"
+  );
+
+  const newChanges = existingChanges.filter((c) => ids.includes(c.id));
+
+  context.setChanges(newChanges);
+  if (context.selectedChange === null && newChanges.length > 0) {
+    context.setSelectedChange(newChanges[0]);
+  }
 }

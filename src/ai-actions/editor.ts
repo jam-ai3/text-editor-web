@@ -17,6 +17,7 @@ import {
 import {
   findAutocompleteBlock,
   findChangeBlock,
+  updateChanges,
 } from "@/components/editor/helpers";
 import { MAX_CONTEXT_LENGTH } from "@/lib/constants";
 import { ParaphraseLanguageType } from "@/lib/types";
@@ -263,10 +264,7 @@ export async function handleParaphrase(
 }
 
 function handleUndo(context: EditorContextType) {
-  if (!context.editor) return;
-  const changeBlock = findChangeBlock(context.editor);
-  const autocompleteBlock = findAutocompleteBlock(context.editor);
-  if (changeBlock || autocompleteBlock) context.editor.commands.undo();
+  updateChanges(context);
 }
 
 function showDiff(context: EditorContextType, newText: string) {

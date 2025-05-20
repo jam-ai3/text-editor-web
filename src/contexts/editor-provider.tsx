@@ -36,7 +36,7 @@ export type EditorContextType = {
   saveStatus: SaveStatus;
 };
 
-export const EditorContext = createContext<EditorContextType>({
+export const defaultEditorContext: EditorContextType = {
   editor: null,
   editorType: "produce",
   setEditorType: () => {},
@@ -60,7 +60,10 @@ export const EditorContext = createContext<EditorContextType>({
   },
   setDocument: () => {},
   saveStatus: "success",
-});
+};
+
+export const EditorContext =
+  createContext<EditorContextType>(defaultEditorContext);
 
 type EditorProviderProps = {
   children: ReactNode;
@@ -91,7 +94,19 @@ export default function EditorProvider({
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
 
   useEffect(() => {
+    // update Ref
     changesRef.current = changes;
+
+    // handle local changes storage
+    const existingChanges: Change[] = JSON.parse(
+      localStorage.getItem("changes") || "[]"
+    );
+    const joinedChanges = [...existingChanges, ...changes];
+    const uniqueChanges = joinedChanges.filter(
+      (change, index) =>
+        joinedChanges.findIndex((c) => c.id === change.id) === index
+    );
+    localStorage.setItem("changes", JSON.stringify(uniqueChanges));
   }, [changes]);
 
   useEffect(() => {
@@ -122,7 +137,10 @@ export default function EditorProvider({
     };
   }, [editor?.getHTML(), doc.title]);
 
-  // TODO: add changes to local storage so users can still accept or decline on ctrl + z
+  useEffect(() => {
+    // clear changes on refresh
+    localStorage.setItem("changes", "[]");
+  }, []);
 
   return (
     <EditorContext.Provider

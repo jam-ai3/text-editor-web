@@ -2,42 +2,24 @@ import { SUGGESTION_COLOR } from "@/lib/constants";
 import { Editor, Extension } from "@tiptap/core";
 import { v4 } from "uuid";
 
-type PreventEnterMethods = {
-  shouldPreventEnter: () => boolean;
+type KeyhandlerArgs = {
+  shouldPreventKeys: () => boolean;
 };
 
-export const PreventEnter = Extension.create<PreventEnterMethods>({
+export const Keyhandler = Extension.create<KeyhandlerArgs>({
   name: "preventEnter",
 
   addOptions() {
     return {
-      shouldPreventEnter: () => false,
+      shouldPreventKeys: () => false,
     };
   },
 
   addKeyboardShortcuts() {
     return {
-      Enter: () => this.options.shouldPreventEnter(),
-    };
-  },
-});
-
-type PreventUndoMethods = {
-  shouldPreventUndo: () => boolean;
-};
-
-export const PreventUndo = Extension.create<PreventUndoMethods>({
-  name: "preventUndo",
-
-  addOptions() {
-    return {
-      shouldPreventUndo: () => false,
-    };
-  },
-
-  addKeyboardShortcuts() {
-    return {
-      "mod-z": () => this.options.shouldPreventUndo(),
+      Enter: () => this.options.shouldPreventKeys(),
+      "mod-z": () => this.options.shouldPreventKeys(),
+      "mod-shift-z": () => this.options.shouldPreventKeys(),
     };
   },
 });

@@ -106,11 +106,8 @@ export function SimpleEditor() {
       if (target.dataset.changeBlock || target.dataset.incomingBlock) {
         event.preventDefault();
         context.setEditType("changes");
-        context.setSelectedChange(
-          context.changes.find(
-            (c) => c.id === target.id || c.id === target.id
-          ) ?? null
-        );
+        const change = context.changes.find((c) => c.id === target.id);
+        context.setSelectedChange(change ?? null);
       }
     }
 
