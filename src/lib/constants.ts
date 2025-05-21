@@ -14,6 +14,7 @@ export const SUGGESTION_COLOR = "#777";
 export const ACCENT_COLOR = "#049904";
 
 export const SHOULD_SAVE = process.env.NODE_ENV !== "development";
+// export const SHOULD_SAVE = true;
 
 export type Product = {
   id: string;

@@ -92,6 +92,7 @@ export default function EditorProvider({
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
+  const html = editor?.getHTML();
 
   useEffect(() => {
     // update Ref
@@ -116,7 +117,7 @@ export default function EditorProvider({
       setSelectedChange({ ...selectedChange, pos: start });
       editor.chain().focus().setTextSelection({ from: start, to: start }).run();
     }
-  }, [selectedChange]);
+  }, [selectedChange, editor]);
 
   useEffect(() => {
     // use debounce to save document after 2 seconds of no typing
@@ -125,9 +126,9 @@ export default function EditorProvider({
     if (saveTimer) clearTimeout(saveTimer);
     setSaveTimer(
       setTimeout(() => {
-        if (!editor) return;
+        if (!html) return;
         setSaveStatus("pending");
-        saveDocument(document.id, doc.title, editor.getHTML(), userId)
+        saveDocument(document.id, doc.title, html, userId)
           .then(() => setSaveStatus("success"))
           .catch(() => setSaveStatus("error"));
       }, 2000)
@@ -135,7 +136,7 @@ export default function EditorProvider({
     return () => {
       if (saveTimer) clearTimeout(saveTimer);
     };
-  }, [editor?.getHTML(), doc.title]);
+  }, [html, doc.title, document.id, userId]);
 
   useEffect(() => {
     // clear changes on refresh

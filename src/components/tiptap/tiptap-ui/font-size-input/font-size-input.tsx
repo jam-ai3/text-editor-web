@@ -51,7 +51,7 @@ export default function FontSizeInput({
 
   useEffect(() => {
     editor?.chain().focus().setFontSize(`${trueSize}px`).run();
-  }, [trueSize]);
+  }, [trueSize, editor]);
 
   useEffect(() => {
     if (!editor) return;
@@ -78,7 +78,7 @@ export default function FontSizeInput({
 
     setInputSize(fontSize);
     setTrueSize(fontSize);
-  }, [editor?.state.selection]);
+  }, [editor?.state.selection, editor]);
 
   return (
     <div className="flex items-center gap-2">
