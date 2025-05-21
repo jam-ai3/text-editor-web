@@ -14,7 +14,7 @@ import { useWindowSize } from "@/hooks/use-window-size";
 // --- Styles ---
 import "@/components/editor/simple-editor.scss";
 import { processKeydown } from "@/ai-actions/editor";
-import Header from "./header";
+import Header from "./header/header";
 import PopupMenu from "./bubble-menu";
 import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
 import EditPanel from "./edit/edit-panel";

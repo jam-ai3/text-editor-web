@@ -1,7 +1,7 @@
 import { checkFullPaperGrammar } from "@/ai-actions/document-changes";
 import { Button } from "@/components/ui/button";
 import { EditorContext } from "@/contexts/editor-provider";
-import { Loader2, Search } from "lucide-react";
+import { FileCheck, Loader2 } from "lucide-react";
 import { useContext, useState } from "react";
 import { UnresolvedChanges } from "./edit-panel";
 
@@ -26,13 +26,14 @@ export default function GrammarPanel() {
         </p>
         <Button
           onClick={handleCheckGrammar}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 w-full"
+          variant="accent"
         >
           <span>{isLoading ? "Checking..." : "Check"}</span>
           {isLoading ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            <Search />
+            <FileCheck />
           )}
         </Button>
       </div>

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Separator } from "@/components/tiptap/tiptap-ui-primitive/separator";
 import "@/components/tiptap/tiptap-ui-primitive/toolbar/toolbar.scss";
+import { cn } from "@/lib/utils";
 
 type BaseProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -243,7 +244,7 @@ export const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
         role="toolbar"
         aria-label="toolbar"
         data-variant={variant}
-        className={`tiptap-toolbar ${className || ""}`}
+        className={cn("tiptap-toolbar", className)}
         {...props}
       >
         {children}
