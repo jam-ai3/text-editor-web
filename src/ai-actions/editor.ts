@@ -259,7 +259,6 @@ export async function handleParaphrase(
     context.setAiResponseLoading(true);
     const { selected } = getContext(context.editor);
     const res = await Gemini.paraphrase(selected, style, customTone);
-    console.log(res);
     if (isError(res)) return; // TODO: handle error
     const { paraphrased } = parseGeminiParaphrase(res);
     showDiff(context, paraphrased);

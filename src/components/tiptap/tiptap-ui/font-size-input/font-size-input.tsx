@@ -53,7 +53,6 @@ export default function FontSizeInput({
     editor?.chain().focus().setFontSize(`${trueSize}px`).run();
     // don't set mark if only changing size of selected text
     if (editor?.state.selection.empty) {
-      console.log("update mark: ", trueSize);
       editor?.commands.setMark("textStyle", { fontSize: `${trueSize}px` });
     }
   }, [trueSize, editor]);
