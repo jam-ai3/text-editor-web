@@ -1,5 +1,5 @@
 import { Editor } from "@tiptap/react";
-import { ButtonProps } from "../../tiptap-ui-primitive/button";
+import { Button, ButtonProps } from "../../tiptap-ui-primitive/button";
 import { useEffect, useState } from "react";
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 import { Minus, Plus } from "lucide-react";
@@ -82,9 +82,9 @@ export default function FontSizeInput({
 
   return (
     <div className="flex items-center gap-2">
-      <button onClick={handleDecrease}>
-        <Minus size={BUTTON_SIZE} />
-      </button>
+      <Button onClick={handleDecrease} data-style="ghost">
+        <Minus size={BUTTON_SIZE} className="tiptap-button-icon" />
+      </Button>
       <input
         type="text"
         className="py-0.5 border-1 rounded-md w-[5ch] text-sm text-center"
@@ -93,9 +93,9 @@ export default function FontSizeInput({
         onChange={(e) => setInputSize(e.target.value)}
         onBlur={handleInput}
       />
-      <button onClick={handleIncrease}>
-        <Plus size={BUTTON_SIZE} />
-      </button>
+      <Button onClick={handleIncrease} data-style="ghost">
+        <Plus size={BUTTON_SIZE} className="tiptap-button-icon" />
+      </Button>
     </div>
   );
 }

@@ -143,11 +143,10 @@ export function getBlocks(node: JSONContent) {
 }
 
 export function updateChanges(context: EditorContextType) {
-  console.log("update called");
   const ids: string[] = [];
 
   if (!context.editor) return;
-  context.editor.state.doc.descendants((node, pos) => {
+  context.editor.state.doc.descendants((node) => {
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
       if (

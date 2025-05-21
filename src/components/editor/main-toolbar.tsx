@@ -3,9 +3,7 @@ import {
   ToolbarGroup,
   ToolbarSeparator,
 } from "@/components/tiptap/tiptap-ui-primitive/toolbar";
-import { HeadingDropdownMenu } from "@/components/tiptap/tiptap-ui/heading-dropdown-menu";
 import { HighlightPopover } from "@/components/tiptap/tiptap-ui/highlight-popover";
-// import { ImageUploadButton } from "@/components/tiptap/tiptap-ui/image-upload-button";
 import { LinkPopover } from "@/components/tiptap/tiptap-ui/link-popover";
 import { ListDropdownMenu } from "@/components/tiptap/tiptap-ui/list-dropdown-menu";
 import { MarkButton } from "@/components/tiptap/tiptap-ui/mark-button";
@@ -14,17 +12,14 @@ import { TextAlignButton } from "@/components/tiptap/tiptap-ui/text-align-button
 import { UndoRedoButton } from "@/components/tiptap/tiptap-ui/undo-redo-button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { useContext } from "react";
-import { EDIT_PANEL_WIDTH } from "./edit/edit-panel";
 import FontSizeInput from "../tiptap/tiptap-ui/font-size-input/font-size-input";
-// import { ThemeToggle } from "./theme-toggle";
+import ShareButton from "./header/share-btn";
 
 export default function MainToolbarContent() {
-  const { editorType, editor } = useContext(EditorContext);
+  const { editor } = useContext(EditorContext);
 
   return (
     <>
-      <Spacer />
-
       <ToolbarGroup>
         <UndoRedoButton action="undo" />
         <UndoRedoButton action="redo" />
@@ -72,14 +67,9 @@ export default function MainToolbarContent() {
         <TextAlignButton align="justify" />
       </ToolbarGroup>
 
-      {/* <ToolbarSeparator />
-      <ToolbarGroup>
-      <ImageUploadButton text="Add" />
-      </ToolbarGroup> */}
-
       <Spacer />
 
-      {editorType === "edit" && <div style={{ width: EDIT_PANEL_WIDTH }} />}
+      <ShareButton />
     </>
   );
 }

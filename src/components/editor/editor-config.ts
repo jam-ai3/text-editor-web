@@ -24,7 +24,6 @@ import {
   ChangeBlock,
   Keyhandler,
 } from "./extensions";
-// import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
 
@@ -56,13 +55,6 @@ const editorConfig = (
     Superscript,
     Subscript,
     Selection,
-    // ImageUploadNode.configure({
-    //   accept: "image/*",
-    //   maxSize: MAX_FILE_SIZE,
-    //   limit: 3,
-    //   upload: handleImageUpload,
-    //   onError: (error) => console.error("Upload failed:", error),
-    // }),
     TrailingNode,
     Color,
     Link.configure({ openOnClick: false }),
