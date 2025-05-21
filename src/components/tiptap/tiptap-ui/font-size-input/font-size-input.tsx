@@ -83,7 +83,7 @@ export default function FontSizeInput({
       setInputSize(fontSize);
       setTrueSize(fontSize);
     }
-  }, [editor?.state.selection]);
+  }, [editor?.state.selection, editor]);
 
   return (
     <div className="flex items-center gap-2">
