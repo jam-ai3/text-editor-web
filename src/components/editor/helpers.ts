@@ -3,7 +3,6 @@ import { Mark } from "prosemirror-model";
 import { rejectAutocomplete, rejectChanges } from "./extensions";
 import { Change } from "@/lib/types";
 import { EditorContextType } from "@/contexts/editor-provider";
-import { Dispatch, SetStateAction } from "react";
 
 export function getWordcount(text: string) {
   return text.trim().split(" ").length;
