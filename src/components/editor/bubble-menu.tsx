@@ -76,7 +76,10 @@ export default function PopupMenu() {
   return (
     <BubbleMenu
       pluginKey="bubbleMenuText"
-      className="flex flex-col bg-secondary border-2 rounded-md max-w-max"
+      className={cn(
+        "flex flex-col bg-secondary border-2 rounded-md max-w-max",
+        context.changes.length !== 0 && "hidden pointer-events-none"
+      )}
       tippyOptions={{ duration: 150 }}
       editor={context.editor}
       shouldShow={({ from, to }) => from !== to}

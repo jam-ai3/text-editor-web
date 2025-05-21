@@ -30,12 +30,6 @@ export async function processKeydown(
     tabOnKeydown(event, context);
   } else if (event.key === "Escape") {
     escapeOnKeydown(event, context);
-  } else if (
-    context.selectedChange ||
-    context.autocomplete ||
-    context.aiResponseLoading
-  ) {
-    event.preventDefault();
   } else if (event.metaKey) {
     await metakeyOnKeydown(event, context);
   }

@@ -1,11 +1,12 @@
 import { Extension } from "@tiptap/core";
+import { Plugin, PluginKey } from "prosemirror-state";
 
 type KeyhandlerArgs = {
   shouldPreventKeys: () => boolean;
 };
 
 export const Keyhandler = Extension.create<KeyhandlerArgs>({
-  name: "preventEnter",
+  name: "preventAllKeys",
 
   addOptions() {
     return {
@@ -13,11 +14,20 @@ export const Keyhandler = Extension.create<KeyhandlerArgs>({
     };
   },
 
-  addKeyboardShortcuts() {
-    return {
-      Enter: () => this.options.shouldPreventKeys(),
-      "mod-z": () => this.options.shouldPreventKeys(),
-      "mod-shift-z": () => this.options.shouldPreventKeys(),
-    };
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("preventAllKeys"),
+        props: {
+          handleKeyDown: (_, event) => {
+            if (this.options.shouldPreventKeys()) {
+              event.preventDefault();
+              return true; // prevent default behavior
+            }
+            return false;
+          },
+        },
+      }),
+    ];
   },
 });
