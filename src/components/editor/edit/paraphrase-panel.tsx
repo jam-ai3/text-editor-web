@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleParaphrase } from "@/ai-actions/editor";
-import { Replace } from "lucide-react";
+import { Loader2, Replace } from "lucide-react";
 
 const MAX_CUSTOM_STYLE_LENGTH = 20;
 
@@ -43,7 +43,11 @@ export default function ParaphrasePanel() {
 
   async function handleParaphraseClick() {
     setIsLoading(true);
-    await handleParaphrase(context, languageStyle);
+    await handleParaphrase(
+      context,
+      languageStyle,
+      languageStyle === "custom" ? customStyle : undefined
+    );
     setIsLoading(false);
   }
 
@@ -88,8 +92,8 @@ export default function ParaphrasePanel() {
         disabled={isLoading || (languageStyle === "custom" && !customStyle)}
         onClick={handleParaphraseClick}
       >
-        <span>Paraphrase</span>
-        <Replace />
+        <span>{isLoading ? "Paraphrasing..." : "Paraphrase"}</span>
+        {isLoading ? <Loader2 className="animate-spin" /> : <Replace />}
       </Button>
     </div>
   );

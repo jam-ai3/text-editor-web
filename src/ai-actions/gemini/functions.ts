@@ -74,17 +74,18 @@ const Gemini = {
     return await promptFlashLite(prompt);
   },
 
-  paraphrase: async (selected: string, style: ParaphraseLanguageType, customTone?: string) => {
-    if (style === "custom" && customTone) {
+  paraphrase: async (
+    selected: string,
+    style: ParaphraseLanguageType,
+    customTone?: string
+  ) => {
+    if (style === "custom") {
+      if (!customTone) return { error: "No custom tone provided" };
       const isValidPrompt = GeminiPrompts.validTonePrompt(customTone);
       const isValid = await promptFlash(isValidPrompt);
-      if (isValid === "1") {
-        const prompt = GeminiPrompts.paraphrase.custom(customTone, selected);
-        return await promptFlash(prompt)
-      } else {
-        // TODO: return error message
-        return ""
-      }
+      if (isValid === "0") return { error: "Invalid tone provided" };
+      const prompt = GeminiPrompts.customParaphrase(customTone, selected);
+      return await promptFlash(prompt);
     }
     const prompt = GeminiPrompts.paraphrase[style](selected);
     return await promptFlash(prompt);
@@ -93,27 +94,42 @@ const Gemini = {
 
 export default Gemini;
 
-export type GeminiOutput = {
+export type GeminiImproved = {
   improved: string;
   reasoning: string | null;
 };
 
-export function parseGeminiOutput(output: string): GeminiOutput {
+export function parseGeminiImproved(output: string): GeminiImproved {
   try {
     return JSON.parse(
       output.replaceAll("```json", "").replaceAll("```", "")
-    ) as GeminiOutput;
+    ) as GeminiImproved;
   } catch (error) {
     console.error("Failed to parse Gemini output:", error);
     return { improved: "", reasoning: null };
   }
 }
 
-export function parseGeminiSynonymOutput(output: string): string[] {
+export function parseGeminiSynonym(output: string): string[] {
   try {
     return JSON.parse(output);
   } catch (error) {
     console.error("Failed to parse Gemini output:", error);
     return [];
+  }
+}
+
+type GeminiParaphrase = {
+  paraphrased: string;
+};
+
+export function parseGeminiParaphrase(output: string): GeminiParaphrase {
+  try {
+    return JSON.parse(
+      output.replaceAll("```json", "").replaceAll("```", "")
+    ) as GeminiParaphrase;
+  } catch (error) {
+    console.error("Failed to parse Gemini output:", error);
+    return { paraphrased: "" };
   }
 }

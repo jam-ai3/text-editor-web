@@ -19,9 +19,7 @@ import {
   handleReorder,
   handleShorten,
 } from "@/ai-actions/editor";
-import Gemini, {
-  parseGeminiSynonymOutput,
-} from "@/ai-actions/gemini/functions";
+import Gemini, { parseGeminiSynonym } from "@/ai-actions/gemini/functions";
 import { capitalized, cn } from "@/lib/utils";
 
 export default function PopupMenu() {
@@ -54,7 +52,7 @@ export default function PopupMenu() {
         contextBefore,
         contextAfter
       );
-      const parsed = parseGeminiSynonymOutput(output);
+      const parsed = parseGeminiSynonym(output);
       setSynonyms(parsed);
     } finally {
       setSynonymsLoading(false);

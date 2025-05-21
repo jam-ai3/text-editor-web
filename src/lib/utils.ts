@@ -13,3 +13,11 @@ export function zip<T, U>(a: T[], b: U[]): [T, U][] {
 export function capitalized(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+type Error = {
+  error: string;
+};
+
+export function isError<T>(error: T | Error): error is Error {
+  return (error as Error).error !== undefined;
+}
