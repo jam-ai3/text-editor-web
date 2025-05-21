@@ -74,7 +74,18 @@ const Gemini = {
     return await promptFlashLite(prompt);
   },
 
-  paraphrase: async (selected: string, style: ParaphraseLanguageType) => {
+  paraphrase: async (selected: string, style: ParaphraseLanguageType, customTone?: string) => {
+    if (style === "custom" && customTone) {
+      const isValidPrompt = GeminiPrompts.validTonePrompt(customTone);
+      const isValid = await promptFlash(isValidPrompt);
+      if (isValid === "1") {
+        const prompt = GeminiPrompts.paraphrase.custom(customTone, selected);
+        return await promptFlash(prompt)
+      } else {
+        // TODO: return error message
+        return ""
+      }
+    }
     const prompt = GeminiPrompts.paraphrase[style](selected);
     return await promptFlash(prompt);
   },
