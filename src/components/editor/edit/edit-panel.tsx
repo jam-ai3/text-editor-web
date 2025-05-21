@@ -33,9 +33,9 @@ export default function EditPanel() {
       style={{ width: EDIT_PANEL_WIDTH }}
     >
       <div className="flex border-b-2">
+        <EditOption text="Grammar" value="grammar" />
         <EditOption text="Paraphrase" value="paraphrase" />
         {/* <EditOption text="Reorder" value="reorder" /> */}
-        <EditOption text="Grammar" value="grammar" />
         <EditOption text="Changes" value="changes" isLast />
       </div>
       {renderPanel()}

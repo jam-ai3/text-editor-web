@@ -15,8 +15,7 @@ export async function checkFullPaperGrammar(context: EditorContextType) {
     (block) =>
       (block.type === "normal" && block.text.length !== 0) ||
       (block.type === "diff" &&
-        (block.current.trim().length !== 0 ||
-          block.incoming.trim().length !== 0))
+        (block.current.length !== 0 || block.incoming.length !== 0))
   );
 
   showDiff(context, diff);
@@ -113,7 +112,10 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
     }
 
     const id = v4();
-    if (block.current.length === 0) {
+    if (
+      block.current.length === 0 ||
+      areEqualWhitespace(block.current, block.incoming)
+    ) {
       insertIncoming(context.editor, block.incoming, id, pos);
       pos += block.incoming.length;
     } else {
@@ -138,4 +140,8 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
       .setTextSelection({ from: changes[0].pos, to: changes[0].pos })
       .run();
   }
+}
+
+function areEqualWhitespace(a: string, b: string) {
+  return a.replace(/\s/g, "") === b.replace(/\s/g, "");
 }

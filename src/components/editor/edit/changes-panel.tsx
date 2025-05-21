@@ -30,19 +30,33 @@ export default function ChangesPanel() {
         </div>
         <div className="space-y-2">
           <p className="font-semibold">Current</p>
-          {context.selectedChange.current.length === 0 ? (
+          {context.selectedChange.current.length === 0 && (
             <p className="font-semibold text-sm text-center">No Current Text</p>
-          ) : (
+          )}
+          {context.selectedChange.current.length > 0 &&
+            context.selectedChange.current.trim().length === 0 && (
+              <p className="text-sm italic">
+                Whitespace: {`"${context.selectedChange?.current}"`}
+              </p>
+            )}
+          {context.selectedChange.current.trim().length > 0 && (
             <p className="text-sm">{context.selectedChange?.current}</p>
           )}
         </div>
         <div className="space-y-2">
           <p className="font-semibold">Incoming</p>
-          {context.selectedChange.incoming.length === 0 ? (
+          {context.selectedChange.incoming.length === 0 && (
             <p className="font-semibold text-sm text-center">
               No Incoming Text
             </p>
-          ) : (
+          )}
+          {context.selectedChange.incoming.length > 0 &&
+            context.selectedChange.incoming.trim().length === 0 && (
+              <p className="text-sm italic">
+                Whitespace: {`"${context.selectedChange?.incoming}"`}
+              </p>
+            )}
+          {context.selectedChange.incoming.trim().length > 0 && (
             <p className="text-sm">{context.selectedChange?.incoming}</p>
           )}
         </div>

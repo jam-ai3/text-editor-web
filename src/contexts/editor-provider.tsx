@@ -40,7 +40,7 @@ export const defaultEditorContext: EditorContextType = {
   editor: null,
   editorType: "produce",
   setEditorType: () => {},
-  editType: "changes",
+  editType: "grammar",
   setEditType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
@@ -79,7 +79,7 @@ export default function EditorProvider({
   userId,
 }: EditorProviderProps) {
   const [editorType, setEditorType] = useState<EditorType>("produce");
-  const [editType, setEditType] = useState<EditType>("changes");
+  const [editType, setEditType] = useState<EditType>("grammar");
   const [autocomplete, setAutocomplete] = useState<Autocomplete | null>(null);
   const autocompleteRef = useRef(autocomplete);
   const [changes, setChanges] = useState<Change[]>([]);
