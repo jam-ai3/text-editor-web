@@ -51,6 +51,11 @@ export default function FontSizeInput({
 
   useEffect(() => {
     editor?.chain().focus().setFontSize(`${trueSize}px`).run();
+    // don't set mark if only changing size of selected text
+    if (editor?.state.selection.empty) {
+      console.log("update mark: ", trueSize);
+      editor?.commands.setMark("textStyle", { fontSize: `${trueSize}px` });
+    }
   }, [trueSize, editor]);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export default function FontSizeInput({
     const { state } = editor;
     const { from, to } = state.selection;
 
-    let fontSize = DEFAULT_FONT_SIZE;
+    let fontSize: string | undefined = undefined;
 
     state.doc.nodesBetween(from, to, (node) => {
       if (node.marks) {
@@ -67,18 +72,18 @@ export default function FontSizeInput({
           (mark) => mark.type.name === "textStyle" && mark.attrs.fontSize
         );
         if (fontSizeMark) {
-          fontSize =
-            parseInt(fontSizeMark.attrs.fontSize)?.toString() ??
-            DEFAULT_FONT_SIZE;
+          fontSize = parseInt(fontSizeMark.attrs.fontSize)?.toString();
           return false; // stop early if found
         }
       }
       return true;
     });
 
-    setInputSize(fontSize);
-    setTrueSize(fontSize);
-  }, [editor?.state.selection, editor]);
+    if (fontSize) {
+      setInputSize(fontSize);
+      setTrueSize(fontSize);
+    }
+  }, [editor?.state.selection]);
 
   return (
     <div className="flex items-center gap-2">

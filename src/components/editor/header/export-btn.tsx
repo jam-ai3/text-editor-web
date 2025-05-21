@@ -9,7 +9,7 @@ import { EditorContext } from "@/contexts/editor-provider";
 import { Share } from "lucide-react";
 import React, { useContext } from "react";
 
-export default function ShareButton() {
+export default function ExportButton() {
   const { document } = useContext(EditorContext);
 
   function handleExportClick(type: FileType) {
@@ -20,16 +20,16 @@ export default function ShareButton() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
-          <span>Share</span>
+          <span>Export</span>
           <Share />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={handleExportClick.bind(null, "pdf")}>
-          PDF
+          {"PDF Document (.pdf)"}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleExportClick.bind(null, "docx")}>
-          docx
+          {"Word (.docx)"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

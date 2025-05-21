@@ -25,7 +25,7 @@ export default function ChangesPanel() {
       <div className="space-y-4 p-4">
         <div className="flex justify-end">
           <span className="text-muted-foreground text-xs">
-            Total Changes {context.changes.length}
+            Total Changes Remaining: {context.changes.length}
           </span>
         </div>
         <div className="space-y-2">

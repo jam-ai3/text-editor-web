@@ -81,7 +81,7 @@ export default function ParaphrasePanel() {
       </div>
       {languageStyle === "custom" && (
         <Input
-          placeholder="Style"
+          placeholder="Ex. 'funny', 'conversational', 'exciting'"
           value={customStyle}
           onChange={handleStyleChange}
         />

@@ -106,11 +106,13 @@ export default function PopupMenu() {
               icon={Edit}
               description="Grammar"
             />
-            <MenuButton
-              onClick={handleReorder.bind(null, context)}
-              icon={ArrowUpDown}
-              description="Reorder"
-            />
+            {!isOneWord && (
+              <MenuButton
+                onClick={handleReorder.bind(null, context)}
+                icon={ArrowUpDown}
+                description="Reorder"
+              />
+            )}
             {isOneWord && (
               <MenuButton
                 disabled={synonymsLoading || synonyms.length > 0}

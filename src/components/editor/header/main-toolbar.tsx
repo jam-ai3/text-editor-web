@@ -13,7 +13,7 @@ import { UndoRedoButton } from "@/components/tiptap/tiptap-ui/undo-redo-button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { useContext } from "react";
 import FontSizeInput from "../../tiptap/tiptap-ui/font-size-input/font-size-input";
-import ShareButton from "./share-btn";
+import ExportButton from "./export-btn";
 
 export default function MainToolbarContent() {
   const { editor } = useContext(EditorContext);
@@ -69,7 +69,7 @@ export default function MainToolbarContent() {
 
       <Spacer />
 
-      <ShareButton />
+      <ExportButton />
     </>
   );
 }
