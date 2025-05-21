@@ -12,12 +12,12 @@ import { Superscript } from "@tiptap/extension-superscript";
 import { Underline } from "@tiptap/extension-underline";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { FontSize } from "tiptap-extension-font-size";
-// --- Custom Extensions ---
 import { Link } from "@/components/tiptap/tiptap-extension/link-extension";
 import { Selection } from "@/components/tiptap/tiptap-extension/selection-extension";
 import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node-extension";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
+// --- Custom Extensions ---
 import {
   IncomingBlock,
   AutocompleteBlock,

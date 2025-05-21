@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleParaphrase } from "@/ai-actions/editor";
+import { Replace } from "lucide-react";
 
 const MAX_CUSTOM_STYLE_LENGTH = 20;
 
@@ -84,10 +85,11 @@ export default function ParaphrasePanel() {
       <Button
         variant="accent"
         className="w-full"
-        disabled={isLoading}
+        disabled={isLoading || (languageStyle === "custom" && !customStyle)}
         onClick={handleParaphraseClick}
       >
         <span>Paraphrase</span>
+        <Replace />
       </Button>
     </div>
   );

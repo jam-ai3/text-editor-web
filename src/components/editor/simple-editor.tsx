@@ -143,7 +143,7 @@ export function SimpleEditor() {
           <EditorContent
             editor={editor}
             role="presentation"
-            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[720px] simple-editor-content"
+            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[816px] simple-editor-content"
           />
         </div>
         <AnimatePresence>

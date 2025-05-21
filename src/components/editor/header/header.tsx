@@ -8,7 +8,7 @@ import { getWordcount } from "../helpers";
 import Link from "next/link";
 import Image from "next/image";
 import { Toolbar } from "../../tiptap/tiptap-ui-primitive/toolbar/toolbar";
-import MainToolbarContent from "../main-toolbar";
+import MainToolbarContent from "./main-toolbar";
 import EditorToggle from "./editor-toggle";
 
 type HeaderProps = {
