@@ -9,7 +9,6 @@ import "@/components/tiptap/tiptap-node/code-block-node/code-block-node.scss";
 import "@/components/tiptap/tiptap-node/list-node/list-node.scss";
 import "@/components/tiptap/tiptap-node/image-node/image-node.scss";
 import "@/components/tiptap/tiptap-node/paragraph-node/paragraph-node.scss";
-import { useMobile } from "@/hooks/use-mobile";
 import { useWindowSize } from "@/hooks/use-window-size";
 // --- Styles ---
 import "@/components/editor/simple-editor.scss";
@@ -24,11 +23,7 @@ import { AnimatePresence, motion } from "framer-motion";
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
   const editor = context.editor;
-  const isMobile = useMobile();
   const windowSize = useWindowSize();
-  const [mobileView, setMobileView] = React.useState<
-    "main" | "highlighter" | "link"
-  >("main");
   const [rect, setRect] = React.useState<
     Pick<DOMRect, "x" | "y" | "width" | "height">
   >({
@@ -89,12 +84,6 @@ export function SimpleEditor() {
 
     checkCursorVisibility();
   }, [editor, rect.height, windowSize.height]);
-
-  React.useEffect(() => {
-    if (!isMobile && mobileView !== "main") {
-      setMobileView("main");
-    }
-  }, [isMobile, mobileView]);
 
   React.useEffect(() => {
     function handleKeydown(event: KeyboardEvent) {

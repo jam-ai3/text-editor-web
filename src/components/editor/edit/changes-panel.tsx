@@ -1,9 +1,10 @@
 import { EditorContext } from "@/contexts/editor-provider";
 import { useContext } from "react";
 import { Button } from "../../ui/button";
-import { Check, X } from "lucide-react";
+import { Check, CheckCheck, X } from "lucide-react";
 import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
 import { handleAcceptChange, handleReject } from "@/ai-actions/editor";
+import { Change } from "@/lib/types";
 
 export default function ChangesPanel() {
   const context = useContext(EditorContext);
@@ -21,69 +22,108 @@ export default function ChangesPanel() {
     );
 
   return (
-    <div className="flex flex-col overflow-y-scroll">
-      <div className="space-y-4 p-4">
-        <div className="flex justify-end">
-          <span className="text-muted-foreground text-xs">
-            Total Changes Remaining: {context.changes.length}
-          </span>
-        </div>
-        <div className="space-y-2">
-          <p className="font-semibold">Current</p>
-          {context.selectedChange.current.length === 0 && (
-            <p className="font-semibold text-sm text-center">No Current Text</p>
+    <div className="flex flex-col gap-4 p-4 overflow-y-scroll">
+      <div className="flex gap-4">
+        <Button
+          className="flex-1"
+          style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
+        >
+          <CheckCheck />
+          <span className="font-semibold">Accept All</span>
+        </Button>
+        <Button
+          className="flex-1"
+          style={{ backgroundColor: REJECT_COLOR_STRONG }}
+        >
+          <X />
+          <span className="font-semibold">Reject All</span>
+        </Button>
+      </div>
+      {context.changes.map((change) => (
+        <ChangeTab key={change.id} change={change} />
+      ))}
+    </div>
+  );
+}
+
+type ChangeTabProps = {
+  change: Change;
+};
+
+function ChangeTab({ change }: ChangeTabProps) {
+  const context = useContext(EditorContext);
+
+  if (context.selectedChange?.id !== change.id)
+    return (
+      <div
+        className="bg-secondary px-4 py-2 border-2 rounded-md cursor-pointer"
+        onClick={() => context.setSelectedChange(change)}
+      >
+        {change.current.trim().length === 0 &&
+          change.incoming.trim().length === 0 && (
+            <p className="text-sm italic">Whitespace Replacement</p>
           )}
-          {context.selectedChange.current.length > 0 &&
-            context.selectedChange.current.trim().length === 0 && (
-              <p className="text-sm italic">
-                Whitespace: {`"${context.selectedChange?.current}"`}
-              </p>
-            )}
-          {context.selectedChange.current.trim().length > 0 && (
-            <p className="text-sm">{context.selectedChange?.current}</p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <p className="font-semibold">Incoming</p>
-          {context.selectedChange.incoming.length === 0 && (
-            <p className="font-semibold text-sm text-center">
-              No Incoming Text
+        {change.current.length > 0 ? (
+          <p className="text-sm truncate">{change.current}</p>
+        ) : (
+          <p className="text-sm truncate">{change.incoming}</p>
+        )}
+      </div>
+    );
+
+  return (
+    <div className="space-y-4 bg-secondary px-4 py-2 border-2 rounded-md">
+      <div className="space-y-1">
+        <p className="font-semibold text-sm">Current</p>
+        {context.selectedChange.current.length === 0 && (
+          <p className="font-semibold text-sm text-center">No Current Text</p>
+        )}
+        {context.selectedChange.current.length > 0 &&
+          context.selectedChange.current.trim().length === 0 && (
+            <p className="text-sm italic">
+              Whitespace: {`"${context.selectedChange?.current}"`}
             </p>
           )}
-          {context.selectedChange.incoming.length > 0 &&
-            context.selectedChange.incoming.trim().length === 0 && (
-              <p className="text-sm italic">
-                Whitespace: {`"${context.selectedChange?.incoming}"`}
-              </p>
-            )}
-          {context.selectedChange.incoming.trim().length > 0 && (
-            <p className="text-sm">{context.selectedChange?.incoming}</p>
+        {context.selectedChange.current.trim().length > 0 && (
+          <p className="text-sm">{context.selectedChange?.current}</p>
+        )}
+      </div>
+      <div className="space-y-1">
+        <p className="font-semibold text-sm">Incoming</p>
+        {context.selectedChange.incoming.length === 0 && (
+          <p className="font-semibold text-sm text-center">No Incoming Text</p>
+        )}
+        {context.selectedChange.incoming.length > 0 &&
+          context.selectedChange.incoming.trim().length === 0 && (
+            <p className="text-sm italic">
+              Whitespace: {`"${context.selectedChange?.incoming}"`}
+            </p>
           )}
-        </div>
-        {/* <div className="space-y-2"> TODO: add reasoning
-          <p className="font-semibold">Reasoning</p>
-          <p className="text-sm">{context.selectedChange?.reasoning}</p>
-        </div> */}
-        <div className="flex gap-2">
-          <Button
-            onClick={() => handleAcceptChange(undefined, context)}
-            className="flex flex-1 items-center gap-2"
-            style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
-          >
-            <Check />
-            <span className="font-semibold">Accept</span>
-            <span className="text-xs">{"(Tab)"}</span>
-          </Button>
-          <Button
-            onClick={() => handleReject(undefined, context)}
-            className="flex flex-1 items-center gap-2"
-            style={{ backgroundColor: REJECT_COLOR_STRONG }}
-          >
-            <X />
-            <span className="font-semibold">Reject</span>
-            <span className="text-xs">{"(Esc)"}</span>
-          </Button>
-        </div>
+        {context.selectedChange.incoming.trim().length > 0 && (
+          <p className="text-sm">{context.selectedChange?.incoming}</p>
+        )}
+      </div>
+      <div className="flex gap-2">
+        <Button
+          onClick={() => handleAcceptChange(undefined, context)}
+          className="flex flex-1 items-center gap-2"
+          style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
+          size="sm"
+        >
+          <Check />
+          <span className="font-semibold">Accept</span>
+          <span className="text-xs">{"(Tab)"}</span>
+        </Button>
+        <Button
+          onClick={() => handleReject(undefined, context)}
+          className="flex flex-1 items-center gap-2"
+          style={{ backgroundColor: REJECT_COLOR_STRONG }}
+          size="sm"
+        >
+          <X />
+          <span className="font-semibold">Reject</span>
+          <span className="text-xs">{"(Esc)"}</span>
+        </Button>
       </div>
     </div>
   );

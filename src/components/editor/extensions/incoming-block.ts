@@ -1,4 +1,4 @@
-import { Editor, Extension } from "@tiptap/react";
+import { ChainedCommands, Editor, Extension } from "@tiptap/react";
 
 export const IncomingBlock = Extension.create({
   name: "incomingBlock",
@@ -48,6 +48,27 @@ export function insertIncoming(
       ],
     })
     .run();
+}
+
+export function insertIncomingChain(
+  chain: ChainedCommands,
+  text: string,
+  id: string,
+  pos: number
+) {
+  return chain.insertContentAt(pos, {
+    type: "text",
+    text,
+    marks: [
+      {
+        type: "textStyle",
+        attrs: {
+          incomingBlock: true,
+          id,
+        },
+      },
+    ],
+  });
 }
 
 export function acceptIncoming(editor: Editor, from: number, text: string) {

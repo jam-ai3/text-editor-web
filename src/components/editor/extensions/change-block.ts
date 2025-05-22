@@ -1,4 +1,4 @@
-import { Editor, Extension } from "@tiptap/react";
+import { ChainedCommands, Editor, Extension } from "@tiptap/react";
 import { v4 } from "uuid";
 
 export const ChangeBlock = Extension.create({
@@ -113,6 +113,19 @@ export function insertChangesAt(
     .setMark("textStyle", { changeBlock: true, id, incoming })
     .setTextSelection({ from: pos + current.length, to: pos + current.length })
     .run();
+}
+
+export function insertChangesChain(
+  chain: ChainedCommands,
+  current: string,
+  incoming: string,
+  id: string,
+  pos: number
+) {
+  return chain
+    .setTextSelection({ from: pos, to: pos + current.length })
+    .setMark("textStyle", { changeBlock: true, id, incoming })
+    .setTextSelection({ from: pos + current.length, to: pos + current.length });
 }
 
 export function acceptChanges(

@@ -4,6 +4,8 @@ import { Change } from "@/lib/types";
 import {
   insertIncoming,
   insertChangesAt,
+  insertIncomingChain,
+  insertChangesChain,
 } from "@/components/editor/extensions";
 import { v4 } from "uuid";
 
@@ -100,6 +102,7 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
 
   const changes: Change[] = [];
   let pos = 1;
+  let chain = context.editor.chain().focus();
 
   for (const block of blocks) {
     if (block.type === "normal") {
@@ -112,14 +115,11 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
     }
 
     const id = v4();
-    if (
-      block.current.length === 0 ||
-      areEqualWhitespace(block.current, block.incoming)
-    ) {
-      insertIncoming(context.editor, block.incoming, id, pos);
+    if (block.current.length === 0) {
+      insertIncomingChain(chain, block.incoming, id, pos);
       pos += block.incoming.length;
     } else {
-      insertChangesAt(context.editor, block.current, block.incoming, id, pos);
+      insertChangesChain(chain, block.current, block.incoming, id, pos);
       pos += block.current.length;
     }
     changes.push({
@@ -130,6 +130,8 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
       reasoning: "",
     });
   }
+
+  chain.run();
 
   context.setChanges(changes);
   if (changes.length > 0) {
@@ -142,6 +144,6 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   }
 }
 
-function areEqualWhitespace(a: string, b: string) {
-  return a.replace(/\s/g, "") === b.replace(/\s/g, "");
-}
+export function acceptAllChanges() {}
+
+export function rejectAllChanges() {}

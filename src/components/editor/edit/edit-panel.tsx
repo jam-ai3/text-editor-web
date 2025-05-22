@@ -29,7 +29,7 @@ export default function EditPanel() {
 
   return (
     <div
-      className="flex flex-col bg-secondary border-l-2 h-full"
+      className="flex flex-col bg-[var(--tertiary)] border-l-2 h-full"
       style={{ width: EDIT_PANEL_WIDTH }}
     >
       <div className="flex border-b-2">

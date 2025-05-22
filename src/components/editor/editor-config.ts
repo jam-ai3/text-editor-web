@@ -1,7 +1,6 @@
 // import { ImageUploadNode } from "@/components/tiptap/tiptap-node/image-upload-node";
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
-import { Image } from "@tiptap/extension-image";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskList } from "@tiptap/extension-task-list";
 import { TextAlign } from "@tiptap/extension-text-align";
@@ -50,7 +49,6 @@ const editorConfig = (
     TaskList,
     TaskItem.configure({ nested: true }),
     Highlight.configure({ multicolor: true }),
-    Image,
     Typography,
     Superscript,
     Subscript,

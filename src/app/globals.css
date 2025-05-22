@@ -129,6 +129,14 @@
 :root {
   --custom-accent: rgb(4, 153, 4);
   --custom-accent-dark: rgb(3, 128, 3);
+  --tertiary: oklch(0.92 0 0); /* medium-light gray */
+  --tertiary-foreground: oklch(0.2 0 0); /* dark text */
+  --border-secondary: oklch(0.8 0 0);
+}
+
+.dark {
+  --tertiary: oklch(0.25 0 0); /* dark gray */
+  --tertiary-foreground: oklch(0.95 0 0); /* light text */
 }
 
 button {
