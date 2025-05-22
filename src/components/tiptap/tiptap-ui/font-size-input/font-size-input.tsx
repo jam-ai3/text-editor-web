@@ -1,5 +1,4 @@
-import { Editor } from "@tiptap/react";
-import { Button, ButtonProps } from "../../tiptap-ui-primitive/button";
+import { Button } from "../../tiptap-ui-primitive/button";
 import { useContext, useEffect, useState } from "react";
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 import { Minus, Plus } from "lucide-react";
