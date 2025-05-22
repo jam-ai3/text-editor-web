@@ -27,7 +27,7 @@ export default function ChangesPanel() {
   }, [context.selectedChange]);
 
   function handleDismiss() {
-    context.setNoChanges(true);
+    context.setNoChanges(false);
     context.setEditorType("produce");
   }
 
