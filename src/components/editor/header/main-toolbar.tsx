@@ -10,8 +10,6 @@ import { MarkButton } from "@/components/tiptap/tiptap-ui/mark-button";
 import { NodeButton } from "@/components/tiptap/tiptap-ui/node-button";
 import { TextAlignButton } from "@/components/tiptap/tiptap-ui/text-align-button";
 import { UndoRedoButton } from "@/components/tiptap/tiptap-ui/undo-redo-button";
-import { EditorContext } from "@/contexts/editor-provider";
-import { useContext } from "react";
 import FontSizeInput from "../../tiptap/tiptap-ui/font-size-input/font-size-input";
 import ExportButton from "./export-btn";
 import AutocompleteButton from "./autocomplete-button";
