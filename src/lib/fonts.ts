@@ -17,25 +17,6 @@ import {
 
 export const DEFAULT_FONT_FAMILY = "Arial";
 
-export function filterFonts(fonts: FontFamilies, selected: string) {
-  console.log(document.fonts.check("16px Dancing dogs"));
-  return {
-    sansSerif: fonts.sansSerif.filter((font) => font !== selected),
-    serif: fonts.serif.filter((font) => font !== selected),
-    monospace: fonts.monospace.filter((font) => font !== selected),
-    decorative: fonts.decorative.filter((font) => font !== selected),
-  };
-}
-
-export type FontFamilies = typeof FONT_FAMILIES;
-
-export const EMPTY_FONTS = {
-  sansSerif: [],
-  serif: [],
-  monospace: [],
-  decorative: [],
-};
-
 export const FONT_FAMILIES = {
   sansSerif: [
     "Arial",

@@ -22,6 +22,8 @@ export async function checkFullPaperGrammar(context: EditorContextType) {
         (block.current.length !== 0 || block.incoming.length !== 0))
   );
 
+  console.log(diff);
+
   showDiff(context, diff);
 }
 
@@ -102,7 +104,7 @@ export function buildDiff(current: string, incoming: string): DiffBlock[] {
 function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   if (!context.editor) return;
 
-  if (context.changes.length === 0) return context.setNoChanges(true);
+  if (blocks.length === 0) return context.setNoChanges(true);
 
   const changes: Change[] = [];
   let pos = 1;

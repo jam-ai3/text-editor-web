@@ -12,19 +12,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  DEFAULT_FONT_FAMILY,
-  EMPTY_FONTS,
-  filterFonts,
-  FONT_FAMILIES,
-  FontFamilies,
-} from "@/lib/fonts";
+import { DEFAULT_FONT_FAMILY, FONT_FAMILIES } from "@/lib/fonts";
 
 export default function FontFamilyInput() {
   const context = useContext(EditorContext);
   const editor = useTiptapEditor(context.editor);
   const [fontFamily, setFontFamily] = useState(DEFAULT_FONT_FAMILY);
-  const [filteredFonts, setFilteredFonts] = useState<FontFamilies>(EMPTY_FONTS);
 
   function handleFontChange(font: string) {
     setFontFamily(font);
@@ -63,12 +56,6 @@ export default function FontFamilyInput() {
     setFontFamily(fontFamily ?? DEFAULT_FONT_FAMILY);
   }, [editor?.state.selection, editor]);
 
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    setFilteredFonts(filterFonts(FONT_FAMILIES, fontFamily));
-  }, [fontFamily]);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -90,30 +77,34 @@ export default function FontFamilyInput() {
             label="Selected"
             fonts={[fontFamily]}
             onClick={handleFontChange}
-            selected
+            selected={fontFamily}
           />
           <FontGroup
             label="Sans Serif"
-            fonts={filteredFonts.sansSerif}
+            fonts={FONT_FAMILIES.sansSerif}
             onClick={handleFontChange}
+            selected={fontFamily}
           />
           <DropdownMenuSeparator />
           <FontGroup
             label="Serif"
-            fonts={filteredFonts.serif}
+            fonts={FONT_FAMILIES.serif}
             onClick={handleFontChange}
+            selected={fontFamily}
           />
           <DropdownMenuSeparator />
           <FontGroup
             label="Monospace"
-            fonts={filteredFonts.monospace}
+            fonts={FONT_FAMILIES.monospace}
             onClick={handleFontChange}
+            selected={fontFamily}
           />
           <DropdownMenuSeparator />
           <FontGroup
             label="Decorative"
-            fonts={filteredFonts.decorative}
+            fonts={FONT_FAMILIES.decorative}
             onClick={handleFontChange}
+            selected={fontFamily}
           />
         </div>
       </DropdownMenuContent>
@@ -125,7 +116,7 @@ type FontGroupProps = {
   label: string;
   fonts: string[];
   onClick: (font: string) => void;
-  selected?: boolean;
+  selected: string;
 };
 
 function FontGroup({ label, fonts, onClick, selected }: FontGroupProps) {
@@ -147,7 +138,7 @@ function FontGroup({ label, fonts, onClick, selected }: FontGroupProps) {
             <span className="w-full text-start" style={{ fontFamily: font }}>
               {font}
             </span>
-            {selected && <CheckIcon className="tiptap-button-icon" />}
+            {font === selected && <CheckIcon className="tiptap-button-icon" />}
           </Button>
         </DropdownMenuItem>
       ))}
