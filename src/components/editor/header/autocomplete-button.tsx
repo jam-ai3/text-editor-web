@@ -1,7 +1,7 @@
 import { handleAutocomplete } from "@/ai-actions/editor";
 import { Button } from "@/components/tiptap/tiptap-ui-primitive/button";
 import { EditorContext } from "@/contexts/editor-provider";
-import { Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { useContext } from "react";
 
 export default function AutocompleteButton() {
@@ -19,12 +19,19 @@ export default function AutocompleteButton() {
       onClick={() => handleAutocomplete(context)}
       disabled={
         context.aiResponseLoading ||
+        context.autocompleteLoading ||
         context.changes.length !== 0 ||
         context.autocomplete !== null
       }
     >
-      <span>Autocomplete</span>
-      <Sparkles className="tiptap-button-icon" />
+      <span>
+        {context.autocompleteLoading ? "Generating..." : "Autocomplete"}
+      </span>
+      {context.autocompleteLoading ? (
+        <Loader2 className="animate-spin tiptap-button-icon" />
+      ) : (
+        <Sparkles className="tiptap-button-icon" />
+      )}
     </Button>
   );
 }

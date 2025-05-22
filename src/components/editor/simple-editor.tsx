@@ -118,11 +118,13 @@ export function SimpleEditor() {
   }, [editor]);
 
   React.useEffect(() => {
-    if (!context.selectedChange || !context.editor) return;
+    if (!context.editor || (!context.selectedChange && !context.noChanges))
+      return;
+    if (context.selectedChange)
+      setActiveBlock(context.editor, context.selectedChange);
     context.setEditorType("edit");
     context.setEditType("changes");
-    setActiveBlock(context.editor, context.selectedChange);
-  }, [context.selectedChange]);
+  }, [context.selectedChange, context.noChanges]);
 
   return (
     <EditorContext.Provider value={{ editor }}>

@@ -169,7 +169,7 @@ export async function handleAutocomplete(context: EditorContextType) {
   )
     return;
   try {
-    context.setAiResponseLoading(true);
+    context.setAutocompleteLoading(true);
     const position = context.editor.state.selection.from;
     const content =
       context.editor
@@ -187,12 +187,12 @@ export async function handleAutocomplete(context: EditorContextType) {
         .join(" ");
     const value = await Gemini.getAutocomplete(content);
     const { improved } = parseGeminiImproved(value);
-    insertAutocomplete(context.editor, improved);
+    insertAutocomplete(context.editor, improved, position);
     context.setAutocomplete({ text: improved, pos: position });
   } catch (error) {
     console.error(error);
   } finally {
-    context.setAiResponseLoading(false);
+    context.setAutocompleteLoading(false);
   }
 }
 
@@ -290,18 +290,7 @@ function showDiff(
   context.setEditorType("edit");
 
   // If incoming is empty or no reasoning, show no changes
-  if (incoming.trim().length === 0) {
-    context.setChanges([
-      {
-        id: "",
-        current: "",
-        incoming: "",
-        pos: 0,
-        reasoning: "No changes were made.",
-      },
-    ]);
-    return;
-  }
+  if (incoming.trim().length === 0) return context.setNoChanges(true);
 
   // Otherwise, show diff
   const id = v4();
@@ -313,6 +302,8 @@ function showDiff(
     pos,
     reasoning: "",
   };
+
+  context.setNoChanges(false);
   context.setChanges((prev) => [...prev, newChange]);
   context.setSelectedChange(newChange);
 }

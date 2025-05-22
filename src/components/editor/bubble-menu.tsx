@@ -78,7 +78,10 @@ export default function PopupMenu() {
       pluginKey="bubbleMenuText"
       className={cn(
         "flex flex-col bg-secondary border-2 rounded-md max-w-max",
-        context.changes.length !== 0 && "hidden pointer-events-none"
+        (context.changes.length !== 0 ||
+          context.autocompleteLoading ||
+          context.autocomplete) &&
+          "hidden pointer-events-none"
       )}
       tippyOptions={{ duration: 150 }}
       editor={context.editor}
@@ -158,12 +161,12 @@ function MenuButton({
   description,
   disabled,
 }: MenuButtonProps) {
-  const { aiResponseLoading } = useContext(EditorContext);
+  const context = useContext(EditorContext);
 
   return (
     <div className="relative flex-1">
       <button
-        disabled={aiResponseLoading || disabled}
+        disabled={context.aiResponseLoading || disabled}
         className="flex justify-center items-center disabled:opacity-50 p-2 hover:bg-border w-full disabled:cursor-not-allowed menu-btn"
         onClick={onClick}
       >

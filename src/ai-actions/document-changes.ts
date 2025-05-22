@@ -102,6 +102,8 @@ export function buildDiff(current: string, incoming: string): DiffBlock[] {
 function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   if (!context.editor) return;
 
+  if (context.changes.length === 0) return context.setNoChanges(true);
+
   const changes: Change[] = [];
   let pos = 1;
   let chain = context.editor.chain().focus();
@@ -144,6 +146,7 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
 
   chain.run();
 
+  context.setNoChanges(false);
   context.setChanges(changes);
   if (changes.length > 0) {
     context.setSelectedChange(changes[0]);

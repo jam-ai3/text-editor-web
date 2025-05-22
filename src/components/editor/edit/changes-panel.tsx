@@ -26,6 +26,32 @@ export default function ChangesPanel() {
     });
   }, [context.selectedChange]);
 
+  function handleDismiss() {
+    context.setNoChanges(true);
+    context.setEditorType("produce");
+  }
+
+  if (context.noChanges) {
+    return (
+      <div className="place-items-center grid h-full">
+        <div className="flex flex-col items-center gap-2 w-4/5">
+          <p className="font-semibold">No Changes</p>
+          <p className="text-muted-foreground text-center">
+            No changes have been made to this document
+          </p>
+          <Button
+            variant="accent"
+            className="mt-2 w-full"
+            onClick={handleDismiss}
+          >
+            <X />
+            <span>Dismiss</span>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (context.selectedChange === null)
     return (
       <div className="place-items-center grid h-full">

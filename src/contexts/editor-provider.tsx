@@ -31,10 +31,14 @@ export type EditorContextType = {
   setEditType: Dispatch<SetStateAction<EditType>>;
   aiResponseLoading: boolean;
   setAiResponseLoading: Dispatch<SetStateAction<boolean>>;
+  autocompleteLoading: boolean;
+  setAutocompleteLoading: Dispatch<SetStateAction<boolean>>;
   autocomplete: Autocomplete | null;
   setAutocomplete: Dispatch<SetStateAction<Autocomplete | null>>;
   changes: Change[];
   setChanges: Dispatch<SetStateAction<Change[]>>;
+  noChanges: boolean;
+  setNoChanges: Dispatch<SetStateAction<boolean>>;
   selectedChange: Change | null;
   setSelectedChange: Dispatch<SetStateAction<Change | null>>;
   document: Document;
@@ -52,10 +56,14 @@ export const defaultEditorContext: EditorContextType = {
   setEditType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
+  autocompleteLoading: false,
+  setAutocompleteLoading: () => {},
   autocomplete: null,
   setAutocomplete: () => {},
   changes: [],
   setChanges: () => {},
+  noChanges: false,
+  setNoChanges: () => {},
   selectedChange: null,
   setSelectedChange: () => {},
   document: {
@@ -94,6 +102,7 @@ export default function EditorProvider({
   const autocompleteRef = useRef(autocomplete);
   const [changes, setChanges] = useState<Change[]>([]);
   const changesRef = useRef(changes);
+  const [noChanges, setNoChanges] = useState(false);
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [doc, setDocument] = useState<Document>(document);
   const editor = useEditor(
@@ -102,6 +111,7 @@ export default function EditorProvider({
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
+  const [autocompleteLoading, setAutocompleteLoading] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
   const html = editor?.getHTML();
 
@@ -164,10 +174,14 @@ export default function EditorProvider({
         setEditType,
         aiResponseLoading,
         setAiResponseLoading,
+        autocompleteLoading,
+        setAutocompleteLoading,
         autocomplete,
         setAutocomplete,
         changes,
         setChanges,
+        noChanges,
+        setNoChanges,
         selectedChange,
         setSelectedChange,
         document: doc,
