@@ -10,10 +10,10 @@ import { Share } from "lucide-react";
 import React, { useContext } from "react";
 
 export default function ExportButton() {
-  const { document } = useContext(EditorContext);
+  const { document, editor } = useContext(EditorContext);
 
   function handleExportClick(type: FileType) {
-    handleExport(document.title, document.content, type);
+    handleExport(document.title, editor?.getHTML() ?? document.content, type);
   }
 
   return (
