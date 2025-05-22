@@ -10,7 +10,13 @@ import {
   useState,
 } from "react";
 import { Editor, useEditor } from "@tiptap/react";
-import { Autocomplete, Change, EditorType, EditType } from "@/lib/types";
+import {
+  Autocomplete,
+  Change,
+  EditorType,
+  EditType,
+  Message,
+} from "@/lib/types";
 import { Document } from "@prisma/client";
 import { saveDocument } from "@/ai-actions/document";
 import editorConfig from "@/components/editor/editor-config";
@@ -34,6 +40,8 @@ export type EditorContextType = {
   document: Document;
   setDocument: Dispatch<SetStateAction<Document>>;
   saveStatus: SaveStatus;
+  message: Message | null;
+  setMessage: Dispatch<SetStateAction<Message | null>>;
 };
 
 export const defaultEditorContext: EditorContextType = {
@@ -60,6 +68,8 @@ export const defaultEditorContext: EditorContextType = {
   },
   setDocument: () => {},
   saveStatus: "success",
+  message: null,
+  setMessage: () => {},
 };
 
 export const EditorContext =
@@ -92,6 +102,7 @@ export default function EditorProvider({
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
+  const [message, setMessage] = useState<Message | null>(null);
   const html = editor?.getHTML();
 
   useEffect(() => {
@@ -162,6 +173,8 @@ export default function EditorProvider({
         document: doc,
         setDocument,
         saveStatus,
+        message,
+        setMessage,
       }}
     >
       {children}

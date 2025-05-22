@@ -123,10 +123,10 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
     const id = v4();
 
     if (block.current.length === 0) {
-      insertIncomingChain(chain, block.incoming, id, pos);
+      chain = insertIncomingChain(chain, block.incoming, id, pos);
       pos += block.incoming.length;
     } else {
-      insertChangesChain(chain, block.current, block.incoming, id, pos);
+      chain = insertChangesChain(chain, block.current, block.incoming, id, pos);
       pos += block.current.length;
     }
     changes.push({

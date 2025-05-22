@@ -156,8 +156,13 @@ async function metakeyOnKeydown(
   }
 }
 
-async function handleAutocomplete(context: EditorContextType) {
-  if (!context.editor) return;
+export async function handleAutocomplete(context: EditorContextType) {
+  if (
+    !context.editor ||
+    context.changes.length !== 0 ||
+    context.autocomplete !== null
+  )
+    return;
   try {
     context.setAiResponseLoading(true);
     const position = context.editor.state.selection.from;

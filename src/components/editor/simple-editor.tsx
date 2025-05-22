@@ -19,6 +19,7 @@ import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
 import EditPanel from "./edit/edit-panel";
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
+import Toast from "./toast";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -146,6 +147,23 @@ export function SimpleEditor() {
               className="h-full"
             >
               <EditPanel />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {context.message && (
+            <motion.div
+              key="toast"
+              initial={{ x: "calc(-100% - 24px)" }}
+              animate={{ x: 0 }}
+              exit={{ x: "calc(-100% - 24px)" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bottom-16 left-[24px] fixed"
+            >
+              <Toast
+                message={context.message}
+                onClose={() => context.setMessage(null)}
+              />
             </motion.div>
           )}
         </AnimatePresence>

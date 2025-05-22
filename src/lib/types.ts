@@ -18,6 +18,11 @@ export type Change = {
   reasoning: string;
 };
 
+export type Message = {
+  variant: "danger" | "warning" | "success" | "info";
+  text: string;
+};
+
 export type EditType = "changes" | "grammar" | "reorder" | "paraphrase";
 
 export type ParaphraseLanguageType =
