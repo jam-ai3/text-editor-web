@@ -108,9 +108,15 @@ export function setActiveBlock(editor: Editor, selectedChange: Change) {
             active: isActive,
           };
 
-          const newMark = schema.marks.change.create(newAttrs);
-          transaction = transaction.removeMark(from, to, mark);
-          transaction = transaction.addMark(from, to, newMark);
+          if (mark.attrs.changeBlock) {
+            const newMark = schema.marks.change.create(newAttrs);
+            transaction = transaction.removeMark(from, to, mark);
+            transaction = transaction.addMark(from, to, newMark);
+          } else if (mark.attrs.incomingBlock) {
+            const newMark = schema.marks.incoming.create(newAttrs);
+            transaction = transaction.removeMark(from, to, mark);
+            transaction = transaction.addMark(from, to, newMark);
+          }
         }
       }
     });

@@ -10,6 +10,7 @@ import {
   rejectIncomingChain,
 } from "@/components/editor/extensions";
 import { v4 } from "uuid";
+import { findChangeBlockById } from "@/components/editor/helpers";
 
 export async function checkFullPaperGrammar(context: EditorContextType) {
   if (!context.editor) return;
@@ -21,8 +22,6 @@ export async function checkFullPaperGrammar(context: EditorContextType) {
       (block.type === "diff" &&
         (block.current.length !== 0 || block.incoming.length !== 0))
   );
-
-  console.log(diff);
 
   showDiff(context, diff);
 }
@@ -161,9 +160,10 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
 }
 
 export function acceptAllChanges(context: EditorContextType) {
-  if (!context.editor) return;
+  if (!context.editor || context.changes.length === 0) return;
   let chain = context.editor.chain().focus();
-  let offset = 0;
+  const startIndex = findChangeBlockById(context.editor, context.changes[0].id);
+  let offset = startIndex - context.changes[0].pos;
   const contentSize = context.editor.getText().length + 1;
 
   for (const change of context.changes) {
@@ -191,7 +191,8 @@ export function acceptAllChanges(context: EditorContextType) {
 export function rejectAllChanges(context: EditorContextType) {
   if (!context.editor) return;
   let chain = context.editor.chain().focus();
-  let offset = 0;
+  const startIndex = findChangeBlockById(context.editor, context.changes[0].id);
+  let offset = startIndex - context.changes[0].pos;
 
   for (const change of context.changes) {
     if (change.current.length === 0) {
