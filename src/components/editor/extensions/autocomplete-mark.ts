@@ -38,20 +38,23 @@ export const AutocompleteMark = Mark.create({
 export function insertAutocomplete(
   editor: Editor,
   autocomplete: string,
-  at?: number
+  at: number
 ) {
-  const { from } = editor.state.selection;
-
-  editor.commands.insertContentAt(at ?? from, {
-    type: "text",
-    text: autocomplete,
-    marks: [
-      {
-        type: "autocomplete",
-        attrs: { autocomplete: true },
-      },
-    ],
-  });
+  editor
+    .chain()
+    .focus()
+    .insertContentAt(at, {
+      type: "text",
+      text: autocomplete,
+      marks: [
+        {
+          type: "autocomplete",
+          attrs: { autocomplete: true },
+        },
+      ],
+    })
+    .setTextSelection(at)
+    .run();
 }
 
 export function acceptAutocomplete(

@@ -170,7 +170,7 @@ export async function handleAutocomplete(context: EditorContextType) {
     return;
   try {
     context.setAutocompleteLoading(true);
-    const position = context.editor.state.selection.from;
+    const position = context.editor.state.selection.to;
     const content =
       context.editor
         .getText()
