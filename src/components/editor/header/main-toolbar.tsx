@@ -15,10 +15,9 @@ import { useContext } from "react";
 import FontSizeInput from "../../tiptap/tiptap-ui/font-size-input/font-size-input";
 import ExportButton from "./export-btn";
 import AutocompleteButton from "./autocomplete-button";
+import FontFamilyInput from "@/components/tiptap/tiptap-ui/font-family-input/font-family-input";
 
 export default function MainToolbarContent() {
-  const context = useContext(EditorContext);
-
   return (
     <>
       <ToolbarGroup>
@@ -37,7 +36,13 @@ export default function MainToolbarContent() {
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <FontSizeInput editor={context.editor} />
+        <FontSizeInput />
+      </ToolbarGroup>
+
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <FontFamilyInput />
       </ToolbarGroup>
 
       <ToolbarSeparator />

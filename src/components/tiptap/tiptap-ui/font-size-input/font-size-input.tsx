@@ -1,20 +1,16 @@
 import { Editor } from "@tiptap/react";
 import { Button, ButtonProps } from "../../tiptap-ui-primitive/button";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 import { Minus, Plus } from "lucide-react";
-
-interface FontSizeDropdownProps extends Omit<ButtonProps, "type"> {
-  editor: Editor | null;
-}
+import { EditorContext } from "@/contexts/editor-provider";
 
 const BUTTON_SIZE = "16";
 const DEFAULT_FONT_SIZE = "12";
 
-export default function FontSizeInput({
-  editor: providedEditor,
-}: FontSizeDropdownProps) {
-  const editor = useTiptapEditor(providedEditor);
+export default function FontSizeInput() {
+  const context = useContext(EditorContext);
+  const editor = useTiptapEditor(context.editor);
   const [inputSize, setInputSize] = useState(DEFAULT_FONT_SIZE);
   const [trueSize, setTrueSize] = useState(DEFAULT_FONT_SIZE);
 

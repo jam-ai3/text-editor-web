@@ -43,7 +43,7 @@ const editorConfig = (
   extensions: [
     StarterKit,
     TextAlign.configure({ types: ["heading", "paragraph"] }),
-    FontFamily,
+    FontFamily.configure({ types: ["textStyle"] }),
     FontSize.configure({ types: ["textStyle"] }),
     Underline,
     TaskList,
