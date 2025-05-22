@@ -16,6 +16,12 @@ import { Selection } from "@/components/tiptap/tiptap-extension/selection-extens
 import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node-extension";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
+import PaginationExtension, {
+  PageNode,
+  HeaderFooterNode,
+  BodyNode,
+} from 'tiptap-extension-pagination';
+
 // --- Custom Extensions ---
 import {
   IncomingBlock,
@@ -42,6 +48,17 @@ const editorConfig = (
   },
   extensions: [
     StarterKit,
+    PaginationExtension.configure({
+      defaultPaperSize: 'A4',
+      // defaultMarginConfig: { top:25.4, right:25.4, bottom:25.4, left:25.4 },
+      pageAmendmentOptions: {
+        enableHeader: false,
+        enableFooter: false,
+      },
+    }),
+    PageNode,
+    HeaderFooterNode,
+    BodyNode,
     TextAlign.configure({ types: ["heading", "paragraph"] }),
     FontFamily,
     FontSize.configure({ types: ["textStyle"] }),

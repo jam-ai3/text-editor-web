@@ -25,6 +25,8 @@ export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
   const editor = context.editor;
   const windowSize = useWindowSize();
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const [pages, setPages] = React.useState<HTMLElement[]>([]);
   const [rect, setRect] = React.useState<
     Pick<DOMRect, "x" | "y" | "width" | "height">
   >({
@@ -129,13 +131,17 @@ export function SimpleEditor() {
       <Header toolbarRef={toolbarRef} />
       <div className="relative flex bg-secondary content-wrapper">
         <PopupMenu />
-        <div className="flex-1 overflow-y-scroll">
+        {/* <div className="flex-1 overflow-y-scroll"> */}
+        <div className="overflow-y-scroll flex-1 bg-secondary">
           <EditorContent
+            className="simple-editor-content"
+            ref={contentRef}
             editor={editor}
             role="presentation"
-            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[816px] simple-editor-content"
+            // className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[816px] simple-editor-content"
           />
         </div>
+
         <AnimatePresence>
           {context.editorType === "edit" && (
             <motion.div

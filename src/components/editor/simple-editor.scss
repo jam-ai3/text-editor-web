@@ -67,14 +67,35 @@ body {
   overflow-y: auto;
 }
 
+// .simple-editor-content .tiptap.ProseMirror {
+//   padding: 3rem 3rem;
+// }
+
 .simple-editor-content .tiptap.ProseMirror {
-  padding: 3rem 3rem;
+  padding: 0 !important;       
+  overflow: visible !important; // let pages show outside its own box
 }
 
 @media screen and (max-width: 480px) {
   .simple-editor-content .tiptap.ProseMirror {
     padding: 1rem 1.5rem;
   }
+}
+
+.simple-editor-content .ProseMirror {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  // center each A4 page horizontally
+  gap: 2rem;            // space between pages
+  background: var(--tt-bg-color);
+  padding: 2rem 0;      // optional top/bottom padding around the whole document
+}
+
+// 3) Constrain your EditorContent wrapper to auto width
+//    (so .page itself defines the page width)
+.simple-editor-content {
+  width: auto !important;
+  max-width: none !important;
 }
 
 /* Diff block styles */
