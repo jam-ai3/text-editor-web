@@ -36,10 +36,7 @@ export function findChangeBlock(editor: Editor): ChangeBlockInfo | null {
   editor.state.doc.descendants((node, pos) => {
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
-      if (
-        (mark.type.name === "textStyle" && mark.attrs?.changeBlock) ||
-        mark.attrs?.incomingBlock
-      ) {
+      if (mark.attrs?.changeBlock || mark.attrs?.incomingBlock) {
         const to = pos + node.nodeSize;
         change = { from: pos, to, text: node.text ?? "" };
       }
@@ -57,7 +54,7 @@ export function findChangeBlockById(editor: Editor, id: string) {
   editor.state.doc.descendants((node, p) => {
     if (!node.isText || pos !== -1) return;
     for (const mark of node.marks) {
-      if (mark.type.name === "textStyle" && mark.attrs?.id === id) {
+      if (mark.attrs?.id === id) {
         pos = p;
         return;
       }
@@ -78,7 +75,7 @@ export function findAutocompleteBlock(editor: Editor): AutocompleteInfo | null {
   editor.state.doc.descendants((node, pos) => {
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
-      if (mark.type.name === "textStyle" && mark.attrs?.suggestion === true) {
+      if (mark.attrs?.suggestion) {
         result = { pos, text: node.text ?? "" };
       }
     });
@@ -96,10 +93,7 @@ export function setActiveBlock(editor: Editor, selectedChange: Change) {
     if (!node.isText) return;
 
     node.marks.forEach((mark) => {
-      if (
-        mark.type.name === "textStyle" &&
-        (mark.attrs.changeBlock || mark.attrs.incomingBlock)
-      ) {
+      if (mark.attrs.changeBlock || mark.attrs.incomingBlock) {
         const oldId = mark.attrs.id;
         const isActive =
           oldId === selectedChange.id || oldId === selectedChange.id;
@@ -114,7 +108,7 @@ export function setActiveBlock(editor: Editor, selectedChange: Change) {
             active: isActive,
           };
 
-          const newMark = schema.marks.textStyle.create(newAttrs);
+          const newMark = schema.marks.change.create(newAttrs);
           transaction = transaction.removeMark(from, to, mark);
           transaction = transaction.addMark(from, to, newMark);
         }
@@ -148,10 +142,7 @@ export function updateChanges(context: EditorContextType) {
   context.editor.state.doc.descendants((node) => {
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
-      if (
-        (mark.type.name === "textStyle" && mark.attrs?.changeBlock) ||
-        mark.attrs?.incomingBlock
-      ) {
+      if (mark.attrs?.changeBlock || mark.attrs?.incomingBlock) {
         ids.push(mark.attrs.id);
       }
     });

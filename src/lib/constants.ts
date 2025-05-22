@@ -10,7 +10,7 @@ export const REJECT_COLOR = "#f005";
 export const REJECT_COLOR_STRONG = "#d00e";
 export const ACCEPT_COLOR = "#0d05";
 export const ACCEPT_COLOR_STRONG = "#0b0e";
-export const SUGGESTION_COLOR = "#777";
+export const AUTOCOMPLETE_COLOR = "#777";
 export const ACCENT_COLOR = "#049904";
 
 export const SHOULD_SAVE = process.env.NODE_ENV !== "development";

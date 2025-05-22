@@ -12,6 +12,7 @@ import {
   acceptChanges,
   acceptIncoming,
   insertAutocomplete,
+  insertChangesAt,
   insertChangesAtSelection,
   rejectAutocomplete,
   rejectChanges,
@@ -203,8 +204,7 @@ export async function handleShorten(context: EditorContextType) {
     const { selected, before, after, from } = getContext(context.editor);
     const response = await Gemini.getShortened(before, after, selected);
     const { improved } = parseGeminiImproved(response);
-    showDiff(context, improved);
-    context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+    showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
   } finally {
@@ -219,8 +219,7 @@ export async function handleLengthen(context: EditorContextType) {
     const { selected, before, after, from } = getContext(context.editor);
     const response = await Gemini.getLengthened(before, after, selected);
     const { improved } = parseGeminiImproved(response);
-    showDiff(context, improved);
-    context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+    showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
   } finally {
@@ -235,8 +234,7 @@ export async function handleGrammar(context: EditorContextType) {
     const { selected, from } = getContext(context.editor);
     const response = await Gemini.getGrammar(selected);
     const { improved } = parseGeminiImproved(response);
-    showDiff(context, improved);
-    context.editor.chain().focus().setTextSelection({ from, to: from }).run();
+    showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
   } finally {
@@ -248,10 +246,10 @@ export async function handleReorder(context: EditorContextType) {
   if (!context.editor) return;
   try {
     context.setAiResponseLoading(true);
-    const { selected } = getContext(context.editor);
+    const { selected, from } = getContext(context.editor);
     const response = await Gemini.reorderSentences(selected);
     const { improved } = parseGeminiImproved(response);
-    showDiff(context, improved);
+    showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
   } finally {
@@ -267,11 +265,11 @@ export async function handleParaphrase(
   if (!context.editor) return;
   try {
     context.setAiResponseLoading(true);
-    const { selected } = getContext(context.editor);
+    const { selected, from } = getContext(context.editor);
     const res = await Gemini.paraphrase(selected, style, customTone);
     if (isError(res)) return; // TODO: handle error
     const { paraphrased } = parseGeminiParaphrase(res);
-    showDiff(context, paraphrased);
+    showDiff(context, selected, paraphrased, from);
   } catch (error) {
     console.error(error);
   } finally {
@@ -283,7 +281,12 @@ function handleUndo(context: EditorContextType) {
   updateChanges(context);
 }
 
-function showDiff(context: EditorContextType, incoming: string) {
+function showDiff(
+  context: EditorContextType,
+  current: string,
+  incoming: string,
+  pos: number
+) {
   if (!context.editor) return;
   context.setEditorType("edit");
 
@@ -303,16 +306,12 @@ function showDiff(context: EditorContextType, incoming: string) {
 
   // Otherwise, show diff
   const id = v4();
-  const { current, from } = insertChangesAtSelection(
-    context.editor,
-    incoming,
-    id
-  );
+  insertChangesAt(context.editor, current, incoming, id, pos);
   const newChange = {
     id,
     current,
     incoming,
-    pos: from,
+    pos,
     reasoning: "",
   };
   context.setChanges((prev) => [...prev, newChange]);

@@ -3,7 +3,7 @@ import { Editor } from "@tiptap/react";
 export * from "./keyhandler";
 export * from "./change-block";
 export * from "./incoming-block";
-export * from "./autocomplete-block";
+export * from "./autocomplete-mark";
 export * from "./pagination";
 
 // ------------------- PLAIN TEXT -------------------

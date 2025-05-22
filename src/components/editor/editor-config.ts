@@ -18,10 +18,10 @@ import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 // --- Custom Extensions ---
 import {
-  IncomingBlock,
-  AutocompleteBlock,
-  ChangeBlock,
+  IncomingMark,
+  AutocompleteMark,
   Keyhandler,
+  ChangeMark,
 } from "./extensions";
 import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
@@ -62,9 +62,9 @@ const editorConfig = (
       shouldPreventKeys: () =>
         changes.current.length !== 0 || autocomplete.current !== null,
     }),
-    ChangeBlock,
-    IncomingBlock,
-    AutocompleteBlock,
+    ChangeMark,
+    IncomingMark,
+    AutocompleteMark,
   ],
   content,
 });
