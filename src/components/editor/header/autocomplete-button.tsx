@@ -1,5 +1,5 @@
 import { handleAutocomplete } from "@/ai-actions/editor";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/tiptap/tiptap-ui-primitive/button";
 import { EditorContext } from "@/contexts/editor-provider";
 import { Sparkles } from "lucide-react";
 import { useContext } from "react";
@@ -9,7 +9,13 @@ export default function AutocompleteButton() {
 
   return (
     <Button
-      variant="ghost"
+      type="button"
+      data-style="ghost"
+      role="button"
+      data-apperance="default"
+      aria-label="test aria label"
+      tooltip="Autocomplete"
+      shortcutKeys="Ctrl-k"
       onClick={() => handleAutocomplete(context)}
       disabled={
         context.aiResponseLoading ||
@@ -18,7 +24,7 @@ export default function AutocompleteButton() {
       }
     >
       <span>Autocomplete</span>
-      <Sparkles />
+      <Sparkles className="tiptap-button-icon" />
     </Button>
   );
 }

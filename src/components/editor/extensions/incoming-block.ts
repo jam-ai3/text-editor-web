@@ -81,10 +81,28 @@ export function acceptIncoming(editor: Editor, from: number, text: string) {
     .run();
 }
 
+export function acceptIncomingChain(
+  chain: ChainedCommands,
+  from: number,
+  text: string
+) {
+  return chain
+    .setTextSelection({ from, to: from + text.length })
+    .unsetMark("textStyle");
+}
+
 export function rejectIncoming(editor: Editor, from: number, text: string) {
   editor
     .chain()
     .focus()
     .deleteRange({ from, to: from + text.length })
     .run();
+}
+
+export function rejectIncomingChain(
+  chain: ChainedCommands,
+  from: number,
+  text: string
+) {
+  return chain.deleteRange({ from, to: from + text.length });
 }

@@ -4,6 +4,10 @@ import { Change } from "@/lib/types";
 import {
   insertIncomingChain,
   insertChangesChain,
+  acceptChangesChain,
+  rejectChangesChain,
+  acceptIncomingChain,
+  rejectIncomingChain,
 } from "@/components/editor/extensions";
 import { v4 } from "uuid";
 
@@ -121,6 +125,13 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
     }
 
     const id = v4();
+    changes.push({
+      id,
+      current: block.current,
+      incoming: block.incoming,
+      pos,
+      reasoning: "",
+    });
 
     if (block.current.length === 0) {
       chain = insertIncomingChain(chain, block.incoming, id, pos);
@@ -129,13 +140,6 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
       chain = insertChangesChain(chain, block.current, block.incoming, id, pos);
       pos += block.current.length;
     }
-    changes.push({
-      id,
-      current: block.current,
-      incoming: block.incoming,
-      pos,
-      reasoning: "",
-    });
   }
 
   chain.run();
@@ -151,6 +155,50 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   }
 }
 
-export function acceptAllChanges() {}
+export function acceptAllChanges(context: EditorContextType) {
+  if (!context.editor) return;
+  let chain = context.editor.chain().focus();
+  let offset = 0;
+  const contentSize = context.editor.getText().length + 1;
 
-export function rejectAllChanges() {}
+  for (const change of context.changes) {
+    if (change.current.length === 0) {
+      chain = acceptIncomingChain(chain, change.pos + offset, change.incoming);
+    } else {
+      const res = acceptChangesChain(
+        chain,
+        change.pos + offset,
+        change.current,
+        change.incoming,
+        contentSize
+      );
+      chain = res.chain;
+      offset += res.offset;
+    }
+  }
+
+  chain.setTextSelection({ from: 0, to: 0 }).run();
+
+  context.setChanges([]);
+  context.setSelectedChange(null);
+}
+
+export function rejectAllChanges(context: EditorContextType) {
+  if (!context.editor) return;
+  let chain = context.editor.chain().focus();
+  let offset = 0;
+
+  for (const change of context.changes) {
+    if (change.current.length === 0) {
+      chain = rejectIncomingChain(chain, change.pos + offset, change.incoming);
+      offset -= change.incoming.length;
+    } else {
+      chain = rejectChangesChain(chain, change.pos + offset, change.current);
+    }
+  }
+
+  chain.setTextSelection({ from: 0, to: 0 }).run();
+
+  context.setChanges([]);
+  context.setSelectedChange(null);
+}

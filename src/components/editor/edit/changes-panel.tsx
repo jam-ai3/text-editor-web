@@ -1,13 +1,30 @@
 import { EditorContext } from "@/contexts/editor-provider";
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Button } from "../../ui/button";
 import { Check, CheckCheck, X } from "lucide-react";
 import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
 import { handleAcceptChange, handleReject } from "@/ai-actions/editor";
 import { Change } from "@/lib/types";
+import {
+  acceptAllChanges,
+  rejectAllChanges,
+} from "@/ai-actions/document-changes";
 
 export default function ChangesPanel() {
   const context = useContext(EditorContext);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!context.selectedChange) return;
+    const element = document.getElementById(
+      `change-${context.selectedChange.id}`
+    );
+    if (!element) return;
+    containerRef.current?.scrollTo({
+      top: element.offsetTop - 100,
+      behavior: "smooth",
+    });
+  }, [context.selectedChange]);
 
   if (context.selectedChange === null)
     return (
@@ -22,11 +39,12 @@ export default function ChangesPanel() {
     );
 
   return (
-    <div className="flex flex-col gap-4 p-4 overflow-y-scroll">
+    <div className="flex flex-col gap-4 p-4 overflow-y-auto" ref={containerRef}>
       <div className="flex gap-4">
         <Button
           className="flex-1"
           style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
+          onClick={() => acceptAllChanges(context)}
         >
           <CheckCheck />
           <span className="font-semibold">Accept All</span>
@@ -34,6 +52,7 @@ export default function ChangesPanel() {
         <Button
           className="flex-1"
           style={{ backgroundColor: REJECT_COLOR_STRONG }}
+          onClick={() => rejectAllChanges(context)}
         >
           <X />
           <span className="font-semibold">Reject All</span>
@@ -56,6 +75,7 @@ function ChangeTab({ change }: ChangeTabProps) {
   if (context.selectedChange?.id !== change.id)
     return (
       <div
+        id={`change-${change.id}`}
         className="bg-secondary px-4 py-2 border-2 border-border-secondary rounded-md cursor-pointer"
         onClick={() => context.setSelectedChange(change)}
       >
@@ -68,7 +88,10 @@ function ChangeTab({ change }: ChangeTabProps) {
     );
 
   return (
-    <div className="space-y-4 bg-secondary px-4 py-2 border-2 border-border-secondary rounded-md">
+    <div
+      className="space-y-4 bg-secondary px-4 py-2 border-2 border-border-secondary rounded-md"
+      id={`change-${change.id}`}
+    >
       <div className="space-y-1">
         <p className="font-semibold text-sm">Current</p>
         {context.selectedChange.current.length === 0 ? (

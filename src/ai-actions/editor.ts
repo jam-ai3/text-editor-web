@@ -136,7 +136,12 @@ export function handleRejectChange(
   }
   const newChanges = context.changes.filter((change) => change.id !== id);
   context.setChanges(newChanges);
-  context.setSelectedChange(newChanges.length > 0 ? newChanges[0] : null);
+  const index = context.changes.findIndex((change) => change.id === id);
+  if (index === -1 || newChanges.length === 0)
+    return context.setSelectedChange(null);
+  if (index === newChanges.length)
+    return context.setSelectedChange(newChanges[0]);
+  context.setSelectedChange(newChanges[index]);
 }
 
 // Metakey handlers

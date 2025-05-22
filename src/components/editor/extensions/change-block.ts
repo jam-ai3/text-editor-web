@@ -144,6 +144,22 @@ export function acceptChanges(
     .run();
 }
 
+export function acceptChangesChain(
+  chain: ChainedCommands,
+  from: number,
+  current: string,
+  incoming: string,
+  contentSize: number
+) {
+  const to =
+    from + current.length > contentSize ? contentSize : from + current.length;
+  const newChain = chain
+    .deleteRange({ from, to })
+    .insertContentAt(from, { type: "text", text: incoming });
+  const offset = incoming.length - current.length;
+  return { chain: newChain, offset };
+}
+
 export function rejectChanges(editor: Editor, from: number, current: string) {
   editor
     .chain()
@@ -155,4 +171,14 @@ export function rejectChanges(editor: Editor, from: number, current: string) {
       to: from + current.length,
     })
     .run();
+}
+
+export function rejectChangesChain(
+  chain: ChainedCommands,
+  from: number,
+  current: string
+) {
+  return chain
+    .setTextSelection({ from, to: from + current.length })
+    .unsetMark("textStyle");
 }

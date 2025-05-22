@@ -30,7 +30,7 @@ export default function EditorToggle() {
   }, [editorType]);
 
   return (
-    <div className="relative flex items-center bg-white shadow-sm p-0.5 border border-gray-200 rounded-lg">
+    <div className="relative flex items-center bg-background shadow-sm p-0.5 rounded-lg">
       <motion.div
         transition={{ type: "easeInOut", duration: 0.2 }}
         animate={{
@@ -46,7 +46,7 @@ export default function EditorToggle() {
         onClick={() => setEditorType("produce")}
         variant="ghost"
         className={cn(
-          "hover:bg-transparent text-gray-500 flex items-center gap-2 transition z-10",
+          "hover:bg-transparent text-muted-foreground flex items-center gap-2 transition z-10",
           editorType === "produce" && "text-background hover:text-background"
         )}
       >
@@ -58,7 +58,7 @@ export default function EditorToggle() {
         onClick={() => setEditorType("edit")}
         variant="ghost"
         className={cn(
-          "hover:bg-transparent text-gray-600 flex items-center gap-2 transition z-10",
+          "hover:bg-transparent text-muted-foreground flex items-center gap-2 transition z-10",
           editorType === "edit" && "text-background hover:text-background"
         )}
       >
