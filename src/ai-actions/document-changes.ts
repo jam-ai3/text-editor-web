@@ -2,8 +2,6 @@ import { EditorContextType } from "@/contexts/editor-provider";
 import Gemini from "./gemini/functions";
 import { Change } from "@/lib/types";
 import {
-  insertIncoming,
-  insertChangesAt,
   insertIncomingChain,
   insertChangesChain,
 } from "@/components/editor/extensions";
@@ -114,7 +112,16 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
       continue;
     }
 
+    if (
+      block.current.trim().length === 0 &&
+      block.incoming.trim().length === 0
+    ) {
+      pos += block.current.length;
+      continue;
+    }
+
     const id = v4();
+
     if (block.current.length === 0) {
       insertIncomingChain(chain, block.incoming, id, pos);
       pos += block.incoming.length;

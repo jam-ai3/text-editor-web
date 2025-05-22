@@ -56,13 +56,9 @@ function ChangeTab({ change }: ChangeTabProps) {
   if (context.selectedChange?.id !== change.id)
     return (
       <div
-        className="bg-secondary px-4 py-2 border-2 rounded-md cursor-pointer"
+        className="bg-secondary px-4 py-2 border-2 border-border-secondary rounded-md cursor-pointer"
         onClick={() => context.setSelectedChange(change)}
       >
-        {change.current.trim().length === 0 &&
-          change.incoming.trim().length === 0 && (
-            <p className="text-sm italic">Whitespace Replacement</p>
-          )}
         {change.current.length > 0 ? (
           <p className="text-sm truncate">{change.current}</p>
         ) : (
@@ -72,19 +68,12 @@ function ChangeTab({ change }: ChangeTabProps) {
     );
 
   return (
-    <div className="space-y-4 bg-secondary px-4 py-2 border-2 rounded-md">
+    <div className="space-y-4 bg-secondary px-4 py-2 border-2 border-border-secondary rounded-md">
       <div className="space-y-1">
         <p className="font-semibold text-sm">Current</p>
-        {context.selectedChange.current.length === 0 && (
+        {context.selectedChange.current.length === 0 ? (
           <p className="font-semibold text-sm text-center">No Current Text</p>
-        )}
-        {context.selectedChange.current.length > 0 &&
-          context.selectedChange.current.trim().length === 0 && (
-            <p className="text-sm italic">
-              Whitespace: {`"${context.selectedChange?.current}"`}
-            </p>
-          )}
-        {context.selectedChange.current.trim().length > 0 && (
+        ) : (
           <p className="text-sm">{context.selectedChange?.current}</p>
         )}
       </div>

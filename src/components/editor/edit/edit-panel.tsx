@@ -29,10 +29,10 @@ export default function EditPanel() {
 
   return (
     <div
-      className="flex flex-col bg-[var(--tertiary)] border-l-2 h-full"
+      className="flex flex-col bg-tertiary border-border-secondary border-l-2 h-full"
       style={{ width: EDIT_PANEL_WIDTH }}
     >
-      <div className="flex border-b-2">
+      <div className="flex border-b-2 border-border-secondary">
         <EditOption text="Grammar" value="grammar" />
         <EditOption text="Paraphrase" value="paraphrase" />
         {/* <EditOption text="Reorder" value="reorder" /> */}
@@ -56,8 +56,8 @@ function EditOption({ text, value, isLast = false }: EditOptionProps) {
     <button
       className={cn(
         "flex-1 text-sm",
-        editType === value && "bg-border font-semibold",
-        !isLast && "border-r-2"
+        editType === value && "bg-border-secondary font-semibold",
+        !isLast && "border-r-2 border-border-secondary"
       )}
       onClick={() => setEditType(value)}
     >
