@@ -32,7 +32,8 @@ body {
 }
 
 .tiptap.ProseMirror {
-  font-family: "DM Sans", sans-serif;
+  font-family: Arial;
+  font-size: 12pt;
 }
 
 .content-wrapper {
@@ -103,20 +104,24 @@ body {
   display: block;
 }
 
-.reject {
-  background-color: #f005;
+// Custom Styles
+
+.change-block {
+  background-color: #ff05;
   cursor: pointer;
+  position: relative;
+  text-decoration: dashed underline;
+}
+.change-block.active {
+  background-color: #ff0d;
 }
 
-.accept {
-  background-color: #0d05;
+.incoming-block {
+  background-color: #0c07;
   cursor: pointer;
+  position: relative;
+  text-decoration: dashed underline;
 }
-
-.change-block-active.reject {
-  background-color: #f009;
-}
-
-.change-block-active.accept {
-  background-color: #0d09;
+.incoming-block.active {
+  background-color: #0d0b;
 }

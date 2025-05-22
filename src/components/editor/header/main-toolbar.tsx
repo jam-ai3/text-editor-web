@@ -3,40 +3,21 @@ import {
   ToolbarGroup,
   ToolbarSeparator,
 } from "@/components/tiptap/tiptap-ui-primitive/toolbar";
-import { HeadingDropdownMenu } from "@/components/tiptap/tiptap-ui/heading-dropdown-menu";
-import {
-  HighlightPopover,
-  HighlighterButton,
-} from "@/components/tiptap/tiptap-ui/highlight-popover";
-// import { ImageUploadButton } from "@/components/tiptap/tiptap-ui/image-upload-button";
-import {
-  LinkPopover,
-  LinkButton,
-} from "@/components/tiptap/tiptap-ui/link-popover";
+import { HighlightPopover } from "@/components/tiptap/tiptap-ui/highlight-popover";
+import { LinkPopover } from "@/components/tiptap/tiptap-ui/link-popover";
 import { ListDropdownMenu } from "@/components/tiptap/tiptap-ui/list-dropdown-menu";
 import { MarkButton } from "@/components/tiptap/tiptap-ui/mark-button";
 import { NodeButton } from "@/components/tiptap/tiptap-ui/node-button";
 import { TextAlignButton } from "@/components/tiptap/tiptap-ui/text-align-button";
 import { UndoRedoButton } from "@/components/tiptap/tiptap-ui/undo-redo-button";
-import { EditorContext } from "@/contexts/editor-provider";
-import { useContext } from "react";
-// import { ThemeToggle } from "./theme-toggle";
+import FontSizeInput from "../../tiptap/tiptap-ui/font-size-input/font-size-input";
+import ExportButton from "./export-btn";
+import AutocompleteButton from "./autocomplete-button";
+import FontFamilyInput from "@/components/tiptap/tiptap-ui/font-family-input/font-family-input";
 
-export default function MainToolbarContent({
-  onHighlighterClick,
-  onLinkClick,
-  isMobile,
-}: {
-  onHighlighterClick: () => void;
-  onLinkClick: () => void;
-  isMobile: boolean;
-}) {
-  const { editorType } = useContext(EditorContext);
-
+export default function MainToolbarContent() {
   return (
     <>
-      {editorType === "produce" && <Spacer />}
-
       <ToolbarGroup>
         <UndoRedoButton action="undo" />
         <UndoRedoButton action="redo" />
@@ -45,10 +26,21 @@ export default function MainToolbarContent({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} />
         <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} />
         <NodeButton type="codeBlock" />
         <NodeButton type="blockquote" />
+      </ToolbarGroup>
+
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <FontSizeInput />
+      </ToolbarGroup>
+
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <FontFamilyInput />
       </ToolbarGroup>
 
       <ToolbarSeparator />
@@ -59,12 +51,8 @@ export default function MainToolbarContent({
         <MarkButton type="strike" />
         <MarkButton type="code" />
         <MarkButton type="underline" />
-        {!isMobile ? (
-          <HighlightPopover />
-        ) : (
-          <HighlighterButton onClick={onHighlighterClick} />
-        )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
+        <HighlightPopover />
+        <LinkPopover />
       </ToolbarGroup>
 
       <ToolbarSeparator />
@@ -83,12 +71,12 @@ export default function MainToolbarContent({
         <TextAlignButton align="justify" />
       </ToolbarGroup>
 
-      {/* <ToolbarSeparator />
-      <ToolbarGroup>
-        <ImageUploadButton text="Add" />
-      </ToolbarGroup> */}
-
       <Spacer />
+
+      <ToolbarGroup>
+        <AutocompleteButton />
+        <ExportButton />
+      </ToolbarGroup>
     </>
   );
 }

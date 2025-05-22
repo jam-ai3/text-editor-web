@@ -26,11 +26,13 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-border-secondary: var(--border-secondary);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+  --color-tertiary: var(--tertiary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -129,13 +131,14 @@
 :root {
   --custom-accent: rgb(4, 153, 4);
   --custom-accent-dark: rgb(3, 128, 3);
+  --tertiary: oklch(0.92 0 0);
+  --border-secondary: oklch(0.86 0 0);
+}
+
+.dark {
+  --tertiary: oklch(0.25 0 0); /* dark gray */
 }
 
 button {
   cursor: pointer;
-}
-
-.suggestion-text {
-  color: #777;
-  font-style: italic;
 }

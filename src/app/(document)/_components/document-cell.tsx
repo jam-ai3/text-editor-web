@@ -23,7 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { deleteDocument } from "@/_actions/document";
+import { deleteDocument } from "@/ai-actions/document";
 import { useRouter } from "next/navigation";
 
 type DocumentCellProps = {

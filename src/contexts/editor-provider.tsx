@@ -10,11 +10,18 @@ import {
   useState,
 } from "react";
 import { Editor, useEditor } from "@tiptap/react";
-import { Autocomplete, Change, EditorType, EditType } from "@/lib/types";
+import {
+  Autocomplete,
+  Change,
+  EditorType,
+  EditType,
+  Message,
+} from "@/lib/types";
 import { Document } from "@prisma/client";
-import { saveDocument } from "@/_actions/document";
+import { saveDocument } from "@/ai-actions/document";
 import editorConfig from "@/components/editor/editor-config";
 import { SHOULD_SAVE } from "@/lib/constants";
+import { findChangeBlockById } from "@/components/editor/helpers";
 
 export type EditorContextType = {
   editor: Editor | null;
@@ -24,29 +31,39 @@ export type EditorContextType = {
   setEditType: Dispatch<SetStateAction<EditType>>;
   aiResponseLoading: boolean;
   setAiResponseLoading: Dispatch<SetStateAction<boolean>>;
+  autocompleteLoading: boolean;
+  setAutocompleteLoading: Dispatch<SetStateAction<boolean>>;
   autocomplete: Autocomplete | null;
   setAutocomplete: Dispatch<SetStateAction<Autocomplete | null>>;
   changes: Change[];
   setChanges: Dispatch<SetStateAction<Change[]>>;
+  noChanges: boolean;
+  setNoChanges: Dispatch<SetStateAction<boolean>>;
   selectedChange: Change | null;
   setSelectedChange: Dispatch<SetStateAction<Change | null>>;
   document: Document;
   setDocument: Dispatch<SetStateAction<Document>>;
   saveStatus: SaveStatus;
+  message: Message | null;
+  setMessage: Dispatch<SetStateAction<Message | null>>;
 };
 
-export const EditorContext = createContext<EditorContextType>({
+export const defaultEditorContext: EditorContextType = {
   editor: null,
   editorType: "produce",
   setEditorType: () => {},
-  editType: "changes",
+  editType: "grammar",
   setEditType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
+  autocompleteLoading: false,
+  setAutocompleteLoading: () => {},
   autocomplete: null,
   setAutocomplete: () => {},
   changes: [],
   setChanges: () => {},
+  noChanges: false,
+  setNoChanges: () => {},
   selectedChange: null,
   setSelectedChange: () => {},
   document: {
@@ -59,7 +76,12 @@ export const EditorContext = createContext<EditorContextType>({
   },
   setDocument: () => {},
   saveStatus: "success",
-});
+  message: null,
+  setMessage: () => {},
+};
+
+export const EditorContext =
+  createContext<EditorContextType>(defaultEditorContext);
 
 type EditorProviderProps = {
   children: ReactNode;
@@ -75,11 +97,12 @@ export default function EditorProvider({
   userId,
 }: EditorProviderProps) {
   const [editorType, setEditorType] = useState<EditorType>("produce");
-  const [editType, setEditType] = useState<EditType>("changes");
+  const [editType, setEditType] = useState<EditType>("grammar");
   const [autocomplete, setAutocomplete] = useState<Autocomplete | null>(null);
   const autocompleteRef = useRef(autocomplete);
   const [changes, setChanges] = useState<Change[]>([]);
   const changesRef = useRef(changes);
+  const [noChanges, setNoChanges] = useState(false);
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [doc, setDocument] = useState<Document>(document);
   const editor = useEditor(
@@ -88,10 +111,34 @@ export default function EditorProvider({
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
+  const [autocompleteLoading, setAutocompleteLoading] = useState(false);
+  const [message, setMessage] = useState<Message | null>(null);
+  const html = editor?.getHTML();
 
   useEffect(() => {
+    // update Ref
     changesRef.current = changes;
+
+    // handle local changes storage
+    const existingChanges: Change[] = JSON.parse(
+      localStorage.getItem("changes") || "[]"
+    );
+    const joinedChanges = [...existingChanges, ...changes];
+    const uniqueChanges = joinedChanges.filter(
+      (change, index) =>
+        joinedChanges.findIndex((c) => c.id === change.id) === index
+    );
+    localStorage.setItem("changes", JSON.stringify(uniqueChanges));
   }, [changes]);
+
+  useEffect(() => {
+    if (!selectedChange || !editor) return;
+    const start = findChangeBlockById(editor, selectedChange.id);
+    if (start !== selectedChange.pos) {
+      setSelectedChange({ ...selectedChange, pos: start });
+      editor.chain().focus().setTextSelection({ from: start, to: start }).run();
+    }
+  }, [selectedChange, editor]);
 
   useEffect(() => {
     // use debounce to save document after 2 seconds of no typing
@@ -100,9 +147,9 @@ export default function EditorProvider({
     if (saveTimer) clearTimeout(saveTimer);
     setSaveTimer(
       setTimeout(() => {
-        if (!editor) return;
+        if (!html) return;
         setSaveStatus("pending");
-        saveDocument(document.id, doc.title, editor.getHTML(), userId)
+        saveDocument(document.id, doc.title, html, userId)
           .then(() => setSaveStatus("success"))
           .catch(() => setSaveStatus("error"));
       }, 2000)
@@ -110,7 +157,12 @@ export default function EditorProvider({
     return () => {
       if (saveTimer) clearTimeout(saveTimer);
     };
-  }, [editor?.getHTML(), doc.title]);
+  }, [html, doc.title, document.id, userId]);
+
+  useEffect(() => {
+    // clear changes on refresh
+    localStorage.setItem("changes", "[]");
+  }, []);
 
   return (
     <EditorContext.Provider
@@ -122,15 +174,21 @@ export default function EditorProvider({
         setEditType,
         aiResponseLoading,
         setAiResponseLoading,
+        autocompleteLoading,
+        setAutocompleteLoading,
         autocomplete,
         setAutocomplete,
         changes,
         setChanges,
+        noChanges,
+        setNoChanges,
         selectedChange,
         setSelectedChange,
         document: doc,
         setDocument,
         saveStatus,
+        message,
+        setMessage,
       }}
     >
       {children}

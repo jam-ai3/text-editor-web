@@ -4,34 +4,27 @@ import * as React from "react";
 import { EditorContent, EditorContext } from "@tiptap/react";
 import { EditorContext as CustomEditorContext } from "@/contexts/editor-provider";
 // --- UI Primitives ---
-import { Toolbar } from "@/components/tiptap/tiptap-ui-primitive/toolbar";
 // --- Tiptap Node ---
 import "@/components/tiptap/tiptap-node/code-block-node/code-block-node.scss";
 import "@/components/tiptap/tiptap-node/list-node/list-node.scss";
 import "@/components/tiptap/tiptap-node/image-node/image-node.scss";
 import "@/components/tiptap/tiptap-node/paragraph-node/paragraph-node.scss";
-import { useMobile } from "@/hooks/use-mobile";
 import { useWindowSize } from "@/hooks/use-window-size";
 // --- Styles ---
 import "@/components/editor/simple-editor.scss";
-import { processKeydown } from "@/_actions/editor";
-import MobileToolbarContent from "./mobile-toolbar";
-import MainToolbarContent from "./main-toolbar";
-import Header from "./header";
-import Image from "next/image";
-import Link from "next/link";
+import { processKeydown } from "@/ai-actions/editor";
+import Header from "./header/header";
 import PopupMenu from "./bubble-menu";
 import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
 import EditPanel from "./edit/edit-panel";
+// framer motion
+import { AnimatePresence, motion } from "framer-motion";
+import Toast from "./toast";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
   const editor = context.editor;
-  const isMobile = useMobile();
   const windowSize = useWindowSize();
-  const [mobileView, setMobileView] = React.useState<
-    "main" | "highlighter" | "link"
-  >("main");
   const [rect, setRect] = React.useState<
     Pick<DOMRect, "x" | "y" | "width" | "height">
   >({
@@ -94,27 +87,17 @@ export function SimpleEditor() {
   }, [editor, rect.height, windowSize.height]);
 
   React.useEffect(() => {
-    if (!isMobile && mobileView !== "main") {
-      setMobileView("main");
-    }
-  }, [isMobile, mobileView]);
-
-  React.useEffect(() => {
     function handleKeydown(event: KeyboardEvent) {
       processKeydown(event, context);
     }
 
     function handleClick(event: MouseEvent) {
       const target = event.target as HTMLElement;
-      console.log(target);
-      if (target.dataset?.diffType) {
+      if (target.dataset.changeBlock || target.dataset.incomingBlock) {
         event.preventDefault();
         context.setEditType("changes");
-        context.setSelectedChange(
-          context.changes.find(
-            (c) => c.current.id === target.id || c.incoming.id === target.id
-          ) ?? null
-        );
+        const change = context.changes.find((c) => c.id === target.id);
+        context.setSelectedChange(change ?? null);
       }
     }
 
@@ -135,53 +118,57 @@ export function SimpleEditor() {
   }, [editor]);
 
   React.useEffect(() => {
-    if (!context.selectedChange || !context.editor) return;
-    setActiveBlock(context.editor, context.selectedChange);
-  }, [context.selectedChange]);
+    if (!context.editor || (!context.selectedChange && !context.noChanges))
+      return;
+    if (context.selectedChange)
+      setActiveBlock(context.editor, context.selectedChange);
+    context.setEditorType("edit");
+    context.setEditType("changes");
+  }, [context.selectedChange, context.noChanges]);
 
   return (
     <EditorContext.Provider value={{ editor }}>
-      <div className="flex items-center gap-4 px-4 border-b-2 w-full">
-        <Link href="/">
-          <Image src="/logo-no-bg.png" alt="Logo" width={64} height={64} />
-        </Link>
-        <div className="w-full">
-          <Header />
-          <Toolbar
-            ref={toolbarRef}
-            style={
-              isMobile
-                ? {
-                    bottom: `calc(100% - ${windowSize.height - rect.y}px)`,
-                  }
-                : {}
-            }
-          >
-            {mobileView === "main" ? (
-              <MainToolbarContent
-                onHighlighterClick={() => setMobileView("highlighter")}
-                onLinkClick={() => setMobileView("link")}
-                isMobile={isMobile}
-              />
-            ) : (
-              <MobileToolbarContent
-                type={mobileView === "highlighter" ? "highlighter" : "link"}
-                onBack={() => setMobileView("main")}
-              />
-            )}
-          </Toolbar>
-        </div>
-      </div>
-      <div className="relative flex content-wrapper">
+      <Header toolbarRef={toolbarRef} />
+      <div className="relative flex bg-secondary content-wrapper">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
           <EditorContent
             editor={editor}
             role="presentation"
-            className="mx-auto my-8 border-2 w-full max-w-[720px] simple-editor-content"
+            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[816px] simple-editor-content"
           />
         </div>
-        {context.editorType === "edit" && <EditPanel />}
+        <AnimatePresence>
+          {context.editorType === "edit" && (
+            <motion.div
+              key="edit-panel"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="h-full"
+            >
+              <EditPanel />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {context.message && (
+            <motion.div
+              key="toast"
+              initial={{ x: "calc(-100% - 24px)" }}
+              animate={{ x: 0 }}
+              exit={{ x: "calc(-100% - 24px)" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bottom-16 left-[24px] fixed"
+            >
+              <Toast
+                message={context.message}
+                onClose={() => context.setMessage(null)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </EditorContext.Provider>
   );

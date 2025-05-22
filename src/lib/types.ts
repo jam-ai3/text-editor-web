@@ -11,16 +11,23 @@ export type Autocomplete = {
 };
 
 export type Change = {
-  current: {
-    id: string;
-    text: string;
-  };
-  incoming: {
-    id: string;
-    text: string;
-  };
+  id: string;
+  current: string;
+  incoming: string;
   pos: number;
   reasoning: string;
 };
 
-export type EditType = "changes" | "grammar" | "reorder";
+export type Message = {
+  variant: "danger" | "warning" | "success" | "info";
+  text: string;
+};
+
+export type EditType = "changes" | "grammar" | "reorder" | "paraphrase";
+
+export type ParaphraseLanguageType =
+  | "academic"
+  | "persuasive"
+  | "professional"
+  | "simple"
+  | "custom";

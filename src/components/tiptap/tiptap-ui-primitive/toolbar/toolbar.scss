@@ -38,7 +38,6 @@
     min-height: var(--tt-toolbar-height);
     background: var(--tt-toolbar-bg-color);
     // border-bottom: 1px solid var(--tt-toolbar-border-color);
-    padding: 0 0.5rem;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
@@ -70,7 +69,6 @@
     --tt-toolbar-padding: 0.25rem;
     --tt-toolbar-border-width: 1px;
 
-    padding: 0.188rem;
     border-radius: calc(
       var(--tt-toolbar-padding) + var(--tt-radius-lg) +
         var(--tt-toolbar-border-width)
@@ -82,7 +80,6 @@
     overflow: hidden;
 
     &[data-plain="true"] {
-      padding: 0;
       border-radius: 0;
       border: none;
       box-shadow: none;

@@ -9,3 +9,15 @@ export function zip<T, U>(a: T[], b: U[]): [T, U][] {
   if (a.length !== b.length) throw new Error("Arrays must be the same length");
   return Array.from({ length: a.length }, (_, i) => [a[i], b[i]]);
 }
+
+export function capitalized(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+type Error = {
+  error: string;
+};
+
+export function isError<T>(error: T | Error): error is Error {
+  return (error as Error).error !== undefined;
+}

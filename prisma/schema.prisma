@@ -17,9 +17,10 @@ model User {
   isAdmin        Boolean   @default(false)
   freeTrialStart DateTime?
 
-  subscriptions Subscription[]
-  documents     Document[]
-  analytics     Analytics[]
+  subscriptions  Subscription[]
+  documents      Document[]
+  analytics      Analytics[]
+  individualCall IndividualCall[]
 }
 
 model Subscription {
@@ -59,6 +60,16 @@ model Analytics {
   lastUpdated       DateTime @default(now())
 
   userId String @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model IndividualCall {
+  id        String   @id @default(uuid())
+  type      String
+  createdAt DateTime @default(now())
+
+  userId String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
