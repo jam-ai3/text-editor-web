@@ -13,7 +13,6 @@ import {
   acceptIncoming,
   insertAutocomplete,
   insertChangesAt,
-  insertChangesAtSelection,
   rejectAutocomplete,
   rejectChanges,
   rejectIncoming,
