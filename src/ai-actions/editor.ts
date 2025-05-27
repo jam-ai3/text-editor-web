@@ -186,6 +186,12 @@ export async function handleAutocomplete(context: EditorContextType) {
   try {
     context.setAutocompleteLoading(true);
     const position = context.editor.state.selection.to;
+    context.editor
+      .chain()
+      .focus()
+      .insertContent({ type: "loaderNode" })
+      .setTextSelection(position)
+      .run();
     const content =
       context.editor
         .getText()
