@@ -52,7 +52,7 @@ export const defaultEditorContext: EditorContextType = {
   editor: null,
   editorType: "produce",
   setEditorType: () => {},
-  editType: "grammar",
+  editType: "document",
   setEditType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
@@ -97,7 +97,7 @@ export default function EditorProvider({
   userId,
 }: EditorProviderProps) {
   const [editorType, setEditorType] = useState<EditorType>("produce");
-  const [editType, setEditType] = useState<EditType>("grammar");
+  const [editType, setEditType] = useState<EditType>("document");
   const [autocomplete, setAutocomplete] = useState<Autocomplete | null>(null);
   const autocompleteRef = useRef(autocomplete);
   const [changes, setChanges] = useState<Change[]>([]);
@@ -162,6 +162,7 @@ export default function EditorProvider({
   useEffect(() => {
     // clear changes on refresh
     localStorage.setItem("changes", "[]");
+    localStorage.setItem("individualChanges", "[]");
   }, []);
 
   return (

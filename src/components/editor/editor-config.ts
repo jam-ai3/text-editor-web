@@ -27,6 +27,7 @@ import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
 import { LineHeight } from "./extensions/line-height";
 import { LoaderNode } from "./extensions/loader";
+import { IndividualChangeNode } from "./extensions/change-node";
 
 const editorConfig = (
   content: string,
@@ -66,6 +67,7 @@ const editorConfig = (
       shouldPreventKeys: () =>
         changes.current.length !== 0 || autocomplete.current !== null,
     }),
+    IndividualChangeNode,
     ChangeMark,
     IncomingMark,
     AutocompleteMark,

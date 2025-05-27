@@ -1,9 +1,6 @@
 "use client";
 
-import Gemini, {
-  parseGeminiImproved,
-  parseGeminiParaphrase,
-} from "./gemini/functions";
+import Gemini from "./gemini/functions";
 import { EditorContextType } from "@/contexts/editor-provider";
 import { Editor } from "@tiptap/core";
 import { v4 } from "uuid";
@@ -20,7 +17,7 @@ import {
 import { updateChanges } from "@/components/editor/helpers";
 import { MAX_CONTEXT_LENGTH } from "@/lib/constants";
 import { ParaphraseLanguageType } from "@/lib/types";
-import { isCtrlPressed, isError } from "@/lib/utils";
+import { isCtrlPressed } from "@/lib/utils";
 import { acceptAllChanges, rejectAllChanges } from "./document-changes";
 
 export async function processKeydown(
@@ -206,8 +203,7 @@ export async function handleAutocomplete(context: EditorContextType) {
         .split(" ")
         .slice(0, MAX_CONTEXT_LENGTH)
         .join(" ");
-    const value = await Gemini.getAutocomplete(content);
-    const { improved } = parseGeminiImproved(value);
+    const { improved } = await Gemini.getAutocomplete(content);
     insertAutocomplete(context.editor, improved, position);
     context.setAutocomplete({ text: improved, pos: position });
   } catch (error) {
@@ -222,8 +218,7 @@ export async function handleShorten(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, before, after, from } = getContext(context.editor);
-    const response = await Gemini.getShortened(before, after, selected);
-    const { improved } = parseGeminiImproved(response);
+    const { improved } = await Gemini.getShortened(before, after, selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -237,8 +232,7 @@ export async function handleLengthen(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, before, after, from } = getContext(context.editor);
-    const response = await Gemini.getLengthened(before, after, selected);
-    const { improved } = parseGeminiImproved(response);
+    const { improved } = await Gemini.getLengthened(before, after, selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -252,8 +246,7 @@ export async function handleGrammar(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, from } = getContext(context.editor);
-    const response = await Gemini.getGrammar(selected);
-    const { improved } = parseGeminiImproved(response);
+    const { improved } = await Gemini.getGrammar(selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -267,8 +260,7 @@ export async function handleReorder(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, from } = getContext(context.editor);
-    const response = await Gemini.reorderSentences(selected);
-    const { improved } = parseGeminiImproved(response);
+    const { improved } = await Gemini.reorderSentences(selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -286,9 +278,11 @@ export async function handleParaphrase(
   try {
     context.setAiResponseLoading(true);
     const { selected, from } = getContext(context.editor);
-    const res = await Gemini.paraphrase(selected, style, customTone);
-    if (isError(res)) return; // TODO: handle error
-    const { paraphrased } = parseGeminiParaphrase(res);
+    const { paraphrased } = await Gemini.paraphrase(
+      selected,
+      style,
+      customTone
+    );
     showDiff(context, selected, paraphrased, from);
   } catch (error) {
     console.error(error);
@@ -315,13 +309,14 @@ function showDiff(
 
   // Otherwise, show diff
   const id = v4();
-  insertChangesAt(context.editor, current, incoming, id, pos);
+  insertChangesAt(context.editor, current, incoming, id, pos, true);
   const newChange = {
     id,
     current,
     incoming,
     pos,
     reasoning: "",
+    isIndividual: true,
   };
 
   context.setNoChanges(false);

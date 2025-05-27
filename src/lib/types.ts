@@ -16,6 +16,7 @@ export type Change = {
   incoming: string;
   pos: number;
   reasoning: string;
+  isIndividual: boolean;
 };
 
 export type Message = {
@@ -23,7 +24,7 @@ export type Message = {
   text: string;
 };
 
-export type EditType = "changes" | "grammar" | "reorder" | "paraphrase";
+export type EditType = "document" | "individual";
 
 export type ParaphraseLanguageType =
   | "academic"

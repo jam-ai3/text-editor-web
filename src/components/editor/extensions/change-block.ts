@@ -90,36 +90,38 @@ export function insertChanges(
   return { id };
 }
 
-export function insertChangesAtSelection(
-  editor: Editor,
-  incoming: string,
-  id: string
-) {
-  const { from, to } = editor.state.selection;
-  const current = editor.state.doc.textBetween(from, to, "");
-  editor
-    .chain()
-    .focus()
-    .setMark("change", { changeBlock: true, id, incoming })
-    .setTextSelection(to)
-    .run();
-  return { current, from };
-}
-
 export function insertChangesAt(
   editor: Editor,
   current: string,
   incoming: string,
   id: string,
-  pos: number
+  pos: number,
+  isIndividual = false
 ) {
-  editor
-    .chain()
-    .focus()
-    .setTextSelection({ from: pos, to: pos + current.length })
-    .setMark("change", { changeBlock: true, id, incoming })
-    .setTextSelection(pos + current.length)
-    .run();
+  if (isIndividual) {
+    editor
+      .chain()
+      .focus()
+      .deleteRange({ from: pos, to: pos + current.length })
+      .insertContentAt(pos, {
+        type: "changeNode",
+        attrs: {
+          id,
+          current,
+          incoming,
+        },
+      })
+      .setTextSelection(pos)
+      .run();
+  } else {
+    editor
+      .chain()
+      .focus()
+      .setTextSelection({ from: pos, to: pos + current.length })
+      .setMark("change", { changeBlock: true, id, incoming })
+      .setTextSelection(pos)
+      .run();
+  }
 }
 
 export function insertChangesChain(

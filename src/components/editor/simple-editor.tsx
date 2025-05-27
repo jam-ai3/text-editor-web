@@ -95,7 +95,7 @@ export function SimpleEditor() {
       const target = event.target as HTMLElement;
       if (target.dataset.changeBlock || target.dataset.incomingBlock) {
         event.preventDefault();
-        context.setEditType("changes");
+        context.setEditType("document");
         const change = context.changes.find((c) => c.id === target.id);
         context.setSelectedChange(change ?? null);
       }
@@ -123,7 +123,7 @@ export function SimpleEditor() {
     if (context.selectedChange)
       setActiveBlock(context.editor, context.selectedChange);
     context.setEditorType("edit");
-    context.setEditType("changes");
+    context.setEditType("document");
   }, [context.selectedChange, context.noChanges]);
 
   return (

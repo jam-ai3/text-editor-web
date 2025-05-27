@@ -1,6 +1,6 @@
 import { EditorContextType } from "@/contexts/editor-provider";
 import Gemini from "./gemini/functions";
-import { Change } from "@/lib/types";
+import { Change, ParaphraseLanguageType } from "@/lib/types";
 import {
   insertIncomingChain,
   insertChangesChain,
@@ -24,6 +24,22 @@ export async function checkFullPaperGrammar(context: EditorContextType) {
   );
 
   showDiff(context, diff);
+}
+
+export async function paraphraseFullPaper(
+  context: EditorContextType,
+  style: ParaphraseLanguageType,
+  customTone?: string
+) {
+  if (!context.editor) return;
+  const text = context.editor.getText();
+  const paragraphs = text.split("\n");
+  const results = await Promise.all(
+    paragraphs.map((p) =>
+      p.trim().length > 0 ? Gemini.paraphraseParagraph(p, style, customTone) : p
+    )
+  );
+  console.log(results);
 }
 
 type DiffBlock =
@@ -134,6 +150,7 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
       incoming: block.incoming,
       pos,
       reasoning: "",
+      isIndividual: false,
     });
 
     if (block.current.length === 0) {
