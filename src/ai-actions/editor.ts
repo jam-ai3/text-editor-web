@@ -20,7 +20,8 @@ import {
 import { updateChanges } from "@/components/editor/helpers";
 import { MAX_CONTEXT_LENGTH } from "@/lib/constants";
 import { ParaphraseLanguageType } from "@/lib/types";
-import { isError } from "@/lib/utils";
+import { isCtrlPressed, isError } from "@/lib/utils";
+import { acceptAllChanges, rejectAllChanges } from "./document-changes";
 
 export async function processKeydown(
   event: KeyboardEvent,
@@ -30,7 +31,7 @@ export async function processKeydown(
     tabOnKeydown(event, context);
   } else if (event.key === "Escape") {
     escapeOnKeydown(event, context);
-  } else if (event.metaKey) {
+  } else if (isCtrlPressed(event)) {
     await metakeyOnKeydown(event, context);
   }
 }
@@ -38,14 +39,13 @@ export async function processKeydown(
 // Tab handlers
 
 function tabOnKeydown(event: KeyboardEvent, context: EditorContextType) {
-  if (context.autocomplete !== null) {
-    handleAcceptAutocomplete(event, context);
-  } else if (context.selectedChange !== null) {
-    handleAcceptChange(event, context);
-  } else {
-    event.preventDefault();
-    context.editor?.commands.insertContent("\t");
-  }
+  if (event.shiftKey) return handleAcceptAll(event, context);
+  if (context.autocomplete !== null)
+    return handleAcceptAutocomplete(event, context);
+  if (context.selectedChange !== null)
+    return handleAcceptChange(event, context);
+  event.preventDefault();
+  context.editor?.commands.insertContent("\t");
 }
 
 export function handleAccept(
@@ -92,12 +92,20 @@ export function handleAcceptChange(
   context.setSelectedChange(newChanges[index]);
 }
 
+function handleAcceptAll(event: KeyboardEvent, context: EditorContextType) {
+  if (context.changes.length !== 0) {
+    event.preventDefault();
+    acceptAllChanges(context);
+  }
+}
+
 // Escape handlers
 
 function escapeOnKeydown(event: KeyboardEvent, context: EditorContextType) {
   if (!context.editor) return;
-  if (context.selectedChange) handleRejectChange(event, context);
-  if (context.autocomplete) handleRejectAutocomplete(event, context);
+  if (event.shiftKey) return handleRejectAll(event, context);
+  if (context.selectedChange) return handleRejectChange(event, context);
+  if (context.autocomplete) return handleRejectAutocomplete(event, context);
 }
 
 export function handleReject(
@@ -142,6 +150,13 @@ export function handleRejectChange(
   if (index === newChanges.length)
     return context.setSelectedChange(newChanges[0]);
   context.setSelectedChange(newChanges[index]);
+}
+
+function handleRejectAll(event: KeyboardEvent, context: EditorContextType) {
+  if (context.changes.length !== 0) {
+    event.preventDefault();
+    rejectAllChanges(context);
+  }
 }
 
 // Metakey handlers

@@ -25,6 +25,7 @@ import {
 } from "./extensions";
 import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
+import { LineHeight } from "./extensions/line-height";
 
 const editorConfig = (
   content: string,
@@ -57,6 +58,7 @@ const editorConfig = (
     Color,
     Link.configure({ openOnClick: false }),
     TextStyle.configure({ mergeNestedSpanStyles: true }),
+    LineHeight,
     // Custom
     Keyhandler.configure({
       shouldPreventKeys: () =>

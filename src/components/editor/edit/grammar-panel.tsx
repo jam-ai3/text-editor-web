@@ -22,7 +22,7 @@ export default function GrammarPanel() {
       <div className="flex flex-col items-center gap-4 max-w-4/5">
         <p className="font-semibold text-lg">Grammar + Spelling</p>
         <p className="text-muted-foreground text-center">
-          Check the grammar and spelling of your entire document for errors
+          Scan your document for errors and potential enhancements in grammar
         </p>
         <Button
           onClick={handleCheckGrammar}

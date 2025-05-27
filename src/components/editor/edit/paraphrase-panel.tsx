@@ -84,6 +84,7 @@ export default function ParaphrasePanel() {
           placeholder="Ex. 'funny', 'conversational', 'exciting'"
           value={customStyle}
           onChange={handleStyleChange}
+          onKeyDown={(e) => e.key === "Enter" && handleParaphraseClick()}
         />
       )}
       <Button

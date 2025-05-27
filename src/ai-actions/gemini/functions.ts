@@ -38,14 +38,15 @@ const Gemini = {
     return await promptFlash(prompt);
   },
 
-  getGrammar: async (selected: string, fullDocument: boolean = false) => {
+  getGrammar: async (selected: string) => {
     const prompt = GeminiPrompts.grammarPrompt(selected);
-    if (!fullDocument) updateAnalytics("grammar");
+    updateAnalytics("grammar");
     return await promptFlash(prompt);
   },
 
   checkFullPaperGrammar: async (text: string) => {
     const prompt = GeminiPrompts.checkFullPaperGrammarPrompt(text);
+    updateAnalytics("grammar-full");
     return await promptFlash(prompt);
   },
 
@@ -71,6 +72,7 @@ const Gemini = {
       contextBefore,
       contextAfter
     );
+    updateAnalytics("synonyms");
     return await promptFlashLite(prompt);
   },
 
@@ -85,9 +87,11 @@ const Gemini = {
       const isValid = await promptFlash(isValidPrompt);
       if (isValid === "0") return { error: "Invalid tone provided" };
       const prompt = GeminiPrompts.customParaphrase(customTone, selected);
+      updateAnalytics("paraphrase");
       return await promptFlash(prompt);
     }
     const prompt = GeminiPrompts.paraphrase[style](selected);
+    updateAnalytics("paraphrase");
     return await promptFlash(prompt);
   },
 };

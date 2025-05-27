@@ -9,7 +9,9 @@ type GeminiAction =
   | "lengthen"
   | "grammar"
   | "reorder"
-  | "custom";
+  | "paraphrase"
+  | "grammar-full"
+  | "synonyms";
 
 export async function updateAnalytics(action: GeminiAction) {
   const session = await getSession();
@@ -43,8 +45,12 @@ function getAnalyticsCreate(action: GeminiAction) {
       return { grammarCalls: 1 };
     case "reorder":
       return { reorderCalls: 1 };
-    case "custom":
-      return { customCalls: 1 };
+    case "paraphrase":
+      return { paraphraseCalls: 1 };
+    case "grammar-full":
+      return { grammarFullCalls: 1 };
+    case "synonyms":
+      return { synonymsCalls: 1 };
   }
 }
 
@@ -60,7 +66,11 @@ function getAnalyticsUpdate(action: GeminiAction) {
       return { grammarCalls: { increment: 1 } };
     case "reorder":
       return { reorderCalls: { increment: 1 } };
-    case "custom":
-      return { customCalls: { increment: 1 } };
+    case "paraphrase":
+      return { paraphraseCalls: { increment: 1 } };
+    case "grammar-full":
+      return { grammarFullCalls: { increment: 1 } };
+    case "synonyms":
+      return { synonymsCalls: { increment: 1 } };
   }
 }

@@ -161,7 +161,9 @@ export function updateChanges(context: EditorContextType) {
   const newChanges = existingChanges.filter((c) => ids.includes(c.id));
 
   context.setChanges(newChanges);
-  if (context.selectedChange === null && newChanges.length > 0) {
+  if (newChanges.length === 0) {
+    context.setSelectedChange(null);
+  } else if (context.selectedChange === null) {
     context.setSelectedChange(newChanges[0]);
   }
 }
