@@ -1,12 +1,11 @@
-import { EditorContext } from "@/contexts/editor-provider";
-import { useContext } from "react";
 import ChangesPanel from "./changes-tab";
 import EditOptions from "./edit-options";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import useDocument from "@/hooks/useDocument";
 
 export default function DocumentPanel() {
-  const context = useContext(EditorContext);
+  const context = useDocument();
 
   if (!context.selectedChange) return <EditOptions />;
 

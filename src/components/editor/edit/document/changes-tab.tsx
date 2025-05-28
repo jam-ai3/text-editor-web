@@ -9,14 +9,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { EditorContext } from "@/contexts/editor-provider";
+import useDocument from "@/hooks/useDocument";
 import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
 import { Change } from "@/lib/types";
 import { X, CheckCheck, Check } from "lucide-react";
-import { useContext, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 export default function ChangesPanel() {
-  const context = useContext(EditorContext);
+  const context = useDocument();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ type ChangeTabProps = {
 };
 
 function ChangeTab({ change }: ChangeTabProps) {
-  const context = useContext(EditorContext);
+  const context = useDocument();
 
   if (context.selectedChange?.id !== change.id)
     return (

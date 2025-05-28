@@ -13,10 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EditorContext } from "@/contexts/editor-provider";
+import useDocument from "@/hooks/useDocument";
 import { ParaphraseLanguageType } from "@/lib/types";
 import { FileCheck, Loader2, Replace } from "lucide-react";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 const MAX_CUSTOM_STYLE_LENGTH = 20;
 
@@ -35,7 +35,7 @@ function OptionSeparator() {
 }
 
 function GrammarOption() {
-  const context = useContext(EditorContext);
+  const context = useDocument();
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleCheckGrammar() {
@@ -67,7 +67,7 @@ function GrammarOption() {
 }
 
 function ParaphraseOption() {
-  const context = useContext(EditorContext);
+  const context = useDocument();
   const [isLoading, setIsLoading] = useState(false);
   const [languageStyle, setLanguageStyle] =
     useState<ParaphraseLanguageType>("academic");

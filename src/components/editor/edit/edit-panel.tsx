@@ -1,14 +1,13 @@
-import { EditorContext } from "@/contexts/editor-provider";
 import { EditType } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { useContext } from "react";
 import DocumentPanel from "./document/document-panel";
 import IndividualPanel from "./individual/individual-panel";
+import useDocument from "@/hooks/useDocument";
 
 export const EDIT_PANEL_WIDTH = 400;
 
 export default function EditPanel() {
-  const { editType } = useContext(EditorContext);
+  const { editType } = useDocument();
 
   function renderPanel() {
     switch (editType) {
@@ -40,7 +39,7 @@ type EditOptionProps = {
 };
 
 function EditOption({ text, value, isLast = false }: EditOptionProps) {
-  const { editType, setEditType } = useContext(EditorContext);
+  const { editType, setEditType } = useDocument();
 
   return (
     <button
