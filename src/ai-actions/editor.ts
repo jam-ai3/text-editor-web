@@ -375,16 +375,16 @@ function showDiff(
 
 export function getContext(editor: Editor) {
   const { from, to } = editor.state.selection;
-  const selected = editor.getText().substring(from - 1, to);
+  const selected = editor.getText().substring(from + 1, to + 1);
   const before = editor
     .getText()
-    .substring(0, from)
+    .substring(0, from + 1)
     .split(" ")
     .slice(-MAX_CONTEXT_LENGTH)
     .join(" ");
   const after = editor
     .getText()
-    .substring(to)
+    .substring(to + 1)
     .split(" ")
     .slice(0, MAX_CONTEXT_LENGTH)
     .join(" ");

@@ -128,7 +128,7 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   if (blocks.length === 0) return context.setNoChanges(true);
 
   const changes: Change[] = [];
-  let pos = 1;
+  let pos = -1;
   let chain = context.editor.chain().focus();
 
   for (const block of blocks) {
@@ -241,7 +241,7 @@ export function rebuildDocument(
   if (!context.editor) return;
 
   const changes: Change[] = [];
-  let pos = 1;
+  let pos = -1;
   let chain = context.editor.chain().focus();
 
   for (const [current, incoming] of paragraphs) {
