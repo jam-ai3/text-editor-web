@@ -4,74 +4,70 @@ import { promptFlash, promptFlashLite } from "./gemini";
 import GeminiPrompts from "./prompts";
 
 const Gemini = {
-  getAutocomplete: async (content: string) => {
-    const prompt = GeminiPrompts.autocompletePrompt(content);
+  autocomplete: async (content: string) => {
+    const { prompt, parser } = GeminiPrompts.autocomplete(content);
     updateAnalytics("autocomplete");
-    return await promptFlashLite(prompt);
+    const result = await promptFlashLite(prompt);
+    return parser(result);
   },
 
-  getShortened: async (
+  shorten: async (
     contextBefore: string,
     contextAfter: string,
     selected: string
   ) => {
-    const prompt = GeminiPrompts.shortenPrompt(
+    const { prompt, parser } = GeminiPrompts.shorten(
       contextBefore,
       contextAfter,
       selected
     );
     updateAnalytics("shorten");
-    return await promptFlash(prompt);
+    const result = await promptFlash(prompt);
+    return parser(result);
   },
 
-  getLengthened: async (
+  lengthen: async (
     contextBefore: string,
     contextAfter: string,
     selected: string
   ) => {
-    const prompt = GeminiPrompts.lengthenPrompt(
+    const { prompt, parser } = GeminiPrompts.lengthen(
       contextBefore,
       contextAfter,
       selected
     );
     updateAnalytics("lengthen");
-    return await promptFlash(prompt);
+    const result = await promptFlash(prompt);
+    return parser(result);
   },
 
-  getGrammar: async (selected: string, fullDocument: boolean = false) => {
-    const prompt = GeminiPrompts.grammarPrompt(selected);
-    if (!fullDocument) updateAnalytics("grammar");
-    return await promptFlash(prompt);
+  grammar: async (selected: string) => {
+    const { prompt, parser } = GeminiPrompts.grammar(selected);
+    updateAnalytics("grammar");
+    const result = await promptFlash(prompt);
+    return parser(result);
   },
 
-  checkFullPaperGrammar: async (text: string) => {
-    const prompt = GeminiPrompts.checkFullPaperGrammarPrompt(text);
-    return await promptFlash(prompt);
+  fullGrammar: async (text: string) => {
+    const { prompt, parser } = GeminiPrompts.fullGrammar(text);
+    updateAnalytics("grammar-full");
+    const result = await promptFlash(prompt);
+    return parser(result);
   },
 
-  reorderParagraph: async (selected: string) => {
-    const prompt = GeminiPrompts.reorderParagraphPrompt(selected);
-    updateAnalytics("reorder");
-    return await promptFlash(prompt);
-  },
-
-  reorderSentences: async (selected: string) => {
-    const prompt = GeminiPrompts.reorderSentencesPrompt(selected);
-    updateAnalytics("reorder");
-    return await promptFlash(prompt);
-  },
-
-  getSynonyms: async (
+  synonyms: async (
     word: string,
     contextBefore: string,
     contextAfter: string
   ) => {
-    const prompt = GeminiPrompts.synonymsPrompt(
+    const { prompt, parser } = GeminiPrompts.synonyms(
       word,
       contextBefore,
       contextAfter
     );
-    return await promptFlashLite(prompt);
+    updateAnalytics("synonyms");
+    const result = await promptFlashLite(prompt);
+    return parser(result);
   },
 
   paraphrase: async (
@@ -80,15 +76,83 @@ const Gemini = {
     customTone?: string
   ) => {
     if (style === "custom") {
-      if (!customTone) return { error: "No custom tone provided" };
-      const isValidPrompt = GeminiPrompts.validTonePrompt(customTone);
-      const isValid = await promptFlash(isValidPrompt);
-      if (isValid === "0") return { error: "Invalid tone provided" };
-      const prompt = GeminiPrompts.customParaphrase(customTone, selected);
-      return await promptFlash(prompt);
+      if (!customTone) throw new Error("No custom tone provided");
+      const { prompt: isValidPrompt, parser: isValidParser } =
+        GeminiPrompts.validTone(customTone);
+      const isValidResult = await promptFlash(isValidPrompt);
+      const isValid = isValidParser(isValidResult);
+      if (isValid === "0") throw new Error("Invalid tone provided");
+      const { prompt, parser } = GeminiPrompts.paraphrase(selected, customTone);
+      updateAnalytics("paraphrase");
+      const result = await promptFlash(prompt);
+      return parser(result);
     }
-    const prompt = GeminiPrompts.paraphrase[style](selected);
-    return await promptFlash(prompt);
+    const { prompt, parser } = GeminiPrompts.paraphrase(selected, style);
+    updateAnalytics("paraphrase");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  paraphraseParagraph: async (
+    paragraph: string,
+    style: ParaphraseLanguageType,
+    customTone?: string
+  ) => {
+    if (style === "custom") {
+      if (!customTone) throw new Error("No custom tone provided");
+      const { prompt: isValidPrompt, parser: isValidParser } =
+        GeminiPrompts.validTone(customTone);
+      const isValidResult = await promptFlash(isValidPrompt);
+      const isValid = isValidParser(isValidResult);
+      if (isValid === "0") throw new Error("Invalid tone provided");
+      const { prompt, parser } = GeminiPrompts.paraphraseParagraph(
+        paragraph,
+        customTone
+      );
+      updateAnalytics("paraphrase");
+      const result = await promptFlash(prompt);
+      return parser(result);
+    }
+    const { prompt, parser } = GeminiPrompts.paraphraseParagraph(
+      paragraph,
+      style
+    );
+    updateAnalytics("paraphrase");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  resize: async (
+    before: string,
+    after: string,
+    selected: string,
+    minLength: number,
+    maxLength: number
+  ) => {
+    const { prompt, parser } = GeminiPrompts.resize(
+      before,
+      after,
+      selected,
+      minLength,
+      maxLength
+    );
+    updateAnalytics("resize");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  fluidity: async (before: string, after: string, selected: string) => {
+    const { prompt, parser } = GeminiPrompts.fluidity(before, after, selected);
+    updateAnalytics("fluidity");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  reorderSentences: async (selected: string) => {
+    const { prompt, parser } = GeminiPrompts.reorderSentences(selected);
+    updateAnalytics("reorder");
+    const result = await promptFlash(prompt);
+    return parser(result);
   },
 };
 
@@ -98,38 +162,3 @@ export type GeminiImproved = {
   improved: string;
   reasoning: string | null;
 };
-
-export function parseGeminiImproved(output: string): GeminiImproved {
-  try {
-    return JSON.parse(
-      output.replaceAll("```json", "").replaceAll("```", "")
-    ) as GeminiImproved;
-  } catch (error) {
-    console.error("Failed to parse Gemini output:", error);
-    return { improved: "", reasoning: null };
-  }
-}
-
-export function parseGeminiSynonym(output: string): string[] {
-  try {
-    return JSON.parse(output);
-  } catch (error) {
-    console.error("Failed to parse Gemini output:", error);
-    return [];
-  }
-}
-
-type GeminiParaphrase = {
-  paraphrased: string;
-};
-
-export function parseGeminiParaphrase(output: string): GeminiParaphrase {
-  try {
-    return JSON.parse(
-      output.replaceAll("```json", "").replaceAll("```", "")
-    ) as GeminiParaphrase;
-  } catch (error) {
-    console.error("Failed to parse Gemini output:", error);
-    return { paraphrased: "" };
-  }
-}

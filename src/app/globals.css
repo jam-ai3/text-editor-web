@@ -30,6 +30,8 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-custom-accent: var(--custom-accent);
+  --color-custom-accent-dark: var(--custom-accent-dark);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-tertiary: var(--tertiary);

@@ -1,6 +1,6 @@
 import { EditorContextType } from "@/contexts/editor-provider";
 import Gemini from "./gemini/functions";
-import { Change } from "@/lib/types";
+import { Change, ParaphraseLanguageType } from "@/lib/types";
 import {
   insertIncomingChain,
   insertChangesChain,
@@ -11,11 +11,12 @@ import {
 } from "@/components/editor/extensions";
 import { v4 } from "uuid";
 import { findChangeBlockById } from "@/components/editor/helpers";
+import { zip } from "@/lib/utils";
 
 export async function checkFullPaperGrammar(context: EditorContextType) {
   if (!context.editor) return;
   const text = context.editor.getText();
-  const results = await Gemini.checkFullPaperGrammar(text);
+  const results = await Gemini.fullGrammar(text);
   const diff = buildDiff(text, results).filter(
     (block) =>
       (block.type === "normal" && block.text.length !== 0) ||
@@ -24,6 +25,27 @@ export async function checkFullPaperGrammar(context: EditorContextType) {
   );
 
   showDiff(context, diff);
+}
+
+export async function paraphraseFullPaper(
+  context: EditorContextType,
+  style: ParaphraseLanguageType,
+  customTone?: string
+) {
+  if (!context.editor) return;
+  const text = context.editor.getText();
+  const paragraphs = text.split("\n");
+  const results = await Promise.all(
+    paragraphs.map((p) =>
+      p.trim().length > 0
+        ? Gemini.paraphraseParagraph(p, style, customTone).then(
+            (r) => r.paraphrased
+          )
+        : p
+    )
+  );
+
+  rebuildDocument(context, zip(paragraphs, results));
 }
 
 type DiffBlock =
@@ -106,7 +128,7 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
   if (blocks.length === 0) return context.setNoChanges(true);
 
   const changes: Change[] = [];
-  let pos = 1;
+  let pos = -1;
   let chain = context.editor.chain().focus();
 
   for (const block of blocks) {
@@ -134,6 +156,7 @@ function showDiff(context: EditorContextType, blocks: DiffBlock[]) {
       incoming: block.incoming,
       pos,
       reasoning: "",
+      isIndividual: false,
     });
 
     if (block.current.length === 0) {
@@ -207,4 +230,49 @@ export function rejectAllChanges(context: EditorContextType) {
 
   context.setChanges([]);
   context.setSelectedChange(null);
+}
+
+type Paragraph = [string, string];
+
+export function rebuildDocument(
+  context: EditorContextType,
+  paragraphs: Paragraph[]
+) {
+  if (!context.editor) return;
+
+  const changes: Change[] = [];
+  let pos = -1;
+  let chain = context.editor.chain().focus();
+
+  for (const [current, incoming] of paragraphs) {
+    if (current === incoming) {
+      pos += current.length + 1;
+      continue;
+    }
+
+    const id = v4();
+    chain = insertChangesChain(chain, current, incoming, id, pos);
+    changes.push({
+      id,
+      current,
+      incoming,
+      pos,
+      reasoning: "",
+      isIndividual: false,
+    });
+    pos += current.length + 1;
+  }
+
+  chain.run();
+
+  context.setNoChanges(changes.length === 0);
+  context.setChanges(changes);
+  if (changes.length > 0) {
+    context.setSelectedChange(changes[0]);
+    context.editor
+      .chain()
+      .focus()
+      .setTextSelection({ from: changes[0].pos, to: changes[0].pos })
+      .run();
+  }
 }

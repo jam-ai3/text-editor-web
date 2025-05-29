@@ -14,6 +14,7 @@ import FontSizeInput from "../../tiptap/tiptap-ui/font-size-input/font-size-inpu
 import ExportButton from "./export-btn";
 import AutocompleteButton from "./autocomplete-button";
 import FontFamilyInput from "@/components/tiptap/tiptap-ui/font-family-input/font-family-input";
+import LineHeightInput from "@/components/tiptap/tiptap-ui/line-height-input/line-height-input";
 
 export default function MainToolbarContent() {
   return (
@@ -69,6 +70,12 @@ export default function MainToolbarContent() {
         <TextAlignButton align="center" />
         <TextAlignButton align="right" />
         <TextAlignButton align="justify" />
+      </ToolbarGroup>
+
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <LineHeightInput />
       </ToolbarGroup>
 
       <Spacer />

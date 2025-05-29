@@ -59,9 +59,6 @@ export async function getSession() {
     return null;
   }
   const token = jwt[0].split("=")[1];
-  if (token) {
-    const decoded = await verifyToken(token);
-    return decoded;
-  }
+  if (token) return await verifyToken(token);
   return null;
 }

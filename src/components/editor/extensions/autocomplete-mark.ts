@@ -43,6 +43,7 @@ export function insertAutocomplete(
   editor
     .chain()
     .focus()
+    .deleteRange({ from: at, to: at + 1 }) // delete loader
     .insertContentAt(at, {
       type: "text",
       text: autocomplete,

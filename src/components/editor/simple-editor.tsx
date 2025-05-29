@@ -15,11 +15,17 @@ import "@/components/editor/simple-editor.scss";
 import { processKeydown } from "@/ai-actions/editor";
 import Header from "./header/header";
 import PopupMenu from "./bubble-menu";
-import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
-import EditPanel from "./edit/edit-panel";
+import {
+  removeAutocomplete,
+  removeChanges,
+  removeIndividualChanges,
+  setActiveBlock,
+} from "./helpers";
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 import Toast from "./toast";
+import AIPanel from "./edit/ai-panel";
+import { Stack } from "@mui/material";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -35,6 +41,7 @@ export function SimpleEditor() {
   });
   const toolbarRef = React.useRef<HTMLDivElement>(null);
 
+  // TipTap UI
   React.useEffect(() => {
     const updateRect = () => {
       setRect(document.body.getBoundingClientRect());
@@ -53,6 +60,7 @@ export function SimpleEditor() {
     };
   }, []);
 
+  // TipTap UI
   React.useEffect(() => {
     const checkCursorVisibility = () => {
       if (!editor || !toolbarRef.current) return;
@@ -86,6 +94,7 @@ export function SimpleEditor() {
     checkCursorVisibility();
   }, [editor, rect.height, windowSize.height]);
 
+  // click handler (select block)
   React.useEffect(() => {
     function handleKeydown(event: KeyboardEvent) {
       processKeydown(event, context);
@@ -95,7 +104,7 @@ export function SimpleEditor() {
       const target = event.target as HTMLElement;
       if (target.dataset.changeBlock || target.dataset.incomingBlock) {
         event.preventDefault();
-        context.setEditType("changes");
+        context.setEditType("document");
         const change = context.changes.find((c) => c.id === target.id);
         context.setSelectedChange(change ?? null);
       }
@@ -115,15 +124,19 @@ export function SimpleEditor() {
     if (!editor) return;
     removeAutocomplete(editor);
     removeChanges(editor);
+    removeIndividualChanges(editor);
   }, [editor]);
 
+  // open edit panel on changes
   React.useEffect(() => {
     if (!context.editor || (!context.selectedChange && !context.noChanges))
       return;
     if (context.selectedChange)
       setActiveBlock(context.editor, context.selectedChange);
     context.setEditorType("edit");
-    context.setEditType("changes");
+    context.setEditType(
+      context.selectedChange?.isIndividual ? "individual" : "document"
+    );
   }, [context.selectedChange, context.noChanges]);
 
   return (
@@ -132,11 +145,9 @@ export function SimpleEditor() {
       <div className="relative flex bg-secondary content-wrapper">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
-          <EditorContent
-            editor={editor}
-            role="presentation"
-            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[816px] simple-editor-content"
-          />
+          <Stack direction="column" flexGrow={1} paddingX={2} overflow="auto">
+            <EditorContent editor={editor} role="presentation" />
+          </Stack>
         </div>
         <AnimatePresence>
           {context.editorType === "edit" && (
@@ -148,7 +159,7 @@ export function SimpleEditor() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="h-full"
             >
-              <EditPanel />
+              <AIPanel />
             </motion.div>
           )}
         </AnimatePresence>

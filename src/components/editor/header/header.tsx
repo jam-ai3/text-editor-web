@@ -2,14 +2,24 @@
 
 import { Input } from "@/components/ui/input";
 import { EditorContext } from "@/contexts/editor-provider";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Info, Loader2, XCircle } from "lucide-react";
 import { useContext } from "react";
-import { getWordcount } from "../helpers";
-import Link from "next/link";
 import Image from "next/image";
 import { Toolbar } from "../../tiptap/tiptap-ui-primitive/toolbar/toolbar";
 import MainToolbarContent from "./main-toolbar";
 import EditorToggle from "./editor-toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Tools from "./tools";
 
 type HeaderProps = {
   toolbarRef: React.RefObject<HTMLDivElement | null>;
@@ -18,8 +28,7 @@ type HeaderProps = {
 const LOGO_SIZE = 48;
 
 export default function Header({ toolbarRef }: HeaderProps) {
-  const { document, setDocument, saveStatus, editor } =
-    useContext(EditorContext);
+  const { document, setDocument, saveStatus } = useContext(EditorContext);
 
   function renderSaveStatus() {
     switch (saveStatus) {
@@ -32,29 +41,24 @@ export default function Header({ toolbarRef }: HeaderProps) {
     }
   }
 
-  function showWordcount() {
-    const selected = editor?.state.selection;
-    if (!selected || selected.from === selected.to) {
-      return getWordcount(editor?.getText() ?? "");
-    }
-    const selectedText = editor
-      ?.getText()
-      .substring(selected.from - 1, selected.to);
-    return getWordcount(selectedText ?? "");
-  }
-
   return (
     <div className="border-b-2 w-full">
       <div className="flex justify-between items-center px-8 h-[var(--header-height)]">
         <div className="flex items-center gap-4">
-          <Link href="/">
-            <Image
-              src="/logo-no-bg.png"
-              alt="Logo"
-              width={LOGO_SIZE}
-              height={LOGO_SIZE}
-            />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href="/">
+                <Image
+                  src="/logo-no-bg.png"
+                  alt="Logo"
+                  width={LOGO_SIZE}
+                  height={LOGO_SIZE}
+                />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>Documents</TooltipContent>
+          </Tooltip>
+          {renderSaveStatus()}
           <Input
             className="w-[256px]"
             value={document.title}
@@ -62,10 +66,17 @@ export default function Header({ toolbarRef }: HeaderProps) {
               setDocument((prev) => ({ ...prev, title: e.target.value }))
             }
           />
-          {renderSaveStatus()}
-          <span className="text-muted-foreground text-sm">
-            {showWordcount()} Words
-          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                <Info size={12} />
+                <span>Info</span>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Tools />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <EditorToggle />
       </div>

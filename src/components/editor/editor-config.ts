@@ -13,7 +13,7 @@ import { FontFamily } from "@tiptap/extension-font-family";
 import { FontSize } from "tiptap-extension-font-size";
 import { Link } from "@/components/tiptap/tiptap-extension/link-extension";
 import { Selection } from "@/components/tiptap/tiptap-extension/selection-extension";
-import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node-extension";
+// import { TrailingNode } from "@/components/tiptap/tiptap-extension/trailing-node-extension";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 // --- Custom Extensions ---
@@ -25,11 +25,24 @@ import {
 } from "./extensions";
 import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
+import { LineHeight } from "./extensions/line-height";
+import { LoaderNode } from "./extensions/loader";
+import {
+  CurrentBlock,
+  IncomingBlock,
+  IndividualChangeNode,
+} from "./extensions/change-node";
+import PaginationExtension, {
+  BodyNode,
+  HeaderFooterNode,
+  PageNode,
+} from "tiptap-extension-pagination";
 
 const editorConfig = (
   content: string,
   changes: RefObject<Change[]>,
-  autocomplete: RefObject<Autocomplete | null>
+  autocomplete: RefObject<Autocomplete | null>,
+  aiLoading: RefObject<boolean>
 ) => ({
   immediatelyRender: false,
   editorProps: {
@@ -53,17 +66,54 @@ const editorConfig = (
     Superscript,
     Subscript,
     Selection,
-    TrailingNode,
+    // TrailingNode,
     Color,
     Link.configure({ openOnClick: false }),
     TextStyle.configure({ mergeNestedSpanStyles: true }),
+
+    // Paging
+
+    PaginationExtension.configure({
+      pageAmendmentOptions: {
+        enableFooter: false,
+        enableHeader: false,
+      },
+      defaultMarginConfig: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+      defaultPageBorders: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      },
+    }),
+    PageNode,
+    HeaderFooterNode,
+    BodyNode,
+
     // Custom
+
+    LineHeight,
+
     Keyhandler.configure({
       shouldPreventKeys: () =>
-        changes.current.length !== 0 || autocomplete.current !== null,
+        changes.current.length !== 0 ||
+        autocomplete.current !== null ||
+        aiLoading.current,
     }),
+
+    IndividualChangeNode,
+    CurrentBlock,
+    IncomingBlock,
+
     ChangeMark,
     IncomingMark,
+
+    LoaderNode,
     AutocompleteMark,
   ],
   content,

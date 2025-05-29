@@ -52,7 +52,7 @@ export const defaultEditorContext: EditorContextType = {
   editor: null,
   editorType: "produce",
   setEditorType: () => {},
-  editType: "grammar",
+  editType: "document",
   setEditType: () => {},
   aiResponseLoading: false,
   setAiResponseLoading: () => {},
@@ -97,7 +97,7 @@ export default function EditorProvider({
   userId,
 }: EditorProviderProps) {
   const [editorType, setEditorType] = useState<EditorType>("produce");
-  const [editType, setEditType] = useState<EditType>("grammar");
+  const [editType, setEditType] = useState<EditType>("document");
   const [autocomplete, setAutocomplete] = useState<Autocomplete | null>(null);
   const autocompleteRef = useRef(autocomplete);
   const [changes, setChanges] = useState<Change[]>([]);
@@ -105,18 +105,18 @@ export default function EditorProvider({
   const [noChanges, setNoChanges] = useState(false);
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [doc, setDocument] = useState<Document>(document);
-  const editor = useEditor(
-    editorConfig(document.content, changesRef, autocompleteRef)
-  );
   const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("success");
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
   const [autocompleteLoading, setAutocompleteLoading] = useState(false);
+  const aiLoadingRef = useRef(aiResponseLoading);
   const [message, setMessage] = useState<Message | null>(null);
+  const editor = useEditor(
+    editorConfig(document.content, changesRef, autocompleteRef, aiLoadingRef)
+  );
   const html = editor?.getHTML();
 
   useEffect(() => {
-    // update Ref
     changesRef.current = changes;
 
     // handle local changes storage
@@ -132,6 +132,12 @@ export default function EditorProvider({
   }, [changes]);
 
   useEffect(() => {
+    autocompleteRef.current = autocomplete;
+    aiLoadingRef.current = aiResponseLoading || autocompleteLoading;
+  }, [aiResponseLoading, autocompleteLoading, autocomplete]);
+
+  // change position of selected change
+  useEffect(() => {
     if (!selectedChange || !editor) return;
     const start = findChangeBlockById(editor, selectedChange.id);
     if (start !== selectedChange.pos) {
@@ -140,6 +146,7 @@ export default function EditorProvider({
     }
   }, [selectedChange, editor]);
 
+  // Save document
   useEffect(() => {
     // use debounce to save document after 2 seconds of no typing
     if (!SHOULD_SAVE) return setSaveStatus("error");
@@ -159,9 +166,10 @@ export default function EditorProvider({
     };
   }, [html, doc.title, document.id, userId]);
 
+  // clear changes on refresh
   useEffect(() => {
-    // clear changes on refresh
     localStorage.setItem("changes", "[]");
+    localStorage.setItem("autocompletes", "[]");
   }, []);
 
   return (

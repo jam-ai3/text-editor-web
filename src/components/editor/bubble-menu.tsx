@@ -19,7 +19,7 @@ import {
   handleReorder,
   handleShorten,
 } from "@/ai-actions/editor";
-import Gemini, { parseGeminiSynonym } from "@/ai-actions/gemini/functions";
+import Gemini from "@/ai-actions/gemini/functions";
 import { capitalized, cn } from "@/lib/utils";
 
 export default function PopupMenu() {
@@ -47,13 +47,12 @@ export default function PopupMenu() {
       const endIndex = Math.min(fullText.length, to + MAX_CONTEXT_LENGTH);
       const contextBefore = fullText.substring(startIndex, from - 1);
       const contextAfter = fullText.substring(to, endIndex);
-      const output = await Gemini.getSynonyms(
+      const synonyms = await Gemini.synonyms(
         selected,
         contextBefore,
         contextAfter
       );
-      const parsed = parseGeminiSynonym(output);
-      setSynonyms(parsed);
+      setSynonyms(synonyms);
     } finally {
       setSynonymsLoading(false);
     }
@@ -88,7 +87,8 @@ export default function PopupMenu() {
       shouldShow={({ from, to }) => from !== to}
     >
       <div
-        className={cn("flex items-center", synonyms.length > 0 && "border-b-2")}
+        // className={cn("flex items-center", synonyms.length > 0 && "border-b-2")}
+        className={cn("flex items-center relative")}
       >
         {context.aiResponseLoading ? (
           <div className="flex items-center gap-2 px-2">
@@ -130,17 +130,23 @@ export default function PopupMenu() {
           </>
         )}
       </div>
-      <div className="flex flex-col max-h-[56px] overflow-y-auto">
+      <div
+        className={cn(
+          "top-0 absolute flex flex-col bg-secondary border-2 rounded-md w-[128px] min-w-fit max-h-[128px] overflow-y-auto",
+          synonyms.length === 0 && "hidden"
+        )}
+        style={{ left: "calc(100% + 8px)" }}
+      >
         {synonyms.map((synonym, i) => (
           <button
             key={i}
             className={cn(
               i !== 0 && "border-t-2",
-              "px-2 text-start hover:bg-border"
+              "px-2 text-start hover:bg-border hover:text-custom-accent"
             )}
             onClick={handleSelectSynonym.bind(null, synonym)}
           >
-            <span>{capitalized(synonym)}</span>
+            <span className="text-sm">{capitalized(synonym)}</span>
           </button>
         ))}
       </div>
@@ -167,7 +173,7 @@ function MenuButton({
     <div className="relative flex-1">
       <button
         disabled={context.aiResponseLoading || disabled}
-        className="flex justify-center items-center disabled:opacity-50 p-2 hover:bg-border w-full disabled:cursor-not-allowed menu-btn"
+        className="flex justify-center items-center disabled:opacity-50 p-2 hover:bg-border w-full hover:text-custom-accent disabled:cursor-not-allowed menu-btn"
         onClick={onClick}
       >
         <Icon size={MENU_BUTTON_SIZE} />

@@ -21,3 +21,7 @@ type Error = {
 export function isError<T>(error: T | Error): error is Error {
   return (error as Error).error !== undefined;
 }
+
+export function isCtrlPressed(event: KeyboardEvent) {
+  return /mac/i.test(navigator.userAgent) ? event.metaKey : event.ctrlKey;
+}

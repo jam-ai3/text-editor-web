@@ -19,7 +19,7 @@ model User {
 
   subscriptions  Subscription[]
   documents      Document[]
-  analytics      Analytics[]
+  // analytics      Analytics[]
   individualCall IndividualCall[]
 }
 
@@ -49,20 +49,23 @@ model Document {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Analytics {
-  id                String   @id @default(uuid())
-  autocompleteCalls Int      @default(0)
-  shortenCalls      Int      @default(0)
-  lengthenCalls     Int      @default(0)
-  grammarCalls      Int      @default(0)
-  reorderCalls      Int      @default(0)
-  customCalls       Int      @default(0)
-  lastUpdated       DateTime @default(now())
+// model Analytics {
+//   id                String   @id @default(uuid())
+//   autocompleteCalls Int      @default(0)
+//   shortenCalls      Int      @default(0)
+//   lengthenCalls     Int      @default(0)
+//   grammarCalls      Int      @default(0)
+//   reorderCalls      Int      @default(0)
+//   paraphraseCalls   Int      @default(0)
+//   grammarFullCalls  Int      @default(0)
+//   synonymCalls      Int      @default(0)
 
-  userId String @unique
+//   lastUpdated       DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+//   userId String @unique
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
 
 model IndividualCall {
   id        String   @id @default(uuid())

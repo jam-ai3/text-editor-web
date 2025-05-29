@@ -1,17 +1,22 @@
-import { EditorContext } from "@/contexts/editor-provider";
-import { useContext, useEffect, useRef } from "react";
-import { Button } from "../../ui/button";
-import { Check, CheckCheck, X } from "lucide-react";
-import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
-import { handleAcceptChange, handleReject } from "@/ai-actions/editor";
-import { Change } from "@/lib/types";
 import {
   acceptAllChanges,
   rejectAllChanges,
 } from "@/ai-actions/document-changes";
+import { handleAcceptChange, handleReject } from "@/ai-actions/editor";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import useDocument from "@/hooks/useDocument";
+import { ACCEPT_COLOR_STRONG, REJECT_COLOR_STRONG } from "@/lib/constants";
+import { Change } from "@/lib/types";
+import { X, CheckCheck, Check } from "lucide-react";
+import { useRef, useEffect } from "react";
 
 export default function ChangesPanel() {
-  const context = useContext(EditorContext);
+  const context = useDocument();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,37 +57,35 @@ export default function ChangesPanel() {
     );
   }
 
-  if (context.selectedChange === null)
-    return (
-      <div className="place-items-center grid h-full">
-        <div className="flex flex-col items-center gap-2 w-4/5">
-          <p className="font-semibold">No Change Selected</p>
-          <p className="text-muted-foreground text-center">
-            Select some portion of your text to see AI features
-          </p>
-        </div>
-      </div>
-    );
-
   return (
     <div className="flex flex-col gap-4 p-4 overflow-y-auto" ref={containerRef}>
       <div className="flex gap-4">
-        <Button
-          className="flex-1"
-          style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
-          onClick={() => acceptAllChanges(context)}
-        >
-          <CheckCheck />
-          <span className="font-semibold">Accept All</span>
-        </Button>
-        <Button
-          className="flex-1"
-          style={{ backgroundColor: REJECT_COLOR_STRONG }}
-          onClick={() => rejectAllChanges(context)}
-        >
-          <X />
-          <span className="font-semibold">Reject All</span>
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="flex-1"
+              style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
+              onClick={() => acceptAllChanges(context)}
+            >
+              <CheckCheck />
+              <span className="font-semibold">Accept All</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{"⇧ + Tab"}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="flex-1"
+              style={{ backgroundColor: REJECT_COLOR_STRONG }}
+              onClick={() => rejectAllChanges(context)}
+            >
+              <X />
+              <span className="font-semibold">Reject All</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{"⇧ + Esc"}</TooltipContent>
+        </Tooltip>
       </div>
       {context.changes.map((change) => (
         <ChangeTab key={change.id} change={change} />
@@ -96,7 +99,7 @@ type ChangeTabProps = {
 };
 
 function ChangeTab({ change }: ChangeTabProps) {
-  const context = useContext(EditorContext);
+  const context = useDocument();
 
   if (context.selectedChange?.id !== change.id)
     return (
@@ -142,26 +145,34 @@ function ChangeTab({ change }: ChangeTabProps) {
         )}
       </div>
       <div className="flex gap-2">
-        <Button
-          onClick={() => handleAcceptChange(undefined, context)}
-          className="flex flex-1 items-center gap-2"
-          style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
-          size="sm"
-        >
-          <Check />
-          <span className="font-semibold">Accept</span>
-          <span className="text-xs">{"(Tab)"}</span>
-        </Button>
-        <Button
-          onClick={() => handleReject(undefined, context)}
-          className="flex flex-1 items-center gap-2"
-          style={{ backgroundColor: REJECT_COLOR_STRONG }}
-          size="sm"
-        >
-          <X />
-          <span className="font-semibold">Reject</span>
-          <span className="text-xs">{"(Esc)"}</span>
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => handleAcceptChange(undefined, context)}
+              className="flex flex-1 items-center gap-2"
+              style={{ backgroundColor: ACCEPT_COLOR_STRONG }}
+              size="sm"
+            >
+              <Check />
+              <span className="font-semibold">Accept</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Tab</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => handleReject(undefined, context)}
+              className="flex flex-1 items-center gap-2"
+              style={{ backgroundColor: REJECT_COLOR_STRONG }}
+              size="sm"
+            >
+              <X />
+              <span className="font-semibold">Reject</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Esc</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );

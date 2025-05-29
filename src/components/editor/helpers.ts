@@ -1,12 +1,17 @@
 import { Editor, JSONContent } from "@tiptap/react";
 import { Mark } from "prosemirror-model";
 import { rejectAutocomplete, rejectChanges } from "./extensions";
-import { Change } from "@/lib/types";
+import { Autocomplete, Change } from "@/lib/types";
 import { EditorContextType } from "@/contexts/editor-provider";
+import { rejectIndividualChange } from "./extensions/change-node";
 
 export function getWordcount(text: string) {
   return text.trim().split(" ").length;
 }
+
+// ============================================================
+// Autocomplete
+// =============================================================
 
 export function removeAutocomplete(editor: Editor) {
   const block = findAutocompleteBlock(editor);
@@ -15,6 +20,30 @@ export function removeAutocomplete(editor: Editor) {
     removeAutocomplete(editor);
   }
 }
+
+type AutocompleteInfo = {
+  pos: number;
+  text: string;
+};
+
+export function findAutocompleteBlock(editor: Editor): AutocompleteInfo | null {
+  let result: AutocompleteInfo | null = null;
+
+  editor.state.doc.descendants((node, pos) => {
+    if (!node.isText) return;
+    node.marks.forEach((mark: Mark) => {
+      if (mark.attrs?.suggestion) {
+        result = { pos, text: node.text ?? "" };
+      }
+    });
+  });
+
+  return result;
+}
+
+// ============================================================
+// Changes
+// =============================================================
 
 export function removeChanges(editor: Editor) {
   const block = findChangeBlock(editor);
@@ -52,7 +81,11 @@ export function findChangeBlockById(editor: Editor, id: string) {
   let pos = -1;
 
   editor.state.doc.descendants((node, p) => {
-    if (!node.isText || pos !== -1) return;
+    if (pos !== -1) return;
+    if (node.attrs.id === id) {
+      pos = p;
+      return;
+    }
     for (const mark of node.marks) {
       if (mark.attrs?.id === id) {
         pos = p;
@@ -64,24 +97,40 @@ export function findChangeBlockById(editor: Editor, id: string) {
   return pos;
 }
 
-type AutocompleteInfo = {
-  pos: number;
-  text: string;
+// ============================================================
+// Individual Change Block
+// =============================================================
+
+export function removeIndividualChanges(editor: Editor) {
+  const block = findIndividualChangeBlock(editor);
+  if (block) {
+    rejectIndividualChange(editor, block.from, block.current, block.incoming);
+    removeIndividualChanges(editor);
+  }
+}
+
+type IndividualChangeInfo = {
+  from: number;
+  current: string;
+  incoming: string;
 };
 
-export function findAutocompleteBlock(editor: Editor): AutocompleteInfo | null {
-  let result: AutocompleteInfo | null = null;
+export function findIndividualChangeBlock(
+  editor: Editor
+): IndividualChangeInfo | null {
+  let change: IndividualChangeInfo | null = null;
 
   editor.state.doc.descendants((node, pos) => {
-    if (!node.isText) return;
-    node.marks.forEach((mark: Mark) => {
-      if (mark.attrs?.suggestion) {
-        result = { pos, text: node.text ?? "" };
-      }
-    });
+    if (node.type.name === "changeNode") {
+      change = {
+        from: pos,
+        current: node.attrs.current,
+        incoming: node.attrs.incoming,
+      };
+    }
   });
 
-  return result;
+  return change;
 }
 
 export function setActiveBlock(editor: Editor, selectedChange: Change) {
@@ -143,13 +192,20 @@ export function getBlocks(node: JSONContent) {
 
 export function updateChanges(context: EditorContextType) {
   const ids: string[] = [];
+  let autocomplete: Autocomplete | null = null;
 
   if (!context.editor) return;
-  context.editor.state.doc.descendants((node) => {
+  context.editor.state.doc.descendants((node, pos) => {
+    if (node.type.name === "changeNode") {
+      ids.push(node.attrs.id);
+      return;
+    }
     if (!node.isText) return;
     node.marks.forEach((mark: Mark) => {
       if (mark.attrs?.changeBlock || mark.attrs?.incomingBlock) {
         ids.push(mark.attrs.id);
+      } else if (mark.attrs?.autocomplete) {
+        autocomplete = { pos, text: node.text ?? "" };
       }
     });
   });
@@ -157,11 +213,15 @@ export function updateChanges(context: EditorContextType) {
   const existingChanges: Change[] = JSON.parse(
     localStorage.getItem("changes") || "[]"
   );
-
   const newChanges = existingChanges.filter((c) => ids.includes(c.id));
-
   context.setChanges(newChanges);
-  if (context.selectedChange === null && newChanges.length > 0) {
+  if (newChanges.length === 0) {
+    context.setSelectedChange(null);
+  } else if (context.selectedChange === null) {
     context.setSelectedChange(newChanges[0]);
+  }
+
+  if (autocomplete) {
+    context.setAutocomplete(autocomplete);
   }
 }
