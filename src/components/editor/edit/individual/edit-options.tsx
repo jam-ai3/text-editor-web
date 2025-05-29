@@ -1,7 +1,6 @@
 import {
   handleFluidity,
   handleGrammar,
-  handleLengthen,
   handleParaphrase,
   handleResize,
 } from "@/ai-actions/editor";
@@ -20,7 +19,7 @@ import {
 import useDocument from "@/hooks/useDocument";
 import { MAX_CUSTOM_STYLE_LENGTH, MAX_RESIZE_LENGTH } from "@/lib/constants";
 import { ParaphraseLanguageType } from "@/lib/types";
-import { FileCheck, MoveHorizontal, Plus, Replace, Waves } from "lucide-react";
+import { FileCheck, MoveHorizontal, Replace, Waves } from "lucide-react";
 import { ChangeEvent, useRef, useState } from "react";
 
 export default function EditOptions() {
