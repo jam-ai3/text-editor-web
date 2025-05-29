@@ -25,6 +25,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import Toast from "./toast";
 import AIPanel from "./edit/ai-panel";
+import { Stack } from "@mui/material";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -144,11 +145,9 @@ export function SimpleEditor() {
       <div className="relative flex bg-secondary content-wrapper">
         <PopupMenu />
         <div className="flex-1 overflow-y-scroll">
-          <EditorContent
-            editor={editor}
-            role="presentation"
-            className="bg-background shadow-sm mx-auto my-8 border-1 w-full max-w-[816px] simple-editor-content"
-          />
+          <Stack direction="column" flexGrow={1} paddingX={2} overflow="auto">
+            <EditorContent editor={editor} role="presentation" />
+          </Stack>
         </div>
         <AnimatePresence>
           {context.editorType === "edit" && (

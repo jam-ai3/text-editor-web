@@ -32,6 +32,11 @@ import {
   IncomingBlock,
   IndividualChangeNode,
 } from "./extensions/change-node";
+import PaginationExtension, {
+  BodyNode,
+  HeaderFooterNode,
+  PageNode,
+} from "tiptap-extension-pagination";
 
 const editorConfig = (
   content: string,
@@ -61,10 +66,34 @@ const editorConfig = (
     Superscript,
     Subscript,
     Selection,
-    TrailingNode,
+    // TrailingNode,
     Color,
     Link.configure({ openOnClick: false }),
     TextStyle.configure({ mergeNestedSpanStyles: true }),
+
+    // Paging
+
+    PaginationExtension.configure({
+      pageAmendmentOptions: {
+        enableFooter: false,
+        enableHeader: false,
+      },
+      defaultMarginConfig: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+      defaultPageBorders: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      },
+    }),
+    PageNode,
+    HeaderFooterNode,
+    BodyNode,
 
     // Custom
 

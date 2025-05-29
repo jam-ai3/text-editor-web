@@ -4,7 +4,6 @@ export * from "./keyhandler";
 export * from "./change-block";
 export * from "./incoming-block";
 export * from "./autocomplete-mark";
-export * from "./pagination";
 
 // ------------------- PLAIN TEXT -------------------
 
