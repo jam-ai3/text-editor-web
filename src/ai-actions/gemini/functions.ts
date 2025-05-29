@@ -4,14 +4,14 @@ import { promptFlash, promptFlashLite } from "./gemini";
 import GeminiPrompts from "./prompts";
 
 const Gemini = {
-  getAutocomplete: async (content: string) => {
+  autocomplete: async (content: string) => {
     const { prompt, parser } = GeminiPrompts.autocomplete(content);
     updateAnalytics("autocomplete");
     const result = await promptFlashLite(prompt);
     return parser(result);
   },
 
-  getShortened: async (
+  shorten: async (
     contextBefore: string,
     contextAfter: string,
     selected: string
@@ -26,7 +26,7 @@ const Gemini = {
     return parser(result);
   },
 
-  getLengthened: async (
+  lengthen: async (
     contextBefore: string,
     contextAfter: string,
     selected: string
@@ -41,35 +41,21 @@ const Gemini = {
     return parser(result);
   },
 
-  getGrammar: async (selected: string) => {
+  grammar: async (selected: string) => {
     const { prompt, parser } = GeminiPrompts.grammar(selected);
     updateAnalytics("grammar");
     const result = await promptFlash(prompt);
     return parser(result);
   },
 
-  checkFullPaperGrammar: async (text: string) => {
-    const { prompt, parser } = GeminiPrompts.checkFullPaperGrammar(text);
+  fullGrammar: async (text: string) => {
+    const { prompt, parser } = GeminiPrompts.fullGrammar(text);
     updateAnalytics("grammar-full");
     const result = await promptFlash(prompt);
     return parser(result);
   },
 
-  reorderParagraph: async (selected: string) => {
-    const { prompt, parser } = GeminiPrompts.reorderParagraph(selected);
-    updateAnalytics("reorder");
-    const result = await promptFlash(prompt);
-    return parser(result);
-  },
-
-  reorderSentences: async (selected: string) => {
-    const { prompt, parser } = GeminiPrompts.reorderSentences(selected);
-    updateAnalytics("reorder");
-    const result = await promptFlash(prompt);
-    return parser(result);
-  },
-
-  getSynonyms: async (
+  synonyms: async (
     word: string,
     contextBefore: string,
     contextAfter: string
@@ -132,6 +118,39 @@ const Gemini = {
       style
     );
     updateAnalytics("paraphrase");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  resize: async (
+    before: string,
+    after: string,
+    selected: string,
+    minLength: number,
+    maxLength: number
+  ) => {
+    const { prompt, parser } = GeminiPrompts.resize(
+      before,
+      after,
+      selected,
+      minLength,
+      maxLength
+    );
+    updateAnalytics("resize");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  fluidity: async (before: string, after: string, selected: string) => {
+    const { prompt, parser } = GeminiPrompts.fluidity(before, after, selected);
+    updateAnalytics("fluidity");
+    const result = await promptFlash(prompt);
+    return parser(result);
+  },
+
+  reorderSentences: async (selected: string) => {
+    const { prompt, parser } = GeminiPrompts.reorderSentences(selected);
+    updateAnalytics("reorder");
     const result = await promptFlash(prompt);
     return parser(result);
   },

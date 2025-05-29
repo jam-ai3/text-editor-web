@@ -13,6 +13,9 @@ export const ACCEPT_COLOR_STRONG = "#0b0e";
 export const AUTOCOMPLETE_COLOR = "#777";
 export const ACCENT_COLOR = "#049904";
 
+export const MAX_CUSTOM_STYLE_LENGTH = 20;
+export const MAX_RESIZE_LENGTH = 500;
+
 export const SHOULD_SAVE = process.env.NODE_ENV !== "development";
 // export const SHOULD_SAVE = true;
 

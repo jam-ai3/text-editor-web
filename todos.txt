@@ -1,0 +1,5 @@
+update analytics to include new options
+- resize
+- fluidity
+
+add context to all Gemini calls

@@ -27,12 +27,17 @@ import { Autocomplete, Change } from "@/lib/types";
 import { RefObject } from "react";
 import { LineHeight } from "./extensions/line-height";
 import { LoaderNode } from "./extensions/loader";
-import { IndividualChangeNode } from "./extensions/change-node";
+import {
+  CurrentBlock,
+  IncomingBlock,
+  IndividualChangeNode,
+} from "./extensions/change-node";
 
 const editorConfig = (
   content: string,
   changes: RefObject<Change[]>,
-  autocomplete: RefObject<Autocomplete | null>
+  autocomplete: RefObject<Autocomplete | null>,
+  aiLoading: RefObject<boolean>
 ) => ({
   immediatelyRender: false,
   editorProps: {
@@ -60,16 +65,26 @@ const editorConfig = (
     Color,
     Link.configure({ openOnClick: false }),
     TextStyle.configure({ mergeNestedSpanStyles: true }),
+
     // Custom
+
     LineHeight,
-    LoaderNode,
+
     Keyhandler.configure({
       shouldPreventKeys: () =>
-        changes.current.length !== 0 || autocomplete.current !== null,
+        changes.current.length !== 0 ||
+        autocomplete.current !== null ||
+        aiLoading.current,
     }),
+
     IndividualChangeNode,
+    CurrentBlock,
+    IncomingBlock,
+
     ChangeMark,
     IncomingMark,
+
+    LoaderNode,
     AutocompleteMark,
   ],
   content,

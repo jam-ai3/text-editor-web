@@ -47,7 +47,7 @@ export default function PopupMenu() {
       const endIndex = Math.min(fullText.length, to + MAX_CONTEXT_LENGTH);
       const contextBefore = fullText.substring(startIndex, from - 1);
       const contextAfter = fullText.substring(to, endIndex);
-      const synonyms = await Gemini.getSynonyms(
+      const synonyms = await Gemini.synonyms(
         selected,
         contextBefore,
         contextAfter

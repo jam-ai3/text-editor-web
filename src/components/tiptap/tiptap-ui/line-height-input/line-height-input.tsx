@@ -55,30 +55,6 @@ export default function LineHeightInput() {
     }
   }, [editor?.state.selection, editor]);
 
-  // useEffect(() => {
-  //   if (!editor) return;
-  //   const { from, to } = editor.state.selection;
-  //   let height: string | undefined = undefined;
-  //   let differentHeights = false;
-
-  //   editor.state.doc.nodesBetween(from - 1, to, (node) => {
-  //     if (!node.marks) return;
-  //     const mark = node.marks.find((mark) => mark.attrs.lineHeight);
-  //     if (node.content.content.length > 0) return;
-  //     if (!mark) {
-  //       height = DEFAULT_LINE_HEIGHT;
-  //       return;
-  //     }
-  //     const lineHeight = mark.attrs.lineHeight ?? DEFAULT_LINE_HEIGHT;
-  //     if (height === undefined) height = lineHeight;
-  //     else if (height !== lineHeight) differentHeights = true;
-  //   });
-
-  //   if (differentHeights) return;
-
-  //   setLineHeight(height ?? DEFAULT_LINE_HEIGHT);
-  // }, [editor?.state.selection, editor]);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -87,8 +63,8 @@ export default function LineHeightInput() {
           data-style="ghost"
           role="button"
           tabIndex={-1}
-          aria-label="Font family"
-          tooltip="Font Family"
+          aria-label="Line height"
+          tooltip="Line Height"
         >
           <span className="w-[4ch] text-sm text-start">{lineHeight}</span>
           <ChevronDownIcon className="tiptap-button-dropdown-small" />

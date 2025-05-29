@@ -105,13 +105,18 @@ export function insertChangesAt(
       .deleteRange({ from: pos, to: pos + current.length })
       .insertContentAt(pos, {
         type: "changeNode",
-        attrs: {
-          id,
-          current,
-          incoming,
-        },
+        attrs: { id, current, incoming },
+        content: [
+          {
+            type: "currentBlock",
+            content: [{ type: "text", text: current }],
+          },
+          {
+            type: "incomingBlock",
+            content: [{ type: "text", text: incoming }],
+          },
+        ],
       })
-      .setTextSelection(pos)
       .run();
   } else {
     editor

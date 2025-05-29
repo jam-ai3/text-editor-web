@@ -15,11 +15,16 @@ import "@/components/editor/simple-editor.scss";
 import { processKeydown } from "@/ai-actions/editor";
 import Header from "./header/header";
 import PopupMenu from "./bubble-menu";
-import { removeAutocomplete, removeChanges, setActiveBlock } from "./helpers";
-import EditPanel from "./edit/edit-panel";
+import {
+  removeAutocomplete,
+  removeChanges,
+  removeIndividualChanges,
+  setActiveBlock,
+} from "./helpers";
 // framer motion
 import { AnimatePresence, motion } from "framer-motion";
 import Toast from "./toast";
+import AIPanel from "./edit/ai-panel";
 
 export function SimpleEditor() {
   const context = React.useContext(CustomEditorContext);
@@ -35,6 +40,7 @@ export function SimpleEditor() {
   });
   const toolbarRef = React.useRef<HTMLDivElement>(null);
 
+  // TipTap UI
   React.useEffect(() => {
     const updateRect = () => {
       setRect(document.body.getBoundingClientRect());
@@ -53,6 +59,7 @@ export function SimpleEditor() {
     };
   }, []);
 
+  // TipTap UI
   React.useEffect(() => {
     const checkCursorVisibility = () => {
       if (!editor || !toolbarRef.current) return;
@@ -86,6 +93,7 @@ export function SimpleEditor() {
     checkCursorVisibility();
   }, [editor, rect.height, windowSize.height]);
 
+  // click handler (select block)
   React.useEffect(() => {
     function handleKeydown(event: KeyboardEvent) {
       processKeydown(event, context);
@@ -115,15 +123,19 @@ export function SimpleEditor() {
     if (!editor) return;
     removeAutocomplete(editor);
     removeChanges(editor);
+    removeIndividualChanges(editor);
   }, [editor]);
 
+  // open edit panel on changes
   React.useEffect(() => {
     if (!context.editor || (!context.selectedChange && !context.noChanges))
       return;
     if (context.selectedChange)
       setActiveBlock(context.editor, context.selectedChange);
     context.setEditorType("edit");
-    context.setEditType("document");
+    context.setEditType(
+      context.selectedChange?.isIndividual ? "individual" : "document"
+    );
   }, [context.selectedChange, context.noChanges]);
 
   return (
@@ -148,7 +160,7 @@ export function SimpleEditor() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="h-full"
             >
-              <EditPanel />
+              <AIPanel />
             </motion.div>
           )}
         </AnimatePresence>

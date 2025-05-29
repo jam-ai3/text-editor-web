@@ -6,7 +6,7 @@ import useDocument from "@/hooks/useDocument";
 
 export const EDIT_PANEL_WIDTH = 400;
 
-export default function EditPanel() {
+export default function AIPanel() {
   const { editType } = useDocument();
 
   function renderPanel() {

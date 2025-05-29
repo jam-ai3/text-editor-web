@@ -11,11 +11,12 @@ import {
 } from "@/components/editor/extensions";
 import { v4 } from "uuid";
 import { findChangeBlockById } from "@/components/editor/helpers";
+import { zip } from "@/lib/utils";
 
 export async function checkFullPaperGrammar(context: EditorContextType) {
   if (!context.editor) return;
   const text = context.editor.getText();
-  const results = await Gemini.checkFullPaperGrammar(text);
+  const results = await Gemini.fullGrammar(text);
   const diff = buildDiff(text, results).filter(
     (block) =>
       (block.type === "normal" && block.text.length !== 0) ||
@@ -36,10 +37,15 @@ export async function paraphraseFullPaper(
   const paragraphs = text.split("\n");
   const results = await Promise.all(
     paragraphs.map((p) =>
-      p.trim().length > 0 ? Gemini.paraphraseParagraph(p, style, customTone) : p
+      p.trim().length > 0
+        ? Gemini.paraphraseParagraph(p, style, customTone).then(
+            (r) => r.paraphrased
+          )
+        : p
     )
   );
-  console.log(results);
+
+  rebuildDocument(context, zip(paragraphs, results));
 }
 
 type DiffBlock =
@@ -224,4 +230,49 @@ export function rejectAllChanges(context: EditorContextType) {
 
   context.setChanges([]);
   context.setSelectedChange(null);
+}
+
+type Paragraph = [string, string];
+
+export function rebuildDocument(
+  context: EditorContextType,
+  paragraphs: Paragraph[]
+) {
+  if (!context.editor) return;
+
+  const changes: Change[] = [];
+  let pos = 1;
+  let chain = context.editor.chain().focus();
+
+  for (const [current, incoming] of paragraphs) {
+    if (current === incoming) {
+      pos += current.length + 1;
+      continue;
+    }
+
+    const id = v4();
+    chain = insertChangesChain(chain, current, incoming, id, pos);
+    changes.push({
+      id,
+      current,
+      incoming,
+      pos,
+      reasoning: "",
+      isIndividual: false,
+    });
+    pos += current.length + 1;
+  }
+
+  chain.run();
+
+  context.setNoChanges(changes.length === 0);
+  context.setChanges(changes);
+  if (changes.length > 0) {
+    context.setSelectedChange(changes[0]);
+    context.editor
+      .chain()
+      .focus()
+      .setTextSelection({ from: changes[0].pos, to: changes[0].pos })
+      .run();
+  }
 }

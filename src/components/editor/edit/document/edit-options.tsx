@@ -2,6 +2,7 @@ import {
   checkFullPaperGrammar,
   paraphraseFullPaper,
 } from "@/ai-actions/document-changes";
+import HorizontalSeparator from "@/components/horizontal-separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,24 +15,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useDocument from "@/hooks/useDocument";
+import { MAX_CUSTOM_STYLE_LENGTH } from "@/lib/constants";
 import { ParaphraseLanguageType } from "@/lib/types";
 import { FileCheck, Loader2, Replace } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 
-const MAX_CUSTOM_STYLE_LENGTH = 20;
-
 export default function EditOptions() {
   return (
-    <div className="flex flex-col items-center gap-8 py-8 h-full">
+    <div className="flex flex-col items-center gap-8 py-8">
       <GrammarOption />
-      <OptionSeparator />
+      <HorizontalSeparator />
       <ParaphraseOption />
     </div>
   );
-}
-
-function OptionSeparator() {
-  return <div className="bg-border-secondary w-full h-px" />;
 }
 
 function GrammarOption() {
@@ -45,7 +41,7 @@ function GrammarOption() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2 max-w-4/5">
+    <div className="flex flex-col items-center gap-4 w-4/5">
       <p className="font-semibold">Grammar + Spelling</p>
       <p className="text-muted-foreground text-sm text-center">
         Scan your document for errors and potential enhancements in grammar
@@ -54,6 +50,7 @@ function GrammarOption() {
         onClick={handleCheckGrammar}
         className="flex items-center gap-2 w-full"
         variant="accent"
+        disabled={isLoading}
       >
         <span>{isLoading ? "Checking..." : "Check"}</span>
         {isLoading ? (
@@ -90,12 +87,10 @@ function ParaphraseOption() {
 
   return (
     <div className="space-y-4 w-4/5">
-      <div className="space-y-2">
-        <p className="font-semibold text-center">Paraphrase</p>
-        <p className="text-muted-foreground text-sm text-center">
-          Change the tone and style of your document
-        </p>
-      </div>
+      <p className="font-semibold text-center">Paraphrase</p>
+      <p className="text-muted-foreground text-sm text-center">
+        Change the tone and style of your document
+      </p>
       <div className="flex justify-between">
         <Label className="font-semibold">Language Style</Label>
         <Select

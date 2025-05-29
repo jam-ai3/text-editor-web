@@ -19,6 +19,10 @@ import { MAX_CONTEXT_LENGTH } from "@/lib/constants";
 import { ParaphraseLanguageType } from "@/lib/types";
 import { isCtrlPressed } from "@/lib/utils";
 import { acceptAllChanges, rejectAllChanges } from "./document-changes";
+import {
+  acceptIndividualChange,
+  rejectIndividualChange,
+} from "@/components/editor/extensions/change-node";
 
 export async function processKeydown(
   event: KeyboardEvent,
@@ -74,7 +78,9 @@ export function handleAcceptChange(
   if (!context.editor || context.selectedChange === null) return;
   event?.preventDefault();
   const { current, incoming, pos, id } = context.selectedChange;
-  if (current.length === 0) {
+  if (context.selectedChange.isIndividual) {
+    acceptIndividualChange(context.editor, pos, current, incoming);
+  } else if (current.length === 0) {
     acceptIncoming(context.editor, pos, incoming);
   } else {
     acceptChanges(context.editor, pos, current, incoming);
@@ -134,7 +140,9 @@ export function handleRejectChange(
   if (!context.editor || context.selectedChange === null) return;
   event?.preventDefault();
   const { current, incoming, pos, id } = context.selectedChange;
-  if (current.length === 0) {
+  if (context.selectedChange.isIndividual) {
+    rejectIndividualChange(context.editor, pos, current, incoming);
+  } else if (current.length === 0) {
     rejectIncoming(context.editor, pos, incoming);
   } else {
     rejectChanges(context.editor, pos, current);
@@ -203,7 +211,7 @@ export async function handleAutocomplete(context: EditorContextType) {
         .split(" ")
         .slice(0, MAX_CONTEXT_LENGTH)
         .join(" ");
-    const { improved } = await Gemini.getAutocomplete(content);
+    const { improved } = await Gemini.autocomplete(content);
     insertAutocomplete(context.editor, improved, position);
     context.setAutocomplete({ text: improved, pos: position });
   } catch (error) {
@@ -218,7 +226,7 @@ export async function handleShorten(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, before, after, from } = getContext(context.editor);
-    const { improved } = await Gemini.getShortened(before, after, selected);
+    const { improved } = await Gemini.shorten(before, after, selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -232,7 +240,7 @@ export async function handleLengthen(context: EditorContextType) {
   try {
     context.setAiResponseLoading(true);
     const { selected, before, after, from } = getContext(context.editor);
-    const { improved } = await Gemini.getLengthened(before, after, selected);
+    const { improved } = await Gemini.lengthen(before, after, selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -241,12 +249,13 @@ export async function handleLengthen(context: EditorContextType) {
   }
 }
 
+// TODO: add context
 export async function handleGrammar(context: EditorContextType) {
   if (!context.editor) return;
   try {
     context.setAiResponseLoading(true);
     const { selected, from } = getContext(context.editor);
-    const { improved } = await Gemini.getGrammar(selected);
+    const { improved } = await Gemini.grammar(selected);
     showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
@@ -284,6 +293,44 @@ export async function handleParaphrase(
       customTone
     );
     showDiff(context, selected, paraphrased, from);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
+}
+
+export async function handleResize(
+  context: EditorContextType,
+  minLength: number,
+  maxLength: number
+) {
+  if (!context.editor) return;
+  try {
+    context.setAiResponseLoading(true);
+    const { selected, before, after, from } = getContext(context.editor);
+    const { improved } = await Gemini.resize(
+      before,
+      after,
+      selected,
+      minLength,
+      maxLength
+    );
+    showDiff(context, selected, improved, from);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    context.setAiResponseLoading(false);
+  }
+}
+
+export async function handleFluidity(context: EditorContextType) {
+  if (!context.editor) return;
+  try {
+    context.setAiResponseLoading(true);
+    const { selected, from, before, after } = getContext(context.editor);
+    const { improved } = await Gemini.fluidity(selected, before, after);
+    showDiff(context, selected, improved, from);
   } catch (error) {
     console.error(error);
   } finally {
